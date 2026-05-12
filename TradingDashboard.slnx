@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TradingDashboard.API/TradingDashboard.API.csproj" />
+    <Project Path="src/TradingDashboard.Application/TradingDashboard.Application.csproj" />
+    <Project Path="src/TradingDashboard.Domain/TradingDashboard.Domain.csproj" />
+    <Project Path="src/TradingDashboard.Infrastructure/TradingDashboard.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TradingDashboard.IntegrationTests/TradingDashboard.IntegrationTests.csproj" />
+    <Project Path="tests/TradingDashboard.UnitTests/TradingDashboard.UnitTests.csproj" />
+  </Folder>
+</Solution>

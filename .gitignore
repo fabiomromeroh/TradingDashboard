@@ -1,0 +1,101 @@
+# ============================================
+# .NET / Visual Studio
+# ============================================
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+
+# Visual Studio user-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Local user-specific files
+appsettings.local.json
+appsettings.*.local.json
+launchSettings.json
+
+# ============================================
+# IDE-specific files
+# ============================================
+# Rider
+.idea/
+*.sln.iml
+*.sln.DotSettings.user
+
+# ============================================
+# NuGet
+# ============================================
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+.nuget/
+
+
+# ============================================
+# Test Results
+# ============================================
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# ============================================
+# Secrets & Local Configuration
+# ============================================
+# Environment variables (contains secrets)
+.env
+.env.local
+.env.*.local
+
+# SQL Server / Database files
+*.mdf
+*.ldf
+*.ndf
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ============================================
+# Temporary Files
+# ===========================================
+tmp/
+temp/
+*.tmp
+*.temp
+
+# ============================================
+# Build Artifacts
+# ============================================
+dist/
+build/
+*.dll
+*.exe
+*.so
+*.dylib

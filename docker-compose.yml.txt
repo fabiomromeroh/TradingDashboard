@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: tradingdashboard-sql
+    environment:
+      SA_PASSWORD: "Docker@12345!"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "Docker@12345!"   # ← add this (some images need both)
+      MSSQL_ENABLE_HADR: "0"
+    ports:
+      - "1433:1433"                     # connect via SSMS/Azure Data Studio on localhost,1433
+    volumes:
+      - sqldata:/var/opt/mssql          # data persists between restarts
+
+volumes:
+  sqldata:
