@@ -58,8 +58,8 @@ app.UseExceptionHandler();
 
 app.UseCors("AllowFrontend");
 
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
@@ -68,7 +68,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 
-}
+//}
 
 
 app.UseHttpsRedirection();
