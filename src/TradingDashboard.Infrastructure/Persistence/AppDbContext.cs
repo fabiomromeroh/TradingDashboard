@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 using System.Reflection;
 using TradingDashboard.Domain.Entities;
 
@@ -10,6 +9,11 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Trade> Trades => Set<Trade>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<Broker> Brokers => Set<Broker>();
+    public DbSet<ImportSession> ImportSessions => Set<ImportSession>();
+    public DbSet<Execution> Executions => Set<Execution>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

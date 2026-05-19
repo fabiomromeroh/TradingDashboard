@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Authentication;
 using TradingDashboard.Application.Common.Exceptions;
 
 namespace TradingDashboard.API.Middleware;
@@ -20,15 +21,15 @@ public class ExceptionHandlingMiddleware : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        logger.LogError(exception, "An unhandled exception occurred.");
 
         var statusCode = GetStatusCode(exception);
 
-        object problemDetails;
+        ProblemDetails problemDetails;
 
         // Special handling for ValidationException to include field-level errors
         if (exception is ValidationException validationException)
         {
+
             problemDetails = new ProblemDetails
             {
                 Status = statusCode,
@@ -40,18 +41,40 @@ public class ExceptionHandlingMiddleware : IExceptionHandler
                     { "errors", validationException.Errors }
                 }
             };
+
+
+            logger.LogWarning("Validation failed with errors: {@Errors}", validationException.Errors);
         }
         else
         {
+            var title = "";
+
+            if (statusCode == 404)
+            {
+                title = "Not Found";
+            }
+            else if(statusCode == 401)
+            {
+                title = "Unauthtorized";
+            }
+            else 
+            {
+                    title = "An unexpected error occurred.";
+                    logger.LogError(exception, "An unhandled exception occurred.");
+            }
+
+            
+
             // Detailed error in development, generic in production
             var detail = environment.IsDevelopment()
                 ? exception.Message
                 : "An internal error occurred. Please contact support.";
 
+
             problemDetails = new ProblemDetails
             {
                 Status = statusCode,
-                Title = "An unexpected error occurred.",
+                Title = title,
                 Detail = detail,
                 Instance = httpcontext.Request.Path
             };
@@ -66,10 +89,10 @@ public class ExceptionHandlingMiddleware : IExceptionHandler
     {
         ValidationException => StatusCodes.Status400BadRequest,
         NotFoundException => StatusCodes.Status404NotFound,
+        AuthenticationException => StatusCodes.Status401Unauthorized,
         ArgumentNullException => StatusCodes.Status400BadRequest,
         ArgumentException => StatusCodes.Status400BadRequest,
         KeyNotFoundException => StatusCodes.Status404NotFound,
-        InvalidOperationException => StatusCodes.Status400BadRequest,
         _ => StatusCodes.Status500InternalServerError
     };
 }

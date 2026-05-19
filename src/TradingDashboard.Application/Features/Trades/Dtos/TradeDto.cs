@@ -11,6 +11,6 @@ namespace TradingDashboard.Application.Features.Trades.Dtos
             decimal Quantity,
             string Direction,
             string Status,
-            DateTime OpenedAt
+            DateTimeOffset OpenedAt
             );
 }

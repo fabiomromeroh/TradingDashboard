@@ -10,18 +10,15 @@ public class CreateTradeCommandValidator : AbstractValidator<CreateTradeCommand>
         RuleFor(x => x.Symbol)
             .NotEmpty()
             .WithMessage("Symbol is required")
-            .MaximumLength(5)
-            .WithMessage("Symbol cannot exceed 5 characters");
+            .Matches(@"^[A-Z0-9]+$").WithMessage("Symbol must be alphanumeric uppercase")
+            .MaximumLength(20)
+            .WithMessage("Symbol cannot exceed 20 characters");
 
         RuleFor(x => x.Quantity)
-            .NotEmpty()
-            .WithMessage("Quantity is required")
             .GreaterThan(0)
             .WithMessage("Quantity must be greater than 0");
 
         RuleFor(x => x.EntryPrice)
-            .NotEmpty()
-            .WithMessage("Entry Price is required")
             .GreaterThan(0)
             .WithMessage("Entry Price must be greater than 0");
 

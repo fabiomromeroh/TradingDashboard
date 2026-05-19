@@ -1,14 +1,15 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
+using TradingDashboard.Application.Features.Trades.Commands.DeleteTrade;
+using TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
 using TradingDashboard.Application.Features.Trades.Queries.GetTradeById;
-using TradingDashboard.Application.Features.Trades.Queries.GetTradeHistory;
 
 namespace TradingDashboard.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TradesController: ControllerBase
+public class TradesController : ControllerBase
 {
     private readonly IMediator mediator;
 
@@ -60,7 +61,23 @@ public class TradesController: ControllerBase
     {
         var result = await mediator.Send(createTradeCommand, cancellationToken);
 
-        return Ok(result);
+        return CreatedAtAction(nameof(CreateTradeCommand), result);
+    }
+
+    /// <summary>
+    /// Deletes the trade with the specified identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the trade to delete.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>A response indicating the result of the delete operation. Returns a 204 No Content status if the deletion is
+    /// successful.</returns>
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+
+        await mediator.Send(new DeleteTradeCommand() { Id= id}, cancellationToken);
+
+        return NoContent();
     }
 
   

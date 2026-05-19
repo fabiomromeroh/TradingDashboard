@@ -18,8 +18,11 @@ public class TradeRepository : ITradeRepository
 
         await context.Trades.AddAsync(trade, cancellationToken);
 
-        await context.SaveChangesAsync(cancellationToken);
+    }
 
+    public async Task DeleteTradeAsync(Trade trade, CancellationToken cancellationToken)
+    {
+        context.Trades.Remove(trade);
     }
 
     public async Task<Trade?> GetTradeAsync(Guid id, CancellationToken cancellationToken)

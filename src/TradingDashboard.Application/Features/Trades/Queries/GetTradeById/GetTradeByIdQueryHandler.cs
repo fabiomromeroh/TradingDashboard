@@ -27,16 +27,6 @@ public class GetTradeByIdQueryHandler: IRequestHandler<GetTradeByIdQuery, TradeD
 
         var tradeDto = mapper.Map<TradeDto>(trade);
 
-        //var map = new TradeDto(
-        //    trade.Id,
-        //    trade.Symbol,
-        //    trade.EntryPrice,
-        //    trade.Quantity,
-        //    trade.Direction.ToString(),
-        //    trade.Status.ToString(),
-        //    trade.OpenedAt
-        //);
-
         return tradeDto;
     }
 

@@ -1,0 +1,121 @@
+using AutoMapper;
+using TradingDashboard.Application.Features.Trades.Queries.GetTradeById;
+using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Common.Exceptions;
+using TradingDashboard.Application.Features.Trades.Dtos;
+using TradingDashboard.Domain.Entities;
+using TradingDashboard.Domain.Enums;
+
+namespace TradingDashboard.UnitTests.Application.Trades;
+
+public class GetTradeByIdQueryHandlerTests
+{
+    private readonly Mock<ITradeRepository> _mockTradeRepository;
+    private readonly Mock<IMapper> _mockMapper;
+    private readonly GetTradeByIdQueryHandler _handler;
+
+    public GetTradeByIdQueryHandlerTests()
+    {
+        _mockTradeRepository = new Mock<ITradeRepository>();
+        _mockMapper = new Mock<IMapper>();
+        _handler = new GetTradeByIdQueryHandler(_mockTradeRepository.Object, _mockMapper.Object);
+    }
+
+    [Fact]
+    public async Task Handle_WithValidId_ShouldReturnTradeDto()
+    {
+        // Arrange
+        var tradeId = Guid.NewGuid();
+        var trade = Trade.Create("EURUSD", 1.0850m, 1.0m, TradeDirection.Long);
+        var expectedDto = new TradeDto(
+            tradeId,
+            "EURUSD",
+            1.0850m,
+            1.0m,
+            "Long",
+            "Open",
+            DateTime.UtcNow
+        );
+
+        var query = new GetTradeByIdQuery(tradeId);
+
+        _mockTradeRepository
+            .Setup(x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(trade);
+
+        _mockMapper
+            .Setup(x => x.Map<TradeDto>(trade))
+            .Returns(expectedDto);
+
+        // Act
+        var result = await _handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedDto);
+        _mockTradeRepository.Verify(
+            x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()),
+            Times.Once);
+        _mockMapper.Verify(
+            x => x.Map<TradeDto>(trade),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_WithNonExistentId_ShouldThrowNotFoundException()
+    {
+        // Arrange
+        var tradeId = Guid.NewGuid();
+        var query = new GetTradeByIdQuery(tradeId);
+
+        _mockTradeRepository
+            .Setup(x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Trade?)null);
+
+        // Act & Assert
+        var act = () => _handler.Handle(query, CancellationToken.None);
+
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage($"*'{nameof(Trade)}'*");
+
+        _mockMapper.Verify(
+            x => x.Map<TradeDto>(It.IsAny<Trade>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_WithValidId_ShouldCallRepositoryWithCorrectParameters()
+    {
+        // Arrange
+        var tradeId = Guid.NewGuid();
+        var trade = Trade.Create("GBPUSD", 1.2650m, 0.5m, TradeDirection.Short);
+        var expectedDto = new TradeDto(
+            tradeId,
+            "GBPUSD",
+            1.2650m,
+            0.5m,
+            "Short",
+            "Open",
+            DateTime.UtcNow
+        );
+
+        var query = new GetTradeByIdQuery(tradeId);
+        var cancellationToken = CancellationToken.None;
+
+        _mockTradeRepository
+            .Setup(x => x.GetTradeAsync(tradeId, cancellationToken))
+            .ReturnsAsync(trade);
+
+        _mockMapper
+            .Setup(x => x.Map<TradeDto>(trade))
+            .Returns(expectedDto);
+
+        // Act
+        var result = await _handler.Handle(query, cancellationToken);
+
+        // Assert
+        result.Should().NotBeNull();
+        _mockTradeRepository.Verify(
+            x => x.GetTradeAsync(tradeId, cancellationToken),
+            Times.Once);
+    }
+}

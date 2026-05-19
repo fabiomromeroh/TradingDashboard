@@ -17,7 +17,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         var requestName = typeof(TRequest).Name;
 
         // Log BEFORE handler runs — what command/query came in
-        _logger.LogInformation("Handling {RequestName}: {@Request}", requestName, request);
+        _logger.LogInformation("Handling {RequestName}", requestName);
 
         var stopwatch = Stopwatch.StartNew();
 

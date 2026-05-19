@@ -20,6 +20,8 @@ public static class DependencyInjection
         // Registers the pipeline behavior that runs validators automatically
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
         // --- AutoMapper ---
         services.AddAutoMapper(cfg => cfg.AddMaps(typeof(DependencyInjection).Assembly));
 

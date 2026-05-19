@@ -1,29 +1,24 @@
+using AutoMapper;
 using MediatR;
 using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.Trades.Dtos;
 
-namespace TradingDashboard.Application.Features.Trades.Queries.GetTradeHistory;
+namespace TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
 
 public class GetAllTradesQueryHandler  : IRequestHandler<GetAllTradesQuery, IEnumerable<TradeDto>>
 {
     private readonly ITradeRepository tradeRepository;
+    private readonly IMapper mapper;
 
-    public GetAllTradesQueryHandler(ITradeRepository tradeRepository)
+    public GetAllTradesQueryHandler(ITradeRepository tradeRepository, IMapper mapper)
     {
         this.tradeRepository = tradeRepository;
+        this.mapper = mapper;
     }
 
     public async Task<IEnumerable<TradeDto>> Handle(GetAllTradesQuery request, CancellationToken cancellationToken)
     {
         var trades = await tradeRepository.GetTradesAsync(cancellationToken);
-        return trades.Select(t => new TradeDto(
-            t.Id,
-            t.Symbol,
-            t.EntryPrice,
-            t.Quantity,
-            t.Direction.ToString(),
-            t.Status.ToString(),
-            t.OpenedAt
-        ));
+        return mapper.Map<IEnumerable<TradeDto>>(trades); ;
     }
 }
