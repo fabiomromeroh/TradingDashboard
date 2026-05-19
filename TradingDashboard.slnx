@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Infra/">
+    <File Path=".github/workflows/main.yml" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/TradingDashboard.API/TradingDashboard.API.csproj" />
     <Project Path="src/TradingDashboard.Application/TradingDashboard.Application.csproj" />
