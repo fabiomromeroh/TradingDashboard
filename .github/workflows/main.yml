@@ -44,9 +44,9 @@ jobs:
       - name: Apply Database Migrations
         run: |
           dotnet tool install -g dotnet-ef --version 10.0.7
-          dotnet ef database update --project src/TradingDashboard.Infrastructure --startup-project src/TradingDashboard.API
+          dotnet ef database update --project src/TradingDashboard.Infrastructure --startup-project src/TradingDashboard.API --verbose
         env:
-          DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
+          ConnectionStrings__DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
