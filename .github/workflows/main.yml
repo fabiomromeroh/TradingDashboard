@@ -13,14 +13,12 @@ env:
   SOLUTION_PATH: TradingDashboard.slnx
   PUBLISH_PATH: ./publish
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: Production
-
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - name: Checkout code
@@ -43,57 +41,9 @@ jobs:
       - name: Publish API
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }} --no-build
 
-      - name: Azure login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Configure App Service settings
-        uses: azure/appservice-settings@v1
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          app-settings-json: |
-            [
-              {
-                "name": "Jwt__SecretKey",
-                "value": "${{ secrets.JWT_SECRETKEY }}",
-                "slotSetting": false
-              },
-              {
-                "name": "Jwt__Issuer",
-                "value": "${{ secrets.JWT_ISSUER }}",
-                "slotSetting": false
-              },
-              {
-                "name": "Jwt__Audience",
-                "value": "${{ secrets.JWT_AUDIENCE }}",
-                "slotSetting": false
-              },
-              {
-                "name": "Jwt__ExpiryMinutes",
-                "value": "${{ secrets.JWT_EXPIRYMINUTES }}",
-                "slotSetting": false
-              },
-              {
-                "name": "ASPNETCORE_ENVIRONMENT",
-                "value": "Production",
-                "slotSetting": false
-              }
-            ]
-          connection-strings-json: |
-            [
-              {
-                "name": "DefaultConnection",
-                "value": "${{ secrets.DB_CONNECTION_STRING }}",
-                "type": "SQLAzure",
-                "slotSetting": false
-              }
-            ]
-
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ${{ env.PUBLISH_PATH }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish
