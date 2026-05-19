@@ -10,6 +10,7 @@ env:
   AZURE_WEBAPP_NAME: tradingdashboard
   DOTNET_VERSION: '10.0.x'
   PROJECT_PATH: src/TradingDashboard.API/TradingDashboard.API.csproj
+  SOLUTION_PATH: TradingDashboard.slnx
   PUBLISH_PATH: ./publish
 
 jobs:
@@ -31,13 +32,13 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore TradingDashboard.sln
-
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+      
       - name: Build
-        run: dotnet build TradingDashboard.sln --configuration Release --no-restore
-
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+      
       - name: Test
-        run: dotnet test TradingDashboard.sln --configuration Release --no-build --verbosity normal
+        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal
 
       - name: Publish API
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }} --no-build
