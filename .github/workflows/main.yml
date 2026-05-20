@@ -34,6 +34,15 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
 
+      - name: Publish API
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }}
+
+      - name: Upload publish artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-artifact
+          path: ${{ env.PUBLISH_PATH }}
+
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -49,21 +58,6 @@ jobs:
       - name: Test
         run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal
 
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Publish API
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }} --no-build
-
   migrations:
     needs: test
     runs-on: ubuntu-latest
@@ -76,6 +70,9 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Install EF Core Tools
+        run: dotnet tool install -g dotnet-ef
+
       - name: Apply Database Migrations
         run: |
           dotnet ef database update --project src/TradingDashboard.Infrastructure --startup-project src/TradingDashboard.API --verbose
@@ -85,9 +82,14 @@ jobs:
           ConnectionStrings__DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
 
   deploy:
-    needs: [test, migrations, publish]
+    needs: [test, migrations]
     runs-on: ubuntu-latest
     steps:
+      - name: Download publish artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-artifact
+          path: ${{ env.PUBLISH_PATH }}
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
