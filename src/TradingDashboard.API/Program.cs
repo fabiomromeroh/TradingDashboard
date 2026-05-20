@@ -53,6 +53,9 @@ builder.Host.UseSerilog((context, configuration) =>
 
 var app = builder.Build();
 
+app.UseDefaultFiles();   // serves index.html on "/"
+app.UseStaticFiles();    // serves JS/CSS/assets from wwwroot
+
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
@@ -65,7 +68,7 @@ app.UseCors("AllowFrontend");
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/openapi/v1.json", "Trading Dashboard API");
-        c.RoutePrefix = string.Empty;
+        c.RoutePrefix = "swagger";
     });
 
 //}
@@ -73,6 +76,8 @@ app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 app.MapControllers();
+
+app.MapFallbackToFile("index.html");   // React Router fallback
 
 
 app.Run();

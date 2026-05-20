@@ -1,4 +1,4 @@
-const baseURL = 'https://localhost:7186/api'
+const baseURL = import.meta.env.VITE_API_URL
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
