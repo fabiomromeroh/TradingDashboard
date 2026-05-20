@@ -99,3 +99,4 @@ build/
 *.exe
 *.so
 *.dylib
+/src/TradingDashboard.API/wwwroot
