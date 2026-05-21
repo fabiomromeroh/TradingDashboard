@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using TradingDashboard.Domain.Common;
 using TradingDashboard.Domain.Enums;
 
@@ -13,7 +12,7 @@ public class ImportSession : BaseEntity
     public string? StoragePath { get; private set; } // blob path or local path
 
     // ── Common to ALL source types ──────────────────────────────
-    public string BrokerName { get; private set; }      // "IBKR", "Alpaca", "TD"
+    public  string? BrokerName { get; private set; }      // "IBKR", "Alpaca", "TD"
     public ImportSessionStatus Status { get; private set; } = ImportSessionStatus.Pending; // Pending, Processing, Completed, Failed
     public DateTimeOffset StartedAt { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }

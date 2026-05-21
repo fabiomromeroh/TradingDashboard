@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TradingDashboard.Application.Common.Interfaces;
-using TradingDashboard.Infrastructure.Azure;
 using TradingDashboard.Infrastructure.Identity;
 using TradingDashboard.Infrastructure.Persistence;
 using TradingDashboard.Infrastructure.Persistence.Repositories;
@@ -36,7 +34,11 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+                sqlOptions => sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null)
+                    .MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
         // --- Repositories ---
         services.AddScoped<ITradeRepository, TradeRepository>();
