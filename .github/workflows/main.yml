@@ -141,14 +141,10 @@ jobs:
 
       - name: Apply Database Migrations
         run: |
-          for i in 1 2 3 4 5; do
             dotnet ef database update \
               --project src/TradingDashboard.Infrastructure \
               --startup-project src/TradingDashboard.API \
-              --verbose && break
-              echo "Migration failed, retrying in 15s.."
-              sleep 15
-            done
+              --verbose 
         env:
           ASPNETCORE_ENVIRONMENT: Production
           DOTNET_ENVIRONMENT: Production
