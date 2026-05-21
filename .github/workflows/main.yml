@@ -9,75 +9,60 @@ on:
 env:
   AZURE_WEBAPP_NAME: tradingdashboard
   DOTNET_VERSION: '10.0.x'
+  NODE_VERSION: '20'
   PROJECT_PATH: src/TradingDashboard.API/TradingDashboard.API.csproj
   SOLUTION_PATH: TradingDashboard.slnx
   PUBLISH_PATH: ./publish
+  CLIENT_PATH: src/TradingDashboard.Client
+  CLIENT_BUILD_ARTIFACT: client-build
+  API_PUBLISH_ARTIFACT: publish-artifact
 
 permissions:
   contents: read
 
 jobs:
 
-  # ── Detect which parts of the repo changed ─────────────────────────────────
-  changes:
+  build-client:
+    name: Build Client
     runs-on: ubuntu-latest
-    outputs:
-      api:    ${{ steps.filter.outputs.api }}
-      client: ${{ steps.filter.outputs.client }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            api:
-              - 'src/TradingDashboard.API/**'
-              - 'src/TradingDashboard.Application/**'
-              - 'src/TradingDashboard.Domain/**'
-              - 'src/TradingDashboard.Infrastructure/**'
-              - 'tests/**'
-              - 'TradingDashboard.slnx'
-            client:
-              - 'src/TradingDashboard.Client/**'
-
-  # ── CLIENT pipeline ─────────────────────────────────────────────────────────
-  deploy-client:
-    name: Build & Deploy Client
-    runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.client == 'true' }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
           cache-dependency-path: src/TradingDashboard.Client/package-lock.json
 
-      - name: Install & Build React
-        working-directory: src/TradingDashboard.Client
-        run: |
-          npm ci
-          npm run build
+      - name: Install dependencies
+        working-directory: ${{ env.CLIENT_PATH }}
+        run: npm ci
 
-      - name: Deploy Client to Azure App Service
-        uses: azure/webapps-deploy@v3
+      - name: Build React
+        working-directory: ${{ env.CLIENT_PATH }}
+        run: npm run build
+
+      - name: Upload client build artifact
+        uses: actions/upload-artifact@v4
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: src/TradingDashboard.API/wwwroot
+          name: ${{ env.CLIENT_BUILD_ARTIFACT }}
+          path: src/TradingDashboard.API/wwwroot
+          if-no-files-found: error
 
-  # ── API pipeline ─────────────────────────────────────────────────────────────
   build:
-    name: Build API
+    name: Build API + Package SPA
     runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.api == 'true' }}
+    needs: [build-client]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Download client build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.CLIENT_BUILD_ARTIFACT }}
+          path: src/TradingDashboard.API/wwwroot
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -91,13 +76,14 @@ jobs:
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
 
       - name: Publish API
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }}
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }} --no-build
 
       - name: Upload publish artifact
         uses: actions/upload-artifact@v4
         with:
-          name: publish-artifact
+          name: ${{ env.API_PUBLISH_ARTIFACT }}
           path: ${{ env.PUBLISH_PATH }}
+          if-no-files-found: error
 
   test:
     name: Run Tests
@@ -141,25 +127,25 @@ jobs:
 
       - name: Apply Database Migrations
         run: |
-            dotnet ef database update \
-              --project src/TradingDashboard.Infrastructure \
-              --startup-project src/TradingDashboard.API \
-              --verbose 
+          dotnet ef database update \
+            --project src/TradingDashboard.Infrastructure \
+            --startup-project src/TradingDashboard.API \
+            --verbose
         env:
           ASPNETCORE_ENVIRONMENT: Production
           DOTNET_ENVIRONMENT: Production
           ConnectionStrings__DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
 
   deploy:
-    name: Deploy API to Azure
-    needs: [test, migrations]
+    name: Deploy to Azure
+    needs: [build, test, migrations]
     runs-on: ubuntu-latest
-    if: ${{ needs.test.result == 'success' && needs.migrations.result == 'success' }}
+    if: ${{ needs.build.result == 'success' && needs.test.result == 'success' && needs.migrations.result == 'success' }}
     steps:
       - name: Download publish artifact
         uses: actions/download-artifact@v4
         with:
-          name: publish-artifact
+          name: ${{ env.API_PUBLISH_ARTIFACT }}
           path: ${{ env.PUBLISH_PATH }}
 
       - name: Deploy to Azure App Service
