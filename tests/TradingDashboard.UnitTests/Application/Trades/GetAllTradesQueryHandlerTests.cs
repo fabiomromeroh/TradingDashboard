@@ -48,10 +48,11 @@ public class GetAllTradesQueryHandlerTests
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        result.Should().HaveCount(3);
-        result.Should().AllSatisfy(dto => dto.Should().NotBeNull());
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(3);
+        result.Value.Should().AllSatisfy(dto => dto.Should().NotBeNull());
 
-        var resultList = result.ToList();
+        var resultList = result.Value!.ToList();
         resultList[0].Symbol.Should().Be("EURUSD");
         resultList[1].Symbol.Should().Be("GBPUSD");
         resultList[2].Symbol.Should().Be("USDJPY");
@@ -81,7 +82,8 @@ public class GetAllTradesQueryHandlerTests
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        result.Should().BeEmpty();
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEmpty();
         _mockTradeRepository.Verify(
             x => x.GetTradesAsync(It.IsAny<CancellationToken>()),
             Times.Once);
@@ -110,7 +112,7 @@ public class GetAllTradesQueryHandlerTests
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        var resultList = result.ToList();
+        var resultList = ((IEnumerable<TradeDto>)result.Value!).ToList();
         resultList.Should().HaveCount(1);
 
         var dto = resultList.First();

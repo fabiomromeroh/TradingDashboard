@@ -1,10 +1,13 @@
 using FluentValidation;
 using MediatR;
+using System.Reflection;
+using TradingDashboard.Application.Common.Interfaces;
 
 namespace TradingDashboard.Application.Common.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
+    where TResponse : IResult
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
@@ -22,9 +25,24 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
             .Where(error => error != null)
             .ToList();
 
-        if (failures.Any())
-            throw new Exceptions.ValidationException(failures);   // ← caught by ExceptionHandlingMiddleware → 400
+        if (!failures.Any())
+            return await next();
 
-        return await next();   // validation passed → call the handler
+        var errors = failures
+            .Select(f => new Error(f.PropertyName, f.ErrorMessage))
+            .ToList();
+
+        // Safe cast — TResponse is guaranteed to be IResult
+        if (typeof(TResponse).IsGenericType)
+        {
+            var resultType = typeof(TResponse).GetGenericArguments()[0];
+            var method = typeof(Result<>)
+                            .MakeGenericType(resultType)
+                            .GetMethod(nameof(Result<object>.ValidationFailure),
+                                BindingFlags.Public | BindingFlags.Static)!;
+            return (TResponse)method.Invoke(null, [errors])!;
+        }
+
+        return (TResponse)(object)Result.ValidationFailure(errors);
     }
 }

@@ -1,12 +1,12 @@
 using AutoMapper;
 using MediatR;
-using TradingDashboard.Application.Common.Exceptions;
+using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.Trades.Dtos;
 
 namespace TradingDashboard.Application.Features.Trades.Queries.GetTradeById;
 
-public class GetTradeByIdQueryHandler: IRequestHandler<GetTradeByIdQuery, TradeDto>
+public class GetTradeByIdQueryHandler : IRequestHandler<GetTradeByIdQuery, Result<TradeDto>>
 {
     private readonly ITradeRepository tradeRepository;
     private readonly IMapper mapper;
@@ -16,19 +16,12 @@ public class GetTradeByIdQueryHandler: IRequestHandler<GetTradeByIdQuery, TradeD
         this.tradeRepository = tradeRepository;
         this.mapper = mapper;
     }
-    public async Task<TradeDto> Handle(GetTradeByIdQuery request, CancellationToken cancellationToken)
+
+    public async Task<Result<TradeDto>> Handle(GetTradeByIdQuery request, CancellationToken cancellationToken)
     {
         var trade = await tradeRepository.GetTradeAsync(request.Id, cancellationToken);
+        if (trade is null) return Result<TradeDto>.NotFound(nameof(trade), request.Id);
 
-        if (trade == null)
-        {
-            throw new NotFoundException(nameof(trade), request.Id);
-        }
-
-        var tradeDto = mapper.Map<TradeDto>(trade);
-
-        return tradeDto;
+        return Result<TradeDto>.Success(mapper.Map<TradeDto>(trade));
     }
-
- 
 }

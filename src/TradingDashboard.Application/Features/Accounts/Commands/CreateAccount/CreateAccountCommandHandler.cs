@@ -1,13 +1,13 @@
 using AutoMapper;
 using MediatR;
-using TradingDashboard.Application.Common.Exceptions;
+using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.Accounts.Dtos;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Accounts.Commands.CreateAccount;
 
-public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, AccountDto>
+public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, Result<AccountDto>>
 {
     private readonly IAccountRepository _accountRepository;
     private readonly IUserRepository _userRepository;
@@ -29,19 +29,19 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
         _mapper = mapper;
     }
 
-    public async Task<AccountDto> Handle(CreateAccountCommand command, CancellationToken cancellationToken)
+    public async Task<Result<AccountDto>> Handle(CreateAccountCommand command, CancellationToken cancellationToken)
     {
-        _ = await _userRepository.GetByIdAsync(command.UserId, cancellationToken)
-            ?? throw new NotFoundException(nameof(User), command.UserId);
+        var user = await _userRepository.GetByIdAsync(command.UserId, cancellationToken);
+        if (user is null) return Result<AccountDto>.NotFound(nameof(User), command.UserId);
 
-        _ = await _brokerRepository.GetByIdAsync(command.BrokerId, cancellationToken)
-            ?? throw new NotFoundException(nameof(Broker), command.BrokerId);
+        var broker = await _brokerRepository.GetByIdAsync(command.BrokerId, cancellationToken);
+        if (broker is null) return Result<AccountDto>.NotFound(nameof(Broker), command.BrokerId);
 
         var account = Account.Create(command.Name, command.Currency, command.InitialBalance, command.UserId, command.BrokerId);
 
         await _accountRepository.AddAsync(account, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return _mapper.Map<AccountDto>(account);
+        return Result<AccountDto>.Success(_mapper.Map<AccountDto>(account));
     }
 }

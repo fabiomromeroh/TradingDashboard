@@ -1,9 +1,10 @@
 using MediatR;
+using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Features.Users.Dtos;
 
 namespace TradingDashboard.Application.Features.Users.Commands.UpdateUser;
 
-public record UpdateUserCommand : IRequest<UserDto>
+public record UpdateUserCommand : IRequest<Result<UserDto>>
 {
     public Guid Id { get; init; }
     public string FirstName { get; init; } = string.Empty;

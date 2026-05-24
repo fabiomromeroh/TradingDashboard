@@ -1,10 +1,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.Users.Commands.DeleteUser;
 using TradingDashboard.Application.Features.Users.Commands.LoginUser;
 using TradingDashboard.Application.Features.Users.Commands.RegisterUser;
 using TradingDashboard.Application.Features.Users.Commands.UpdateUser;
 using TradingDashboard.Application.Features.Users.Queries.GetUserById;
+using TradingDashboard.Application.Features.Users.Queries.GetUsers;
 
 namespace TradingDashboard.API.Controllers;
 
@@ -20,10 +22,10 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult> Register([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Register([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        return result.ToActionResult(value => CreatedAtAction(nameof(GetById), new { id = value.Id }, value));
     }
 
     [HttpPost("login")]
@@ -52,5 +54,14 @@ public class UsersController : ControllerBase
     {
         await _mediator.Send(new DeleteUserCommand(id), cancellationToken);
         return NoContent();
+    }
+
+    [HttpGet]
+    public async Task<ActionResult> Get(CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetUsersQuery(), cancellationToken);
+
+        return result.ToActionResult();
+
     }
 }

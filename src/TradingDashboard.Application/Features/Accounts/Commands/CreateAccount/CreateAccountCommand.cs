@@ -1,9 +1,10 @@
 using MediatR;
+using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Features.Accounts.Dtos;
 
 namespace TradingDashboard.Application.Features.Accounts.Commands.CreateAccount;
 
-public record CreateAccountCommand : IRequest<AccountDto>
+public record CreateAccountCommand : IRequest<Result<AccountDto>>
 {
     public string Name { get; init; } = string.Empty;
     public string Currency { get; init; } = "USD";

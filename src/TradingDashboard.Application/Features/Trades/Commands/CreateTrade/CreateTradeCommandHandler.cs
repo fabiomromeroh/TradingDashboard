@@ -1,10 +1,11 @@
 using MediatR;
+using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
 
-public class CreateTradeCommandHandler: IRequestHandler<CreateTradeCommand, Guid>
+public class CreateTradeCommandHandler : IRequestHandler<CreateTradeCommand, Result<Guid>>
 {
     private readonly ITradeRepository tradeRepository;
     private readonly IUnitOfWork unitOfWork;
@@ -15,7 +16,7 @@ public class CreateTradeCommandHandler: IRequestHandler<CreateTradeCommand, Guid
         this.unitOfWork = unitOfWork;
     }
 
-    public async Task<Guid> Handle(CreateTradeCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateTradeCommand command, CancellationToken cancellationToken)
     {
 
         var trade = Trade.Create(command.Symbol, command.EntryPrice, command.Quantity, command.Direction);
@@ -24,6 +25,7 @@ public class CreateTradeCommandHandler: IRequestHandler<CreateTradeCommand, Guid
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return trade.Id;
+        return Result<Guid>.Success(trade.Id);
     }
 }
+

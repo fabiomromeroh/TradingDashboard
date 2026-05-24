@@ -1,10 +1,11 @@
 using MediatR;
+using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Features.Trades.Dtos;
 using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
 
-public record CreateTradeCommand : IRequest<Guid>
+public record CreateTradeCommand : IRequest<Result<Guid>>
 {
     public string Symbol { get; init; } = string.Empty;
     public decimal EntryPrice { get; init; }

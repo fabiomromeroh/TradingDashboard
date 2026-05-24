@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
 using TradingDashboard.Application.Features.Trades.Commands.DeleteTrade;
 using TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
@@ -57,11 +58,12 @@ public class TradesController : ControllerBase
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An ActionResult containing the result of the trade creation operation.</returns>
     [HttpPost]
-    public async Task<ActionResult> Post(CreateTradeCommand createTradeCommand, CancellationToken cancellationToken)
+    public async Task<IActionResult> Post(CreateTradeCommand createTradeCommand, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(createTradeCommand, cancellationToken);
 
-        return CreatedAtAction(nameof(CreateTradeCommand), result);
+
+        return result.ToActionResult(value => CreatedAtAction(nameof(CreateTradeCommand), value));
     }
 
     /// <summary>
