@@ -2,7 +2,7 @@
 
 A full-stack **trading journal + analytics dashboard** built with **.NET 10** and **React (Vite + TypeScript)**.
 
-The goal is to make it easy to **capture trades consistently** and then explore performance through **clean, queryable analytics** (e.g., by strategy, instrument, time window, and risk parameters).
+The goal is to make it easy to **log trades consistently** and then analyze performance through **queryable analytics** (for example: by strategy, instrument, time window, and risk parameters).
 
 ## Tech stack
 
@@ -23,13 +23,11 @@ The goal is to make it easy to **capture trades consistently** and then explore 
 
 ## Getting started
 
-### Docker (recommended)
+### Docker
 
 ```bash
 docker-compose up --build
 ```
-
-This brings up the API + client (and any dependent services defined in `docker-compose.yml`).
 
 ### Run locally (without Docker)
 
@@ -58,11 +56,6 @@ Environment-specific configuration is typically handled via:
 - environment variables
 - Docker Compose env configuration
 
-## Notes
-
-- The frontend project also contains its own README under `src/TradingDashboard.Client/`.
-- If you’d like, I can add a small "Preview" section once you have a screenshot/GIF and confirm the default ports.
-
 ## License
 
-If you plan to share or reuse this project, consider adding a license (MIT/Apache-2.0).
+Consider adding a license (MIT/Apache-2.0) if you plan to share or reuse this project.
