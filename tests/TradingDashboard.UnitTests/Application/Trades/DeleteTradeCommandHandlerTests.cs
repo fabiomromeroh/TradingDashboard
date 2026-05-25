@@ -1,6 +1,5 @@
-using TradingDashboard.Application.Features.Trades.Commands.DeleteTrade;
 using TradingDashboard.Application.Common.Interfaces;
-using TradingDashboard.Application.Common.Exceptions;
+using TradingDashboard.Application.Features.Trades.Commands.DeleteTrade;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
 
@@ -44,7 +43,7 @@ public class DeleteTradeCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Should().Be(Unit.Value);
+        result.IsSuccess.Should().BeTrue();
         _mockTradeRepository.Verify(
             x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()),
             Times.Once);
@@ -57,7 +56,7 @@ public class DeleteTradeCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WithNonExistentTradeId_ShouldThrowNotFoundException()
+    public async Task Handle_WithNonExistentTradeId_ShouldReturnNotFound()
     {
         // Arrange
         var tradeId = Guid.NewGuid();
@@ -67,11 +66,13 @@ public class DeleteTradeCommandHandlerTests
             .Setup(x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Trade?)null);
 
-        // Act & Assert
-        var act = () => _handler.Handle(command, CancellationToken.None);
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
 
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage($"*'{nameof(Trade)}'*");
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        result.Errors.Should().ContainSingle(e => e.Code == "NotFound" && e.Message.Contains(nameof(Trade)));
 
         _mockTradeRepository.Verify(
             x => x.DeleteTradeAsync(It.IsAny<Trade>(), It.IsAny<CancellationToken>()),

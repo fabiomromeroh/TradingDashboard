@@ -1,17 +1,14 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using TradingDashboard.Application.Common.Interfaces;
 
 namespace TradingDashboard.Application.Common
 {
-    public class Result<T>: IResult
+    public class Result<T> : IResult
     {
         public bool IsSuccess { get; }
         public bool IsFailure => !IsSuccess;
-        public IReadOnlyList<Error> Errors { get; set; }  
+        public IReadOnlyList<Error> Errors { get; set; }
         public T? Value { get; set; }
         public HttpStatusCode StatusCode { get; set; }
 

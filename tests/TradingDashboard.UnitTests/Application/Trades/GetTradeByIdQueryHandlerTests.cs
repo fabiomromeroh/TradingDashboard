@@ -1,8 +1,8 @@
 using AutoMapper;
-using TradingDashboard.Application.Features.Trades.Queries.GetTradeById;
+using System.Net;
 using TradingDashboard.Application.Common.Interfaces;
-using TradingDashboard.Application.Common.Exceptions;
 using TradingDashboard.Application.Features.Trades.Dtos;
+using TradingDashboard.Application.Features.Trades.Queries.GetTradeById;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
 
@@ -51,7 +51,10 @@ public class GetTradeByIdQueryHandlerTests
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
-        result.Should().BeEquivalentTo(expectedDto);
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEquivalentTo(expectedDto);
+
         _mockTradeRepository.Verify(
             x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()),
             Times.Once);
@@ -61,7 +64,7 @@ public class GetTradeByIdQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WithNonExistentId_ShouldThrowNotFoundException()
+    public async Task Handle_WithNonExistentId_ShouldReturnNotFound()
     {
         // Arrange
         var tradeId = Guid.NewGuid();
@@ -72,10 +75,14 @@ public class GetTradeByIdQueryHandlerTests
             .ReturnsAsync((Trade?)null);
 
         // Act & Assert
-        var act = () => _handler.Handle(query, CancellationToken.None);
+        var result = await _handler.Handle(query, CancellationToken.None);
 
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage($"*'{nameof(Trade)}'*");
+        result.IsFailure.Should().BeTrue();
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        result.Errors.Should().ContainSingle(e => e.Code == "NotFound" && e.Message.Contains(nameof(Trade)));
+
+        _mockTradeRepository.Verify(x => x.GetTradeAsync(tradeId, CancellationToken.None), Times.Once);
+
 
         _mockMapper.Verify(
             x => x.Map<TradeDto>(It.IsAny<Trade>()),
