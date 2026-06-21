@@ -42,6 +42,8 @@ public class CreateTradeCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
+        result.Should().BeOfType<int>();
+        result.Should().Be(It.IsAny<int>());
         result.Should().NotBe(Guid.Empty);
         _mockTradeRepository.Verify(
             x => x.AddTradeAsync(It.IsAny<Trade>(), It.IsAny<CancellationToken>()),
