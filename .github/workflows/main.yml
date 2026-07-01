@@ -14,19 +14,18 @@ env:
   SOLUTION_PATH: TradingDashboard.slnx
   PUBLISH_PATH: ./publish
   CLIENT_PATH: src/TradingDashboard.Client
-  CLIENT_BUILD_ARTIFACT: client-build
   API_PUBLISH_ARTIFACT: publish-artifact
 
 permissions:
   contents: read
 
 jobs:
-
-  build-client:
-    name: Build Client
+  build-test-publish:
+    name: Build Client + API
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -35,34 +34,19 @@ jobs:
           cache: npm
           cache-dependency-path: src/TradingDashboard.Client/package-lock.json
 
-      - name: Install dependencies
+      - name: Install client dependencies
         working-directory: ${{ env.CLIENT_PATH }}
         run: npm ci
 
-      - name: Build React
+      - name: Build React client
         working-directory: ${{ env.CLIENT_PATH }}
         run: npm run build
 
-      - name: Upload client build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.CLIENT_BUILD_ARTIFACT }}
-          path: src/TradingDashboard.API/wwwroot
-          if-no-files-found: error
-
-  build:
-    name: Build API + Package SPA
-    runs-on: ubuntu-latest
-    needs: [build-client]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download client build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ env.CLIENT_BUILD_ARTIFACT }}
-          path: src/TradingDashboard.API/wwwroot
+      - name: Verify React build output
+        run: |
+          echo "Contents of API wwwroot after client build:"
+          ls -la src/TradingDashboard.API/wwwroot
+          test -f src/TradingDashboard.API/wwwroot/index.html
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -75,8 +59,19 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
 
-      - name: Publish API
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }} --no-build
+      - name: Test
+        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal
+
+      - name: Publish API with SPA assets
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -o ${{ env.PUBLISH_PATH }}
+
+      - name: Verify published SPA files
+        run: |
+          echo "Contents of publish output:"
+          ls -la ${{ env.PUBLISH_PATH }}
+          echo "Contents of published wwwroot:"
+          ls -la ${{ env.PUBLISH_PATH }}/wwwroot
+          test -f ${{ env.PUBLISH_PATH }}/wwwroot/index.html
 
       - name: Upload publish artifact
         uses: actions/upload-artifact@v4
@@ -85,31 +80,11 @@ jobs:
           path: ${{ env.PUBLISH_PATH }}
           if-no-files-found: error
 
-  test:
-    name: Run Tests
-    needs: build
-    runs-on: ubuntu-latest
-    if: ${{ needs.build.result == 'success' }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
-
-      - name: Test
-        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-restore --verbosity normal
-
   migrations:
     name: Apply DB Migrations
-    needs: test
+    needs: build-test-publish
     runs-on: ubuntu-latest
-    if: ${{ needs.test.result == 'success' }}
+    if: ${{ needs.build-test-publish.result == 'success' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -138,15 +113,21 @@ jobs:
 
   deploy:
     name: Deploy to Azure
-    needs: [build, test, migrations]
+    needs: [build-test-publish, migrations]
     runs-on: ubuntu-latest
-    if: ${{ needs.build.result == 'success' && needs.test.result == 'success' && needs.migrations.result == 'success' }}
+    if: ${{ needs.build-test-publish.result == 'success' && needs.migrations.result == 'success' }}
     steps:
       - name: Download publish artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{ env.API_PUBLISH_ARTIFACT }}
           path: ${{ env.PUBLISH_PATH }}
+
+      - name: Verify deployment package
+        run: |
+          ls -la ${{ env.PUBLISH_PATH }}
+          ls -la ${{ env.PUBLISH_PATH }}/wwwroot
+          test -f ${{ env.PUBLISH_PATH }}/wwwroot/index.html
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
