@@ -1,5 +1,6 @@
-using TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
+using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
 
@@ -26,6 +27,7 @@ public class CreateTradeCommandHandlerTests
         {
             Symbol = "EURUSD",
             EntryPrice = 1.0850m,
+            AccountId = Guid.NewGuid(),
             Quantity = 1.0m,
             Direction = TradeDirection.Long
         };
@@ -42,12 +44,14 @@ public class CreateTradeCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Should().BeOfType<int>();
-        result.Should().Be(It.IsAny<int>());
-        result.Should().NotBe(Guid.Empty);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().NotBe(Guid.Empty);
+        result.Errors.Should().BeEmpty();
+
         _mockTradeRepository.Verify(
             x => x.AddTradeAsync(It.IsAny<Trade>(), It.IsAny<CancellationToken>()),
             Times.Once);
+
         _mockUnitOfWork.Verify(
             x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),
             Times.Once);

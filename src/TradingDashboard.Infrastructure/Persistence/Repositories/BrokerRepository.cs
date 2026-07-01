@@ -10,7 +10,7 @@ public class BrokerRepository : IBrokerRepository
 
     public BrokerRepository(AppDbContext context) => _context = context;
 
-    public async Task<IEnumerable<Broker>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<List<Broker>> GetAllAsync(CancellationToken cancellationToken)
         => await _context.Brokers.AsNoTracking().ToListAsync(cancellationToken);
 
     public async Task<Broker?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
