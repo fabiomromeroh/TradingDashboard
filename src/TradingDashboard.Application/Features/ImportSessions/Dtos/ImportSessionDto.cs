@@ -7,6 +7,6 @@ public record ImportSessionDto(
     int TotalTrades,
     int ImportedTrades,
     string? ErrorMessage,
-    DateTime? CompletedAt,
+    DateTimeOffset? CompletedAt,
     Guid AccountId,
-    DateTime CreatedAt);
+    DateTimeOffset CreatedAt);

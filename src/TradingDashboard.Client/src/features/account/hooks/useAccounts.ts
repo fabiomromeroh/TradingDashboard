@@ -1,17 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Account } from "../types/account.types";
+import type { AccountQuery } from "../types/account.types";
 import { getAccounts } from "../api/accountApi";
 
-export function useAccounts() {
-  const [accounts, setAccounts] = useState<Account[]>([]);
+interface UseAccountsResult {
+  accounts: AccountQuery[];
+  error: string | null;
+  isLoading: boolean;
+  refetch: () => void;
+}
+
+export function useAccounts(): UseAccountsResult {
+  const [accounts, setAccounts] = useState<AccountQuery[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAccounts = useCallback(async () => {
-    setIsLoading(true);
     await getAccounts()
       .then((data) => {
-        console.log("Fetched accounts:", data); // Debugging log
         setAccounts(data);
         setError(null);
       })
@@ -20,12 +25,11 @@ export function useAccounts() {
         setAccounts([]);
       })
       .finally(() => setIsLoading(false));
+  }, []);
 
-    }, []);
-
-    useEffect(() => {
-      fetchAccounts();
-    }, [fetchAccounts]);
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
 
   return { accounts, isLoading, error, refetch: fetchAccounts };
 }

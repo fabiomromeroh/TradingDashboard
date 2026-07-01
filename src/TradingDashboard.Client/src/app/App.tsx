@@ -1,16 +1,14 @@
-
-import './App.css'
-import Router from './Router'
-import { Toaster } from 'sonner'
+// import './App.css'
+import Router from "./Router";
+import { Toaster } from "sonner";
 
 function App() {
-
   return (
     <>
-        <Router />
-        <Toaster richColors position="top-right" />
+      <Router />
+      <Toaster richColors position="top-right" />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

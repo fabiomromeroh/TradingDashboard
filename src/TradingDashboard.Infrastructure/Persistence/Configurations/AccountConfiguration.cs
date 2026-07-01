@@ -8,24 +8,81 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
 {
     public void Configure(EntityTypeBuilder<Account> builder)
     {
+        builder.ToTable("Accounts");
+
         builder.HasKey(a => a.Id);
-        builder.Property(a => a.Name).HasMaxLength(150).IsRequired();
-        builder.Property(a => a.Currency).HasMaxLength(10).IsRequired();
-        builder.Property(a => a.InitialBalance).HasColumnType("decimal(18,4)");
 
-        builder.HasOne(a => a.Broker)
-               .WithMany(b => b.Accounts)
-               .HasForeignKey(a => a.BrokerId)
-               .OnDelete(DeleteBehavior.Restrict);
+        // ── Scalar properties ────────────────────────────────────────────
 
-        builder.HasMany(a => a.Trades)
-               .WithOne(t => t.Account)
-               .HasForeignKey(t => t.AccountId)
-               .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(x => x.Name)
+            .IsRequired()
+            .HasMaxLength(100);
 
-        builder.HasMany(a => a.ImportSessions)
-               .WithOne(i => i.Account)
-               .HasForeignKey(i => i.AccountId)
-               .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(x => x.Currency)
+            .HasMaxLength(10)
+            .IsRequired(false)
+            .HasDefaultValue("USD");
+
+        builder.Property(x => x.InitialBalance)
+            .IsRequired()
+            .HasPrecision(18, 4)
+            .HasDefaultValue(0m);
+
+        builder.Property(x => x.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        // ── Foreign keys ─────────────────────────────────────────────────
+
+        builder.Property(x => x.UserId)
+            .IsRequired();
+
+        builder.Property(x => x.BrokerId)
+            .IsRequired();
+
+        // ── Indexes ──────────────────────────────────────────────────────
+
+        // All accounts for a user — most common query
+        builder.HasIndex(x => x.UserId)
+            .HasDatabaseName("IX_Accounts_UserId");
+
+        // Unique account name per user — no duplicate "Main Account" names
+        builder.HasIndex(x => new { x.UserId, x.Name })
+            .IsUnique()
+            .HasDatabaseName("UIX_Accounts_UserId_Name");
+
+        // Filter active accounts quickly (soft-delete pattern)
+        builder.HasIndex(x => new { x.UserId, x.IsActive })
+            .HasDatabaseName("IX_Accounts_UserId_IsActive");
+
+        // ── Relationships ─────────────────────────────────────────────────
+
+        builder.HasOne(x => x.User)
+            .WithMany(u => u.Accounts)     // adjust to match User's collection name
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Broker)
+            .WithMany()                    // adjust if Broker exposes an Accounts collection
+            .HasForeignKey(x => x.BrokerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(x => x.Trades)
+            .WithOne(t => t.Account)
+            .HasForeignKey(t => t.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(x => x.Trades)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasField("_trades");
+
+        builder.HasMany(x => x.ImportSessions)
+            .WithOne(s => s.Account)
+            .HasForeignKey(s => s.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(x => x.ImportSessions)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasField("_importSessions");
     }
 }

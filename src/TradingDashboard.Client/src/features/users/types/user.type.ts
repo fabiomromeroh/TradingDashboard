@@ -1,6 +1,3 @@
-
-
-
 export interface UserQuery {
   id: string;
   firstName: string;
@@ -10,11 +7,9 @@ export interface UserQuery {
   avatarUrl?: string;
 }
 
-export interface CreateUserRequest {
+export interface CreateUserCommand {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
 }
-
-

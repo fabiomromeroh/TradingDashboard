@@ -31,18 +31,18 @@ public class User : BaseEntity
         FirstName = firstName;
         LastName = lastName;
         Email = email;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void SetPasswordHash(string passwordHash)
     {
         PasswordHash = passwordHash;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void Deactivate()
     {
         IsActive = false;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

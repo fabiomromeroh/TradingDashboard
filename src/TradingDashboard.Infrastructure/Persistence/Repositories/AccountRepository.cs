@@ -1,5 +1,7 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Features.Accounts.Dtos;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Persistence.Repositories;
@@ -7,11 +9,20 @@ namespace TradingDashboard.Infrastructure.Persistence.Repositories;
 public class AccountRepository : IAccountRepository
 {
     private readonly AppDbContext _context;
+    private readonly IMapper mapper;
 
-    public AccountRepository(AppDbContext context) => _context = context;
+    public AccountRepository(AppDbContext context, IMapper mapper)
+    {
+        _context = context;
+        this.mapper = mapper;
+    }
 
-    public async Task<IEnumerable<Account>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
-        => await _context.Accounts.AsNoTracking().Where(a => a.UserId == userId).ToListAsync(cancellationToken);
+    public async Task<IEnumerable<AccountDto>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
+        => await _context.Accounts.AsNoTracking()
+        .Include(x => x.Broker)
+        .Where(a => a.UserId == userId)
+        .Select(x => mapper.Map<AccountDto>(x))
+        .ToListAsync(cancellationToken);
 
     public async Task<Account?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         => await _context.Accounts.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id, cancellationToken);

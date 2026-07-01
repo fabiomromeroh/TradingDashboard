@@ -1,4 +1,4 @@
-import type { TradeStatus } from '../types/trade.types';
+import type { TradeStatus } from "../types/trade.types";
 
 interface TradeStatusBadgeProps {
   status: TradeStatus;
@@ -6,9 +6,9 @@ interface TradeStatusBadgeProps {
 
 // A lookup table instead of if/else chains — easy to extend with new statuses.
 const statusStyles: Record<TradeStatus, string> = {
-  Open: 'bg-blue-100 text-blue-700',
-  Closed: 'bg-green-100 text-green-700',
-  Cancelled: 'bg-gray-100 text-gray-500',
+  Open: "bg-primary/20 text-primary-foreground",
+  Closed: "bg-accent/20 text-accent-foreground",
+  Cancelled: "bg-muted/50 text-muted-foreground",
 };
 
 export function TradeStatusBadge({ status }: TradeStatusBadgeProps) {
@@ -20,4 +20,3 @@ export function TradeStatusBadge({ status }: TradeStatusBadgeProps) {
     </span>
   );
 }
-

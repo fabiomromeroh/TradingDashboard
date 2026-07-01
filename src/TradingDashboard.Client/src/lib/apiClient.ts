@@ -1,9 +1,9 @@
-import axios from 'axios';
+import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: '/api',         // Vite proxy forwards this to https://localhost:7186/api
+  baseURL: "/api", // Vite proxy forwards this to https://localhost:7186/api
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -18,14 +18,14 @@ apiClient.interceptors.request.use((config) => {
 // RESPONSE interceptor — runs on every response before it reaches your code.
 // Handle global errors here instead of in every hook.
 apiClient.interceptors.response.use(
-  (response) => response.data,   // unwrap .data so callers get the payload directly
+  (response) => response.data, // unwrap .data so callers get the payload directly
   (error) => {
     if (error.response?.status === 401) {
       // redirect to login, clear auth state, etc.
     }
     // Re-throw so individual hooks can still catch and show specific messages
-    return Promise.reject(error);
-  }
+    return Promise.reject(error.response.data);
+  },
 );
 
 export default apiClient;

@@ -9,14 +9,14 @@ public class Broker : BaseEntity
     public string? Website { get; private set; }
     public string? SupportedImportFormat { get; private set; }
 
-    public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
     private readonly List<Account> _accounts = [];
+    public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
 
     private Broker() { }
 
     public static Broker Create(string name, string displayName, string? website = null, string? supportedImportFormat = null)
     {
-        return new Broker
+        return new()
         {
             Name = name,
             DisplayName = displayName,
@@ -31,6 +31,6 @@ public class Broker : BaseEntity
         DisplayName = displayName;
         Website = website;
         SupportedImportFormat = supportedImportFormat;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

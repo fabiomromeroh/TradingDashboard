@@ -2,7 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Services.Import;
 using TradingDashboard.Infrastructure.Identity;
+using TradingDashboard.Infrastructure.Import;
+using TradingDashboard.Infrastructure.Import.Ibkr;
 using TradingDashboard.Infrastructure.Persistence;
 using TradingDashboard.Infrastructure.Persistence.Repositories;
 
@@ -53,6 +56,10 @@ public static class DependencyInjection
 
         // --- Identity ---
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+        ////---Import---
+        services.AddScoped<IBrokerParser, IbkrCsvParser>();
+        services.AddScoped<IBrokerParserFactory, BrokerParserFactory>();
 
         return services;
     }

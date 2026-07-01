@@ -1,31 +1,26 @@
-import { useCallback,  useState } from "react";
+import { useCallback, useState } from "react";
 import { createUser } from "../api/usersApi";
-import type { CreateUserRequest } from "../types/user.type";
+import type { CreateUserCommand } from "../types/user.type";
 
+export function useCreateUser() {
+  const [error, setError] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(true);
 
-export function useCreateUser(onSuccess?: () => void) {
+  const create = useCallback(async (user: CreateUserCommand) => {
+    return createUser(user)
+      .then(() => {
+        return true;
+      })
+      .catch((err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : "Failed to create user";
+        setError(message);
+        return false;
+      })
+      .finally(() => {
+        setIsCreating(false);
+      });
+  }, []);
 
-    const [error, setError] = useState<string | null>(null);
-    const [isCreating, setIsCreating] = useState(false);
-
-    
-    const create = useCallback(async (user: CreateUserRequest): Promise<boolean> => {
-        setIsCreating(true);
-        setError(null);
-        try {
-            await createUser(user);
-            onSuccess?.();
-            return true;
-        } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : 'Failed to create user';
-            setError(message);
-            return false;
-        } finally {
-            setIsCreating(false);
-        }
-    }, [onSuccess]);
-
-
-    return { error, isCreating, execute : create };
-
+  return { error, isCreating, execute: create };
 }

@@ -1,46 +1,66 @@
-import { NavLink } from 'react-router-dom';
-import {  ArrowLeftRight, Upload, Users } from 'lucide-react';
+import { NavLink } from "react-router-dom";
+import {
+  ArrowLeftRight,
+  Briefcase,
+  ChartBar,
+  LayoutDashboardIcon,
+  Plus,
+  Users,
+} from "lucide-react";
 
 const navItems = [
-  { to: '/users', icon: Users, label: 'Users' },
-  { to: '/trades', icon: ArrowLeftRight, label: 'Trades' },
-  { to: '/import', icon: Upload, label: 'Import' },
+  { to: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
+  { to: "/users", icon: Users, label: "Users" },
+  { to: "/trades", icon: ArrowLeftRight, label: "Trades" },
+  { to: "/accounts", icon: Briefcase, label: "Accounts" },
+  { to: "/reports", icon: ChartBar, label: "Reports" },
 ];
 
 export default function Sidebar() {
   return (
-    <aside className="w-56 h-screen bg-zinc-900 flex flex-col shrink-0">
+    <aside className="h-screen bg-sidebar flex flex-col">
       {/* Logo */}
-      <div className="px-5 py-4 border-b border-zinc-800">
-        <span className="text-white font-bold text-base tracking-tight">
-          Trading <span className="text-blue-400">Dashboard</span>
+      <div className="px-5 py-4 border-b border-sidebar-border">
+        <span className="text-sidebar-foreground font-bold text-base tracking-tight">
+          Trading Dashboard
         </span>
       </div>
 
+      <nav className="flex mt-5 px-3 py-1 flex-col">
+        <NavLink
+          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors bg-sidebar-primary text-sidebar-primary-foreground"
+          key="/add-trades"
+          to="/add-trades"
+        >
+          <Plus className="text-current" size={16} />
+          Add Trades
+        </NavLink>
+      </nav>
+
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 px-3 py-4">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
-            end={to === '/'}
+            end={to === "/"}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors p-2 ${
                 isActive
-                  ? 'bg-blue-600 text-white'
-                  : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100'
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                  : "text-muted-foreground hover:bg-sidebar-accent/20 hover:text-sidebar-foreground"
               }`
             }
           >
-            <Icon size={16} />
+            <Icon className="text-current" size={16} />
             {label}
           </NavLink>
         ))}
       </nav>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-zinc-800">
-        <p className="text-xs text-zinc-500">v0.1.0</p>
+      <div className="px-5 py-4 border-t border-sidebar-border">
+        <p className="text-xs text-muted-foreground">v0.1.0</p>
       </div>
     </aside>
   );

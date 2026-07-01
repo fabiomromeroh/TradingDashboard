@@ -37,7 +37,7 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
         var broker = await _brokerRepository.GetByIdAsync(command.BrokerId, cancellationToken);
         if (broker is null) return Result<AccountDto>.NotFound(nameof(Broker), command.BrokerId);
 
-        var account = Account.Create(command.Name, command.Currency, command.InitialBalance, command.UserId, command.BrokerId);
+        var account = Account.Create(command.Name, command.UserId, command.BrokerId, command.InitialBalance, command.Currency);
 
         await _accountRepository.AddAsync(account, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

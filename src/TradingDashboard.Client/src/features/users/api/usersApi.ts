@@ -1,10 +1,10 @@
 import apiClient from "@/lib/apiClient";
-import type { CreateUserRequest, UserQuery } from "../types/user.type";
+import type { CreateUserCommand, UserQuery } from "../types/user.type";
 
 export async function getUsers(): Promise<UserQuery[]> {
-    return apiClient.get('/users');
+  return apiClient.get("/users");
 }
 
-export async function createUser(user: CreateUserRequest): Promise<UserQuery> {
-    return apiClient.post('/users/register', user);
+export async function createUser(user: CreateUserCommand) {
+  return apiClient.post("/users/register", user);
 }

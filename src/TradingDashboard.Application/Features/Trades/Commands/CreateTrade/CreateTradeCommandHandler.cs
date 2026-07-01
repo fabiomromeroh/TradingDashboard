@@ -19,7 +19,7 @@ public class CreateTradeCommandHandler : IRequestHandler<CreateTradeCommand, Res
     public async Task<Result<Guid>> Handle(CreateTradeCommand command, CancellationToken cancellationToken)
     {
 
-        var trade = Trade.Create(command.Symbol, command.EntryPrice, command.Quantity, command.Direction);
+        var trade = Trade.Create(command.Symbol, command.EntryPrice, command.Quantity, command.Direction, command.AccountId, DateTimeOffset.UtcNow);
 
         await tradeRepository.AddTradeAsync(trade, cancellationToken);
 

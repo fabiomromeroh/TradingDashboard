@@ -6,4 +6,4 @@ public record UserDto(
     string FirstName,
     string LastName,
     bool IsActive,
-    DateTime CreatedAt);
+    DateTimeOffset CreatedAt);

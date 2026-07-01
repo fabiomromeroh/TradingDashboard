@@ -5,56 +5,58 @@ namespace TradingDashboard.Domain.Entities;
 
 public class ImportSession : BaseEntity
 {
-    public string FileName { get; private set; } = string.Empty;
+    public Guid AccountId { get; private set; }
+    public required string BrokerName { get; set; }
+    public string? FileName { get; private set; } = string.Empty;
     public string? FileHash { get; private set; }  // SHA-256, duplicate
     public string? FileFormat { get; private set; }     // "CSV", "PDF", "XLSX"
     public ImportSourceType SourceType { get; private set; }
-    public string? StoragePath { get; private set; } // blob path or local path
 
     // ── Common to ALL source types ──────────────────────────────
-    public  string? BrokerName { get; private set; }      // "IBKR", "Alpaca", "TD"
-    public ImportSessionStatus Status { get; private set; } = ImportSessionStatus.Pending; // Pending, Processing, Completed, Failed
-    public DateTimeOffset StartedAt { get; private set; }
+    public ImportSessionStatus Status { get; private set; } = ImportSessionStatus.Completed; // Completed, RolledBack
     public DateTimeOffset? CompletedAt { get; private set; }
     public int TotalRows { get; private set; }
     public int ProcessedRows { get; private set; }
-    public int FailedRows { get; private set; }
-    public string? ErrorSummary { get; private set; }
+    public int SkippedRows { get; private set; }
+    public bool IsRolledBack { get; private set; }
     public DateTimeOffset? PeriodStart { get; private set; }
     public DateTimeOffset? PeriodEnd { get; private set; }
 
     // ── Executions created in this session ─────────────────────
-    private readonly List<Execution> _executions = new();
+    private readonly List<Execution> _executions = [];
     public IReadOnlyList<Execution> Executions => _executions;
 
-    public Guid AccountId { get; private set; }
     public Account? Account { get; private set; }
 
     private ImportSession() { }
 
-    public static ImportSession Create(string fileName, Guid accountId)
+    public static ImportSession Create(Guid accountId, string brokerName, string? fileName = default)
     {
-        return new ImportSession
+        return new()
         {
+            AccountId = accountId,
+            BrokerName = brokerName,
             FileName = fileName,
-            AccountId = accountId
+            CompletedAt = DateTimeOffset.UtcNow
         };
     }
 
-    public void Complete(int totalRows, int importedRows)
+    public void Complete(int total, int imported, int skipped,
+                         DateTimeOffset periodStart, DateTimeOffset periodEnd)
     {
-        TotalRows = totalRows;
-        ProcessedRows = importedRows;
+        TotalRows = total;
+        ProcessedRows = imported;
+        SkippedRows = skipped;
+        PeriodStart = periodStart;
+        PeriodEnd = periodEnd;
         Status = ImportSessionStatus.Completed;
-        CompletedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
+        CompletedAt = DateTimeOffset.UtcNow;
     }
 
-    public void Fail(string errorMessage)
+    public void MarkAsRolledBack()
     {
-        ErrorSummary = errorMessage;
-        Status = ImportSessionStatus.Failed;
-        CompletedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
+        IsRolledBack = true;
+        Status = ImportSessionStatus.RolledBack;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

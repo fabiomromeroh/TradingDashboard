@@ -2,8 +2,7 @@ namespace TradingDashboard.Domain.Enums;
 
 public enum ImportSessionStatus
 {
-    Pending = 0,
-    Processing = 1,
-    Completed = 2,
-    Failed = 3
+
+    Completed = 1,
+    RolledBack = 2
 }

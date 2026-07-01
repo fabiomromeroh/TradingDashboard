@@ -22,15 +22,16 @@ public class TradesController : ControllerBase
     /// <summary>
     /// Handles HTTP GET requests to retrieve all trades.
     /// </summary>
-    /// <param name="cancellationToken">A cancellation token that can be used by the caller to cancel the operation.</param>
-    /// <returns>An asynchronous operation that returns an <see cref="ActionResult"/> containing all trades data.</returns>
-    [HttpGet]
-    public async Task<ActionResult> Get(CancellationToken cancellationToken)
+    /// <param name="accountIds"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost("accounts")]
+    public async Task<ActionResult> GetByAccountId([FromBody] List<Guid> accountIds, CancellationToken cancellationToken)
     {
 
-        var result = await mediator.Send(new GetAllTradesQuery(), cancellationToken);
+        var result = await mediator.Send(new GetTradesByAccountIdQuery(accountIds), cancellationToken);
 
-        return Ok(result);
+        return result.ToActionResult();
     }
 
 
@@ -44,9 +45,9 @@ public class TradesController : ControllerBase
     public async Task<ActionResult> Get(Guid id, CancellationToken cancellationToken)
     {
 
-        var trade = await mediator.Send(new GetTradeByIdQuery(id), cancellationToken);
+        var result = await mediator.Send(new GetTradeByIdQuery(id), cancellationToken);
 
-        return Ok(trade);
+        return result.ToActionResult();
     }
 
     /// <summary>
@@ -77,11 +78,11 @@ public class TradesController : ControllerBase
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
 
-        await mediator.Send(new DeleteTradeCommand() { Id= id}, cancellationToken);
+        await mediator.Send(new DeleteTradeCommand() { Id = id }, cancellationToken);
 
         return NoContent();
     }
 
 
-  
+
 }

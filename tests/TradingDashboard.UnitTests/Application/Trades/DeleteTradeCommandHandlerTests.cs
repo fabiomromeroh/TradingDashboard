@@ -23,7 +23,7 @@ public class DeleteTradeCommandHandlerTests
     {
         // Arrange
         var tradeId = Guid.NewGuid();
-        var trade = Trade.Create("EURUSD", 1.0850m, 1.0m, TradeDirection.Long);
+        var trade = Trade.Create("EURUSD", 1.0850m, 1.0m, TradeDirection.Long, Guid.NewGuid(), DateTimeOffset.UtcNow);
 
         var command = new DeleteTradeCommand { Id = tradeId };
 
@@ -87,7 +87,7 @@ public class DeleteTradeCommandHandlerTests
     {
         // Arrange
         var tradeId = Guid.NewGuid();
-        var trade = Trade.Create("GBPUSD", 1.2650m, 0.5m, TradeDirection.Short);
+        var trade = Trade.Create("GBPUSD", 1.2650m, 0.5m, TradeDirection.Short, Guid.NewGuid(), DateTimeOffset.UtcNow);
         var command = new DeleteTradeCommand { Id = tradeId };
 
         _mockTradeRepository

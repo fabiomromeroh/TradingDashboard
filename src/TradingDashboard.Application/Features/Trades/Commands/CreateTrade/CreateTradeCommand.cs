@@ -1,6 +1,5 @@
 using MediatR;
 using TradingDashboard.Application.Common;
-using TradingDashboard.Application.Features.Trades.Dtos;
 using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
@@ -14,4 +13,6 @@ public record CreateTradeCommand : IRequest<Result<Guid>>
     /// Gets the direction of the trade (buy or sell).
     /// </summary>
     public TradeDirection Direction { get; init; }
+
+    public Guid AccountId { get; set; }
 }

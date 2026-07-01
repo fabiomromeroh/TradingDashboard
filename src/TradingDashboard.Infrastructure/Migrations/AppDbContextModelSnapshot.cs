@@ -31,27 +31,36 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.Property<Guid>("BrokerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid?>("BrokerId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Currency")
-                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("USD");
 
                     b.Property<decimal>("InitialBalance")
-                        .HasColumnType("decimal(18,4)");
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)")
+                        .HasDefaultValue(0m);
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -60,9 +69,19 @@ namespace TradingDashboard.Infrastructure.Migrations
 
                     b.HasIndex("BrokerId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("BrokerId1");
 
-                    b.ToTable("Accounts");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_Accounts_UserId");
+
+                    b.HasIndex("UserId", "IsActive")
+                        .HasDatabaseName("IX_Accounts_UserId_IsActive");
+
+                    b.HasIndex("UserId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("UIX_Accounts_UserId_Name");
+
+                    b.ToTable("Accounts", (string)null);
                 });
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Broker", b =>
@@ -71,8 +90,8 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -88,8 +107,8 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Website")
                         .HasMaxLength(250)
@@ -100,7 +119,17 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Brokers");
+                    b.ToTable("Brokers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c3a2b8d9-5f1a-4b6d-9f2e-1a2b3c4d5e6f"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 6, 22, 9, 38, 56, 536, DateTimeKind.Unspecified).AddTicks(9367), new TimeSpan(0, 0, 0, 0, 0)),
+                            DisplayName = "IBKR",
+                            Name = "Interactive Brokers",
+                            Website = "https://www.interactivebrokers.com"
+                        });
                 });
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Execution", b =>
@@ -109,49 +138,91 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Action")
-                        .HasColumnType("int");
+                    b.Property<string>("BrokerExecutionId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("BrokerOrderId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Direction")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Commission")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("USD");
+
+                    b.Property<string>("Exchange")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("");
 
                     b.Property<DateTimeOffset>("ExecutedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("ImportSessionId")
+                    b.Property<Guid>("ImportSessionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                    b.Property<string>("InstrumentType")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("OrderType")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasDefaultValue("");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<string>("Side")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<Guid>("TradeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExecutedAt");
+                    b.HasIndex("TradeId")
+                        .HasDatabaseName("IX_Executions_TradeId");
 
-                    b.HasIndex("ImportSessionId");
+                    b.HasIndex("ImportSessionId", "BrokerExecutionId")
+                        .IsUnique()
+                        .HasDatabaseName("UIX_Executions_ImportSessionId_BrokerExecutionId");
 
-                    b.HasIndex("TradeId");
+                    b.HasIndex("Symbol", "ExecutedAt")
+                        .HasDatabaseName("IX_Executions_Symbol_ExecutedAt");
 
-                    b.ToTable("Executions");
+                    b.ToTable("Executions", (string)null);
                 });
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.ImportSession", b =>
@@ -164,31 +235,32 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BrokerName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTimeOffset?>("CompletedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ErrorSummary")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<int>("FailedRows")
-                        .HasColumnType("int");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("FileFormat")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("FileHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("FileName")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsRolledBack")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTimeOffset?>("PeriodEnd")
                         .HasColumnType("datetimeoffset");
@@ -197,33 +269,39 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("ProcessedRows")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
-                    b.Property<int>("SourceType")
-                        .HasColumnType("int");
+                    b.Property<int>("SkippedRows")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
-                    b.Property<DateTimeOffset>("StartedAt")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<string>("SourceType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("StoragePath")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("TotalRows")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("IX_ImportSessions_AccountId");
 
-                    b.ToTable("ImportSessions");
+                    b.ToTable("ImportSessions", (string)null);
                 });
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Trade", b =>
@@ -235,73 +313,89 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("ClosePrice")
-                        .HasColumnType("decimal(18,4)");
+                    b.Property<decimal?>("AverageClosePrice")
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)");
 
-                    b.Property<DateTimeOffset>("ClosedAt")
+                    b.Property<decimal>("AverageEntryPrice")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<decimal?>("ClosePrice")
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<DateTimeOffset?>("ClosedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateOnly>("ClosedAtDate")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("date")
-                        .HasComputedColumnSql("CAST([ClosedAt] AS DATE)", true);
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("ClosedAtHour")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("int")
-                        .HasComputedColumnSql("DATEPART(HOUR, [ClosedAt])", true);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Direction")
-                        .HasColumnType("int");
+                    b.Property<string>("Direction")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<decimal>("EntryPrice")
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)");
+
+                    b.Property<decimal?>("NetReturn")
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)");
 
                     b.Property<DateTimeOffset>("OpenedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateOnly>("OpenedAtDate")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("date")
-                        .HasComputedColumnSql("CAST([OpenedAt] AS DATE)", true);
+                    b.Property<decimal?>("PercentageReturn")
+                        .HasPrecision(10, 4)
+                        .HasColumnType("decimal(10,4)");
 
-                    b.Property<int>("OpenedAtHour")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("int")
-                        .HasComputedColumnSql("DATEPART(HOUR, [OpenedAt])", true);
+                    b.Property<decimal>("PositionSize")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)")
+                        .HasDefaultValue(0m);
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Open");
 
                     b.Property<string>("Symbol")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<decimal>("TotalCommissions")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 8)
+                        .HasColumnType("decimal(18,8)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("IX_Trades_AccountId");
 
-                    b.HasIndex("ClosedAtDate");
+                    b.HasIndex("AccountId", "OpenedAt")
+                        .HasDatabaseName("IX_Trades_AccountId_OpenedAt");
 
-                    b.HasIndex("ClosedAtHour");
+                    b.HasIndex("AccountId", "Symbol", "Status")
+                        .HasDatabaseName("IX_Trades_AccountId_Symbol_Status");
 
-                    b.HasIndex("OpenedAtDate");
-
-                    b.HasIndex("OpenedAtHour");
-
-                    b.HasIndex("Symbol");
-
-                    b.ToTable("Trades");
+                    b.ToTable("Trades", (string)null);
                 });
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.User", b =>
@@ -310,8 +404,8 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -335,29 +429,33 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Account", b =>
                 {
                     b.HasOne("TradingDashboard.Domain.Entities.Broker", "Broker")
-                        .WithMany("Accounts")
+                        .WithMany()
                         .HasForeignKey("BrokerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("TradingDashboard.Domain.Entities.Broker", null)
+                        .WithMany("Accounts")
+                        .HasForeignKey("BrokerId1");
+
                     b.HasOne("TradingDashboard.Domain.Entities.User", "User")
                         .WithMany("Accounts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Broker");
@@ -367,15 +465,19 @@ namespace TradingDashboard.Infrastructure.Migrations
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Execution", b =>
                 {
-                    b.HasOne("TradingDashboard.Domain.Entities.ImportSession", null)
+                    b.HasOne("TradingDashboard.Domain.Entities.ImportSession", "ImportSession")
                         .WithMany("Executions")
-                        .HasForeignKey("ImportSessionId");
+                        .HasForeignKey("ImportSessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("TradingDashboard.Domain.Entities.Trade", "Trade")
                         .WithMany("Executions")
                         .HasForeignKey("TradeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ImportSession");
 
                     b.Navigation("Trade");
                 });
@@ -385,7 +487,7 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.HasOne("TradingDashboard.Domain.Entities.Account", "Account")
                         .WithMany("ImportSessions")
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Account");

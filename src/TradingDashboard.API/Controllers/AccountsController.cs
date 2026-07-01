@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.Accounts.Commands.CreateAccount;
 using TradingDashboard.Application.Features.Accounts.Commands.DeleteAccount;
 using TradingDashboard.Application.Features.Accounts.Commands.UpdateAccount;
@@ -22,29 +23,34 @@ public class AccountsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAccountCommand command, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetById), new { id = result.Value }, result);
+        Guid userId = Guid.Parse("dd7e0338-d43d-4f24-a274-22bbf194dc3e");
+
+        var enrichedCommand = command with { UserId = userId };
+
+        var result = await _mediator.Send(enrichedCommand, cancellationToken);
+        return result.ToActionResult(value => CreatedAtAction(nameof(GetById), new { id = value.Id }, value));
+
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetAccountByIdQuery(id), cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     [HttpGet("user/{userId:guid}")]
     public async Task<ActionResult> GetByUser(Guid userId, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetAccountsByUserQuery(userId), cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateAccountCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command with { Id = id }, cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     [HttpDelete("{id:guid}")]

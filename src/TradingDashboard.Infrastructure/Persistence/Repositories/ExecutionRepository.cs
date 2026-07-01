@@ -30,4 +30,10 @@ public class ExecutionRepository : IExecutionRepository
         _context.Executions.Remove(execution);
         return Task.CompletedTask;
     }
+
+    public Task<List<string>> GetExistingBrokerExecutionIdsAsync(List<string> brokerExecutionIds, Guid accountId, CancellationToken ct)
+    {
+        return _context.Executions.Where(x => brokerExecutionIds.Contains(x.BrokerExecutionId)).Select(x => x.BrokerExecutionId).ToListAsync(ct);
+    }
+
 }

@@ -26,15 +26,23 @@ public class GetTradeByIdQueryHandlerTests
     {
         // Arrange
         var tradeId = Guid.NewGuid();
-        var trade = Trade.Create("EURUSD", 1.0850m, 1.0m, TradeDirection.Long);
+        var trade = Trade.Create("EURUSD", 1.0850m, 1.0m, TradeDirection.Long, Guid.NewGuid(), DateTimeOffset.UtcNow);
         var expectedDto = new TradeDto(
             tradeId,
             "EURUSD",
             1.0850m,
+            1.1m,
             1.0m,
+            0m,
             "Long",
             "Open",
-            DateTime.UtcNow
+            DateTimeOffset.UtcNow,
+            DateTimeOffset.UtcNow,
+            0.36m,
+            1.0850m,
+            1.1m,
+            10,
+            30
         );
 
         var query = new GetTradeByIdQuery(tradeId);
@@ -94,15 +102,23 @@ public class GetTradeByIdQueryHandlerTests
     {
         // Arrange
         var tradeId = Guid.NewGuid();
-        var trade = Trade.Create("GBPUSD", 1.2650m, 0.5m, TradeDirection.Short);
+        var trade = Trade.Create("GBPUSD", 1.2650m, 0.5m, TradeDirection.Short, Guid.NewGuid(), DateTimeOffset.UtcNow);
         var expectedDto = new TradeDto(
             tradeId,
             "GBPUSD",
             1.2650m,
+            1.1m,
+            0.5m,
             0.5m,
             "Short",
             "Open",
-            DateTime.UtcNow
+            DateTimeOffset.UtcNow,
+            DateTimeOffset.UtcNow,
+            0.36m,
+            1.0850m,
+            1.1m,
+            10,
+            30
         );
 
         var query = new GetTradeByIdQuery(tradeId);

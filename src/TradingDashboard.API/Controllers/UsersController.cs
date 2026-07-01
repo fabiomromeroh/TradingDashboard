@@ -32,21 +32,21 @@ public class UsersController : ControllerBase
     public async Task<ActionResult> Login([FromBody] LoginUserCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command, cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetUserByIdQuery(id), cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     [HttpPut("{id:guid}")]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateUserCommand command, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(command with { Id = id }, cancellationToken);
-        return Ok(result);
+        return result.ToActionResult();
     }
 
     [HttpDelete("{id:guid}")]

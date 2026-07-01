@@ -11,10 +11,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
+import { useBrokers } from "@/features/import/hooks/useBrokers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { useCreateAccount } from "../hooks/useCreateAccount";
+import { toast } from "sonner";
 
 const accountSchema = z.object({
   name: z.string().min(1, "Account name is required"),
@@ -24,16 +27,37 @@ const accountSchema = z.object({
 
 type CreateAccountFormValues = z.infer<typeof accountSchema>;
 
-export function CreateAccountModal() {
+type CreateAccountModalProps = {
+  handleOnAccountChange: () => void;
+};
+
+export function CreateAccountModal(props: CreateAccountModalProps) {
   const [open, setOpen] = useState(false);
   const form = useForm<CreateAccountFormValues>({
     resolver: zodResolver(accountSchema),
     defaultValues: { name: "", broker: "", currency: "" },
   });
 
+  const { brokers } = useBrokers();
+  const { create, error } = useCreateAccount();
+
   async function handleFormSubmit(values: CreateAccountFormValues) {
-    void values;
-    // Handle form submission logic here
+    const success = await create({
+      name: values.name,
+      brokerId: values.broker,
+      currency: values.currency,
+      initialBalance: 0, // Set initial balance to 0
+    });
+
+    if (success) {
+      toast.success("Account created successfully");
+      setOpen(false);
+      form.reset();
+      props.handleOnAccountChange();
+    } else {
+      toast.error(error ?? "Failed to create account");
+    }
+    setOpen(false);
   }
 
   return (
@@ -52,33 +76,34 @@ export function CreateAccountModal() {
             onSubmit={form.handleSubmit(handleFormSubmit)}
             className="space-y-4"
           >
-            <AppInputField
-              name="name"
-              control={form.control}
-              placeholder="Account Name"
-              label="Name"
-            />
-            <AppSelectField
-              name="broker"
-              control={form.control}
-              placeholder="Select a broker"
-              label="Broker"
-              options={[
-                { value: "broker1", label: "Broker 1" },
-                { value: "broker2", label: "Broker 2" },
-              ]}
-            />
+            <div className="grid grid-cols-1 gap-4">
+              <AppInputField
+                name="name"
+                control={form.control}
+                placeholder="Account Name"
+                label="Name"
+              />
+              <AppSelectField
+                name="broker"
+                control={form.control}
+                placeholder="Select a broker"
+                label="Broker"
+                className="w-full"
+                options={brokers}
+              />
 
-            <AppSelectField
-              name="currency"
-              control={form.control}
-              label="Currency"
-              placeholder="Select a currency"
-              options={[
-                { value: "USD", label: "USD" },
-                { value: "EUR", label: "EUR" },
-              ]}
-            />
+              <AppSelectField
+                name="currency"
+                control={form.control}
+                label="Currency"
+                placeholder="Select a currency"
+                className="w-full"
+                options={[
+                  { value: "USD", label: "USD" },
+                  { value: "EUR", label: "EUR" },
+                ]}
+              />
+            </div>
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline" type="button">
