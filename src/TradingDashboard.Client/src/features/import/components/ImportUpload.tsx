@@ -1,8 +1,7 @@
 import { FileUpload } from "@/components/shared/FileUpload";
 import { useUploadImport } from "../hooks/useUploadImport";
 import { PreviewImportModal } from "./PreviewImportModal";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { AppSelect } from "@/components/shared/AppSelect";
 import { useAppSelector } from "@/store/hooks";
 import { toSelectOptions } from "@/lib/utils";
@@ -10,24 +9,36 @@ import { Label } from "@/components/ui/label";
 import { useBrokers } from "../hooks/useBrokers";
 import { Card, CardContent } from "@/components/ui/card";
 
-export function ImportUpload({ accountId }: { accountId?: string }) {
-  const { uploadFile, importResult, error } = useUploadImport();
+export function ImportUpload({
+  // accountId,
+  selectedAccount,
+  onSelectedAccountChange,
+}: {
+  accountId?: string;
+  selectedAccount: string;
+  onSelectedAccountChange: (value: string) => void;
+}) {
+  const { uploadFile, importResult, isUploading } = useUploadImport();
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [uploadKey, setUploadKey] = useState(0);
-  const [selectedAccount, setSelectedAccount] = useState<string>(
-    accountId || "",
-  );
   const [selectedBroker, setSelectedBroker] = useState<string>("");
   const [selectedBrokerLabel, setSelectedBrokerLabel] = useState<string>("");
-  const [isImporting, setIsImporting] = useState<boolean>(false);
 
   const { brokers: brokerOptions } = useBrokers();
 
   const accounts = useAppSelector((x) => x.account.accounts);
   const accountOptions = toSelectOptions(accounts);
 
-  if (!selectedAccount && accountOptions.length > 0)
-    setSelectedAccount(accountOptions[0].value);
+  useEffect(() => {
+    if (selectedAccount && selectedAccount !== "") {
+      onSelectedAccountChange(selectedAccount);
+      return;
+    }
+
+    if (accountOptions.length > 0) {
+      onSelectedAccountChange(accountOptions[0].value);
+    }
+  }, [accountOptions, onSelectedAccountChange, selectedAccount]);
 
   const cancelUpload = () => {
     setShowPreview(false);
@@ -35,8 +46,6 @@ export function ImportUpload({ accountId }: { accountId?: string }) {
   };
 
   const handleUploadFIle = async (file: File) => {
-    setIsImporting(true);
-
     const success = await uploadFile(
       file,
       selectedAccount,
@@ -45,12 +54,6 @@ export function ImportUpload({ accountId }: { accountId?: string }) {
 
     if (success) {
       setShowPreview(true);
-      setIsImporting(false);
-    } else {
-      toast.error(
-        error ?? "Failed to import file, please check file formatting.",
-      );
-      setIsImporting(false);
     }
   };
 
@@ -63,6 +66,7 @@ export function ImportUpload({ accountId }: { accountId?: string }) {
               {...importResult}
               cancelUpload={cancelUpload}
               showPreview={showPreview}
+              setShowPreview={setShowPreview}
             />
           )}
           <div className="grid gap-4 col-start-1">
@@ -72,7 +76,7 @@ export function ImportUpload({ accountId }: { accountId?: string }) {
               options={accountOptions}
               value={selectedAccount}
               placeholder="Select an account.."
-              onChange={(value) => setSelectedAccount(value)}
+              onChange={(value) => onSelectedAccountChange(value)}
               className="w-full"
               groupLabel="Accounts"
             />
@@ -95,7 +99,7 @@ export function ImportUpload({ accountId }: { accountId?: string }) {
             />
 
             <FileUpload
-              isImporting={isImporting}
+              isUploading={isUploading}
               disabled={!selectedAccount || !selectedBroker}
               key={uploadKey}
               handleUpload={(file) => handleUploadFIle(file)}

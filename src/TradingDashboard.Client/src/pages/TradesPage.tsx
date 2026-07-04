@@ -5,9 +5,9 @@ import { TradeTable } from "../features/trades";
 // No hooks, no API calls, no state here.
 export default function TradesPage() {
   return (
-    <div>
-      <Card>
-        <CardContent>
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <CardContent className="flex min-h-0 flex-1 flex-col p-4">
           <TradeTable />
         </CardContent>
       </Card>

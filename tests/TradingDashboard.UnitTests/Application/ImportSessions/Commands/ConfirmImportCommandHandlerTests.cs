@@ -1,8 +1,8 @@
 using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmImport;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
+using TradingDashboard.Application.Services.Import.Interfaces;
 using TradingDashboard.Domain.Entities;
-using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.UnitTests.Application.ImportSessions.Commands;
 
@@ -10,18 +10,21 @@ public class ConfirmImportCommandHandlerTests
 {
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly Mock<IImportSessionRepository> _mockImportSessionRepository;
-    private readonly Mock<ITradeRepository> _mockTradeRepository;
+    private readonly Mock<IExecutionRepository> _mockExecutionRepository;
+    private readonly Mock<IImportService> _mockImportService;
     private readonly ConfirmImportCommandHandler _handler;
 
     public ConfirmImportCommandHandlerTests()
     {
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockImportSessionRepository = new Mock<IImportSessionRepository>();
-        _mockTradeRepository = new Mock<ITradeRepository>();
+        _mockExecutionRepository = new Mock<IExecutionRepository>();
+        _mockImportService = new Mock<IImportService>();
         _handler = new ConfirmImportCommandHandler(
             _mockUnitOfWork.Object,
             _mockImportSessionRepository.Object,
-            _mockTradeRepository.Object);
+            _mockExecutionRepository.Object,
+            _mockImportService.Object);
     }
 
     [Fact]
@@ -72,6 +75,7 @@ public class ConfirmImportCommandHandlerTests
 
         var command = new ConfirmImportCommand(
             FileName: fileName,
+            BrokerName: "IBKR",
             AccountId: accountId,
             TotalRows: 2,
             NewRows: 2,
@@ -79,12 +83,13 @@ public class ConfirmImportCommandHandlerTests
             InvalidRows: 0,
             Rows: rows);
 
-        _mockTradeRepository
-            .Setup(x => x.GetOpenTradesByAccountIdAsync(accountId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync([]);
 
         _mockImportSessionRepository
             .Setup(x => x.AddAsync(It.IsAny<ImportSession>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        _mockExecutionRepository
+            .Setup(x => x.AddAsync(It.IsAny<Execution>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         _mockUnitOfWork
@@ -99,9 +104,9 @@ public class ConfirmImportCommandHandlerTests
         result.Value.Should().NotBe(Guid.Empty);
         result.Errors.Should().BeEmpty();
 
-        _mockTradeRepository.Verify(
-            x => x.GetOpenTradesByAccountIdAsync(accountId, It.IsAny<CancellationToken>()),
-            Times.Once);
+        _mockExecutionRepository.Verify(
+            x => x.AddAsync(It.IsAny<Execution>(), It.IsAny<CancellationToken>()),
+            Times.Exactly(rows.Count));
 
         _mockImportSessionRepository.Verify(
             x => x.AddAsync(It.IsAny<ImportSession>(), It.IsAny<CancellationToken>()),
@@ -160,6 +165,7 @@ public class ConfirmImportCommandHandlerTests
 
         var command = new ConfirmImportCommand(
             FileName: fileName,
+            BrokerName: "IBKR",
             AccountId: accountId,
             TotalRows: 2,
             NewRows: 1,
@@ -167,9 +173,9 @@ public class ConfirmImportCommandHandlerTests
             InvalidRows: 0,
             Rows: rows);
 
-        _mockTradeRepository
-            .Setup(x => x.GetOpenTradesByAccountIdAsync(accountId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync([]);
+        _mockExecutionRepository
+            .Setup(x => x.AddAsync(It.IsAny<Execution>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
 
         _mockImportSessionRepository
             .Setup(x => x.AddAsync(It.IsAny<ImportSession>(), It.IsAny<CancellationToken>()))
@@ -187,81 +193,9 @@ public class ConfirmImportCommandHandlerTests
         result.Value.Should().NotBe(Guid.Empty);
 
         // Verify that only one trade was processed (the non-duplicate one)
-        _mockTradeRepository.Verify(
-            x => x.AddTradeAsync(It.IsAny<Trade>(), It.IsAny<CancellationToken>()),
-            Times.Once); // Only one new trade should be added
-    }
-
-    [Fact]
-    public async Task Handle_WithExistingOpenTrade_ShouldUpdateTradeWithExecution()
-    {
-        // Arrange
-        var accountId = Guid.NewGuid();
-        var tradeId = Guid.NewGuid();
-        var fileName = "test_import.csv";
-        var executedAt = DateTimeOffset.UtcNow;
-
-        var existingTrade = Trade.Create(
-            "EURUSD",
-            1.0800m,
-            1.0m,
-            TradeDirection.Long,
-            accountId,
-            executedAt.AddMinutes(-10));
-
-        var rows = new List<PreviewRowDto>
-        {
-            new(
-                RowNumber: 1,
-                Symbol: "EURUSD",
-                Description: "EUR/USD",
-                Side: "Buy",
-                Quantity: 1.0m,
-                Price: 1.0850m,
-                Commission: 10m,
-                Exchange: "FOREX",
-                OrderType: "Market",
-                ExecutedAt: executedAt,
-                IsDuplicate: false,
-                ParseError: null,
-                BrokerExecutionId: "EXEC001",
-                BrokerOrderId: "ORDER001",
-                BrokerTradeId: "TRADE001"
-            )
-        };
-
-        var command = new ConfirmImportCommand(
-            FileName: fileName,
-            AccountId: accountId,
-            TotalRows: 1,
-            NewRows: 0,
-            DuplicateRows: 0,
-            InvalidRows: 0,
-            Rows: rows);
-
-        _mockTradeRepository
-            .Setup(x => x.GetOpenTradesByAccountIdAsync(accountId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync([existingTrade]);
-
-        _mockImportSessionRepository
-            .Setup(x => x.AddAsync(It.IsAny<ImportSession>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockUnitOfWork
-            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(1);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().NotBe(Guid.Empty);
-
-        // Verify that no new trade was added (only existing trade was updated)
-        _mockTradeRepository.Verify(
-            x => x.AddTradeAsync(It.IsAny<Trade>(), It.IsAny<CancellationToken>()),
-            Times.Never);
+        _mockExecutionRepository.Verify(
+            x => x.AddAsync(It.IsAny<Execution>(), It.IsAny<CancellationToken>()),
+            Times.Once); // Only one new execution should be added
     }
 
     [Fact]
@@ -295,6 +229,7 @@ public class ConfirmImportCommandHandlerTests
 
         var command = new ConfirmImportCommand(
             FileName: fileName,
+            BrokerName: "IBKR",
             AccountId: accountId,
             TotalRows: 1,
             NewRows: 1,
@@ -302,8 +237,8 @@ public class ConfirmImportCommandHandlerTests
             InvalidRows: 0,
             Rows: rows);
 
-        _mockTradeRepository
-            .Setup(x => x.GetOpenTradesByAccountIdAsync(accountId, It.IsAny<CancellationToken>()))
+        _mockExecutionRepository
+            .Setup(x => x.AddAsync(It.IsAny<Execution>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("Database connection failed"));
 
         // Act & Assert

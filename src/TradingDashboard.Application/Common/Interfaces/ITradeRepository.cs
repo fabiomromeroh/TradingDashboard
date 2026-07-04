@@ -14,4 +14,6 @@ public interface ITradeRepository
 
     public Task<Trade> FindOrCreateTradeAsync(PreviewRowDto row, Guid accountId, CancellationToken cancellationToken);
     public Task<IEnumerable<Trade>> GetTradesByAccountId(List<Guid> accountIds, CancellationToken cancellationToken);
+    public Task AddTradeRangeAsync(IEnumerable<Trade> trades, CancellationToken cancellationToken);
+    void RemoveTradeRangeByAccountAndSymbol(Guid accountId, string[] symbols);
 }

@@ -24,7 +24,9 @@ apiClient.interceptors.response.use(
       // redirect to login, clear auth state, etc.
     }
     // Re-throw so individual hooks can still catch and show specific messages
-    return Promise.reject(error.response.data);
+    return Promise.reject(
+      error.response?.data ?? { errors: [{ message: "Network error" }] },
+    );
   },
 );
 

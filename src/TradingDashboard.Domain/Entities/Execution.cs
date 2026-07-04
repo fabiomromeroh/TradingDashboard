@@ -16,32 +16,40 @@ public class Execution : BaseEntity
     public string? Exchange { get; private set; } = string.Empty;
     public string? OrderType { get; private set; } = string.Empty;
     public DateTimeOffset ExecutedAt { get; private set; }
-
-    public Guid TradeId { get; private set; }
+    public Guid AccountId { get; set; }
+    public Guid? TradeId { get; private set; }
     public required string BrokerExecutionId { get; set; }
     public string? BrokerOrderId { get; private set; }
 
     public Guid ImportSessionId { get; set; }
-    public Trade? Trade { get; private set; }
+    public Trade? Trade { get; set; } = null!;
+    public Account Account { get; set; } = null!;
     public ImportSession ImportSession { get; set; } = null!;
 
     private Execution() { }
 
-    public static Execution Create(Guid tradeId, string symbol, decimal price, decimal quantity, Side side, DateTimeOffset executedAt, decimal commission, string brokerExecutionId, string brokerOrderId, Guid importSessionId, string? exchange = default, string? orderType = default, CurrencyType currency = default)
+    public static Execution Create(Guid accountId, string symbol, decimal price, decimal quantity, Side side, DateTimeOffset executedAt, decimal commission, string brokerExecutionId, string brokerOrderId, Guid importSessionId, string? exchange = default, string? orderType = default, CurrencyType currency = default)
     {
         return new()
         {
+            AccountId = accountId,
             Symbol = symbol,
-            TradeId = tradeId,
-            BrokerExecutionId = brokerExecutionId,
-            BrokerOrderId = brokerOrderId,
             Price = price,
             Quantity = quantity,
             Side = side,
             ExecutedAt = executedAt,
-            ImportSessionId = importSessionId,
-            Currency = currency,
             Commission = commission,
+            BrokerExecutionId = brokerExecutionId,
+            BrokerOrderId = brokerOrderId,
+            ImportSessionId = importSessionId,
+            Exchange = exchange,
+            OrderType = orderType,
+            Currency = currency,
+
         };
+    }
+    public void AttachToTrade(Guid tradeId)
+    {
+        TradeId = tradeId;
     }
 }

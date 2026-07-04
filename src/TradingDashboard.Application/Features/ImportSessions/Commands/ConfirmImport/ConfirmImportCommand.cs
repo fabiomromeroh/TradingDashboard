@@ -6,6 +6,7 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmI
 {
     public record ConfirmImportCommand(
         string FileName,
+        string BrokerName,
         Guid AccountId,
         int TotalRows,
         int NewRows,

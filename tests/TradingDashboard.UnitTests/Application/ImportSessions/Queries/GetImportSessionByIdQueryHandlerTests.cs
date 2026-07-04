@@ -35,12 +35,18 @@ public class GetImportSessionByIdQueryHandlerTests
 
         var importSessionDto = new ImportSessionDto(
             Id: sessionId,
+            FileFormat: "csv",
             FileName: fileName,
+            BrokerName: "IBKR",
             Status: "Completed",
-            TotalTrades: 10,
-            ImportedTrades: 9,
-            ErrorMessage: null,
+            TotalRows: 10,
+            SkippedRows: 1,
+            ProcessedRows: 9,
+            IsRolledBack: false,
+            SourceType: "FileUpload",
             CompletedAt: createdAt.AddSeconds(30),
+            PeriodStart: DateTimeOffset.Now.AddDays(-10),
+            PeriodEnd: DateTimeOffset.Now.AddDays(30),
             AccountId: accountId,
             CreatedAt: createdAt);
 
@@ -63,8 +69,8 @@ public class GetImportSessionByIdQueryHandlerTests
         result.Value!.Id.Should().Be(sessionId);
         result.Value!.FileName.Should().Be(fileName);
         result.Value!.Status.Should().Be("Completed");
-        result.Value!.TotalTrades.Should().Be(10);
-        result.Value!.ImportedTrades.Should().Be(9);
+        result.Value!.TotalRows.Should().Be(10);
+        result.Value!.ProcessedRows.Should().Be(9);
         result.Errors.Should().BeEmpty();
 
         _mockImportSessionRepository.Verify(

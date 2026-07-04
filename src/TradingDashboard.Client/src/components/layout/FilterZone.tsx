@@ -9,7 +9,6 @@ export function FilterZone() {
   const accountOptions = toSelectOptions(accounts);
   const dispatch = useAppDispatch();
   const selectedAccount = useAppSelector((x) => x.account.selectedAccounts);
-  console.log(selectedAccount);
 
   return (
     <div className="w-[320px]">
@@ -17,8 +16,6 @@ export function FilterZone() {
         options={accountOptions}
         value={selectedAccount}
         onValueChange={(values) => {
-          console.log("onValueChange", values);
-
           dispatch(setSelectedAccounts(values));
         }}
         placeholder="Select Account"

@@ -138,6 +138,9 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("BrokerExecutionId")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -204,7 +207,7 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<Guid>("TradeId")
+                    b.Property<Guid?>("TradeId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -212,8 +215,9 @@ namespace TradingDashboard.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TradeId")
-                        .HasDatabaseName("IX_Executions_TradeId");
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("TradeId");
 
                     b.HasIndex("ImportSessionId", "BrokerExecutionId")
                         .IsUnique()
@@ -465,6 +469,12 @@ namespace TradingDashboard.Infrastructure.Migrations
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Execution", b =>
                 {
+                    b.HasOne("TradingDashboard.Domain.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TradingDashboard.Domain.Entities.ImportSession", "ImportSession")
                         .WithMany("Executions")
                         .HasForeignKey("ImportSessionId")
@@ -474,8 +484,9 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.HasOne("TradingDashboard.Domain.Entities.Trade", "Trade")
                         .WithMany("Executions")
                         .HasForeignKey("TradeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Account");
 
                     b.Navigation("ImportSession");
 
@@ -498,7 +509,7 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.HasOne("TradingDashboard.Domain.Entities.Account", "Account")
                         .WithMany("Trades")
                         .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Account");

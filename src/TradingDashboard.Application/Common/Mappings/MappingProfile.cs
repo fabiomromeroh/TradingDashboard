@@ -17,5 +17,6 @@ public class MappingProfile : Profile
         CreateMap<ImportSession, ImportSessionDto>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         CreateMap<Broker, BrokerDto>();
+        CreateMap<Execution, ExecutionDto>();
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace TradingDashboard.Infrastructure.Import.Ibkr
+﻿namespace TradingDashboard.Infrastructure.Services.Import.Ibkr
 {
     public class IbkrRawRecord
     {

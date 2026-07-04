@@ -23,7 +23,7 @@ public class AccountsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAccountCommand command, CancellationToken cancellationToken)
     {
-        Guid userId = Guid.Parse("dd7e0338-d43d-4f24-a274-22bbf194dc3e");
+        Guid userId = Guid.Parse("cf9da4a8-fa83-4c99-8dd0-166e043c1c76");
 
         var enrichedCommand = command with { UserId = userId };
 

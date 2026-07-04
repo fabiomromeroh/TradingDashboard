@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmImport;
+using TradingDashboard.Application.Features.ImportSessions.Commands.DeleteImport;
 using TradingDashboard.Application.Features.ImportSessions.Commands.UploadImport;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
 using TradingDashboard.Application.Features.ImportSessions.Queries.GetImportSessionById;
@@ -58,5 +59,14 @@ public class ImportsController : ControllerBase
         return result.ToActionResult();
     }
 
+
+    [HttpPost("rollback/{id}")]
+    public async Task<ActionResult> Rollback(Guid id, CancellationToken ct)
+    {
+
+        var result = await _mediator.Send(new DeleteImportCommand(id), ct);
+
+        return result.ToActionResult(() => NoContent());
+    }
 
 }

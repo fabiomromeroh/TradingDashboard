@@ -75,5 +75,17 @@ public class TradeRepository : ITradeRepository
         return await context.Trades.Where(x => accountIds.Contains(x.AccountId)).ToListAsync(cancellationToken);
     }
 
+    public Task AddTradeRangeAsync(IEnumerable<Trade> trades, CancellationToken cancellationToken)
+    {
+        return context.Trades.AddRangeAsync(trades, cancellationToken);
+    }
 
+    public void RemoveTradeRangeByAccountAndSymbol(Guid accountId, string[] symbols)
+    {
+        var trades = context.Trades
+        .Where(t => t.AccountId == accountId && symbols.Contains(t.Symbol))
+        .ToList();
+
+        context.Trades.RemoveRange(trades);
+    }
 }

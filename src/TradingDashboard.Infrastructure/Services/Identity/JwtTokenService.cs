@@ -7,7 +7,7 @@ using System.Text;
 using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Domain.Entities;
 
-namespace TradingDashboard.Infrastructure.Identity;
+namespace TradingDashboard.Infrastructure.Services.Identity;
 
 public class JwtTokenService : IJwtTokenService
 {

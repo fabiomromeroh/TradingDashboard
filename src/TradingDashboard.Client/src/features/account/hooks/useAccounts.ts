@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AccountQuery } from "../types/account.types";
 import { getAccounts } from "../api/accountApi";
+import { useAppSelector } from "@/store/hooks";
 
 interface UseAccountsResult {
   accounts: AccountQuery[];
@@ -13,9 +14,10 @@ export function useAccounts(): UseAccountsResult {
   const [accounts, setAccounts] = useState<AccountQuery[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const userId = useAppSelector((state) => state.user.id);
 
   const fetchAccounts = useCallback(async () => {
-    await getAccounts()
+    await getAccounts(userId)
       .then((data) => {
         setAccounts(data);
         setError(null);
@@ -25,11 +27,11 @@ export function useAccounts(): UseAccountsResult {
         setAccounts([]);
       })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
+    if (userId) fetchAccounts();
+  }, [userId, fetchAccounts]);
 
   return { accounts, isLoading, error, refetch: fetchAccounts };
 }

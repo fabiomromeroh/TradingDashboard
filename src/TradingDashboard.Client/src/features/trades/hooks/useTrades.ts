@@ -14,8 +14,6 @@ export function useTrades(): UseTradesResult {
   // useCallback ensures `fetchTrades` keeps a stable reference so it's safe
   // to pass as a prop or put in a dependency array without infinite loops.
   const fetchTrades = useCallback(async () => {
-    console.log(selectedAccounts);
-
     await getTradesByAccountId(selectedAccounts)
       .then((data) => {
         setTrades(data);

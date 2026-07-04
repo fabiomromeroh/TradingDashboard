@@ -54,7 +54,6 @@ export function AppMultiSelect({
     }
 
     const newValue = [...value, optionValue];
-    console.log("selected", newValue);
 
     return onValueChange(newValue);
   };
@@ -117,15 +116,28 @@ export function AppMultiSelect({
               const checked = value.includes(option.value);
 
               return (
-                <button
+                <div
                   key={option.value}
-                  type="button"
-                  disabled={option.disabled}
-                  onClick={() => toggleOption(option.value)}
+                  role="option"
+                  aria-selected={checked}
+                  tabIndex={option.disabled ? -1 : 0}
+                  aria-disabled={option.disabled}
+                  onClick={() => {
+                    if (option.disabled) return;
+                    toggleOption(option.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (option.disabled) return;
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleOption(option.value);
+                    }
+                  }}
                   className={cn(
-                    "flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors",
+                    "flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors cursor-pointer",
                     "hover:bg-accent hover:text-accent-foreground",
-                    "disabled:pointer-events-none disabled:opacity-50",
+                    "focus:outline-none focus:bg-accent focus:text-accent-foreground",
+                    option.disabled && "pointer-events-none opacity-50",
                   )}
                 >
                   <Checkbox checked={checked} className="pointer-events-none" />
@@ -133,7 +145,7 @@ export function AppMultiSelect({
                   {checked ? (
                     <Check className="h-4 w-4 text-muted-foreground" />
                   ) : null}
-                </button>
+                </div>
               );
             })}
           </div>

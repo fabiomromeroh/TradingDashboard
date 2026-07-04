@@ -7,6 +7,7 @@ import {
   Plus,
   Users,
 } from "lucide-react";
+import { useAppSelector } from "@/store/hooks";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
@@ -17,6 +18,8 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+  const user = useAppSelector((x) => x.user);
+
   return (
     <aside className="h-screen bg-sidebar flex flex-col">
       {/* Logo */}
@@ -60,6 +63,7 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="px-5 py-4 border-t border-sidebar-border">
+        {user.name}
         <p className="text-xs text-muted-foreground">v0.1.0</p>
       </div>
     </aside>

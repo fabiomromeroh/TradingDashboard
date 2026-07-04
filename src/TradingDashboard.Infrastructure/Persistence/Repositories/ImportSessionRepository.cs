@@ -14,7 +14,7 @@ public class ImportSessionRepository : IImportSessionRepository
         => await _context.ImportSessions.AsNoTracking().Where(i => i.AccountId == accountId).ToListAsync(cancellationToken);
 
     public async Task<ImportSession?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
-        => await _context.ImportSessions.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        => await _context.ImportSessions.AsNoTracking().Include(x => x.Executions).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
 
     public async Task AddAsync(ImportSession importSession, CancellationToken cancellationToken)
         => await _context.ImportSessions.AddAsync(importSession, cancellationToken);

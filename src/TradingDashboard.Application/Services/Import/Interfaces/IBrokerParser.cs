@@ -1,6 +1,6 @@
 ﻿using TradingDashboard.Application.Services.Import.Models;
 
-namespace TradingDashboard.Application.Services.Import
+namespace TradingDashboard.Application.Services.Import.Interfaces
 {
     public interface IBrokerParser
     {

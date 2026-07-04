@@ -1,7 +1,7 @@
 using System.Net;
 using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.ImportSessions.Commands.UploadImport;
-using TradingDashboard.Application.Services.Import;
+using TradingDashboard.Application.Services.Import.Interfaces;
 using TradingDashboard.Application.Services.Import.Models;
 
 namespace TradingDashboard.UnitTests.Application.ImportSessions.Commands;
@@ -68,7 +68,7 @@ public class UploadImportCommandHandlerTests
 
         _mockBrokerParserFactory
             .Setup(x => x.SupportedBrokers)
-            .Returns(new[] { brokerName }.ToList());
+            .Returns([brokerName]);
 
         _mockBrokerParserFactory
             .Setup(x => x.GetParser(brokerName))

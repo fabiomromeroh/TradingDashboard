@@ -8,8 +8,8 @@ export function useCreateUser() {
 
   const create = useCallback(async (user: CreateUserCommand) => {
     return createUser(user)
-      .then(() => {
-        return true;
+      .then((data) => {
+        return data;
       })
       .catch((err: unknown) => {
         const message =

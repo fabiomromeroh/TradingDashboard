@@ -1,10 +1,10 @@
 ﻿using CsvHelper;
 using System.Globalization;
 using TradingDashboard.Application.Extensions;
-using TradingDashboard.Application.Services.Import;
+using TradingDashboard.Application.Services.Import.Interfaces;
 using TradingDashboard.Application.Services.Import.Models;
 
-namespace TradingDashboard.Infrastructure.Import.Ibkr
+namespace TradingDashboard.Infrastructure.Services.Import.Ibkr
 {
     public class IbkrCsvParser : IBrokerParser
     {

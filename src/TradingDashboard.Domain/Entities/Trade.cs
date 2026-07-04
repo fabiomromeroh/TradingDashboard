@@ -34,6 +34,7 @@ public class Trade : BaseEntity
     // EF Core constructor
     private Trade() { }
 
+
     public static Trade Create(string symbol, decimal entryPrice, decimal quantity, TradeDirection direction, Guid accountId, DateTimeOffset openedAt)
     {
         return new()
@@ -48,6 +49,24 @@ public class Trade : BaseEntity
         };
     }
 
+    public static Trade CreatePlaceholder(string symbol, Guid accountId)
+    {
+        return new()
+        {
+            Symbol = symbol,
+            AccountId = accountId,
+            Status = TradeStatus.Open,
+
+        };
+    }
+
+    public void RebuildFromExecutions(IEnumerable<Execution> executions)
+    {
+        _executions.Clear();
+        _executions.AddRange(executions.OrderBy(e => e.ExecutedAt).ThenBy(e => e.Id));
+        RecalculatePosition();
+    }
+
     public void AddExecution(Execution execution)
     {
         _executions.Add(execution);
@@ -56,6 +75,19 @@ public class Trade : BaseEntity
 
     private void RecalculatePosition()
     {
+        if (_executions.Count == 0)
+            return;
+
+        //First execution
+        if (_executions.Count == 1)
+        {
+            EntryPrice = _executions[0].Price;
+            Quantity = _executions[0].Quantity;
+            Direction = _executions[0].Side == Side.Buy ? TradeDirection.Long : TradeDirection.Short;
+            OpenedAt = _executions[0].ExecutedAt;
+        }
+
+
         var buys = _executions.Where(e => e.Side == Side.Buy).ToList();
         var sells = _executions.Where(e => e.Side == Side.Sell).ToList();
 
@@ -66,9 +98,9 @@ public class Trade : BaseEntity
 
         TotalCommissions = _executions.Sum(e => e.Commission);
 
-        // Detect direction from first execution
-        var first = _executions.MinBy(e => e.ExecutedAt);
-        Direction = first?.Side == Side.Sell ? TradeDirection.Short : TradeDirection.Long;
+        //// Detect direction from first execution
+        //var first = _executions.MinBy(e => e.ExecutedAt);
+        //Direction = first?.Side == Side.Sell ? TradeDirection.Short : TradeDirection.Long;
 
         // VWAP entry = opening side, VWAP exit = closing side
         var openingSide = Direction == TradeDirection.Long ? buys : sells;
@@ -80,7 +112,7 @@ public class Trade : BaseEntity
             ? openingSide.Sum(e => e.Price * e.Quantity) / openingQty
             : 0;
 
-        if (PositionSize == 0 && _executions.Any())
+        if (PositionSize == 0)
         {
             var last = _executions.MaxBy(e => e.ExecutedAt);
             Status = TradeStatus.Closed;
@@ -106,6 +138,7 @@ public class Trade : BaseEntity
                 ? (NetReturn / capitalDeployed) * 100m
                 : 0;
         }
+
     }
 
     public bool IsClosed => Status == TradeStatus.Closed;

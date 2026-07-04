@@ -1,6 +1,6 @@
-﻿using TradingDashboard.Application.Services.Import;
+﻿using TradingDashboard.Application.Services.Import.Interfaces;
 
-namespace TradingDashboard.Infrastructure.Import
+namespace TradingDashboard.Infrastructure.Services.Import
 {
     public class BrokerParserFactory : IBrokerParserFactory
     {

@@ -79,6 +79,9 @@ public class ExecutionConfiguration : IEntityTypeConfiguration<Execution>
         // ── Foreign keys ─────────────────────────────────────────────────
 
         builder.Property(x => x.TradeId)
+            .IsRequired(false);
+
+        builder.Property(x => x.AccountId)
             .IsRequired();
 
         builder.Property(x => x.ImportSessionId)
@@ -92,8 +95,8 @@ public class ExecutionConfiguration : IEntityTypeConfiguration<Execution>
             .HasDatabaseName("UIX_Executions_ImportSessionId_BrokerExecutionId");
 
         // Lookup all executions belonging to a trade
-        builder.HasIndex(x => x.TradeId)
-            .HasDatabaseName("IX_Executions_TradeId");
+        //builder.HasIndex(x => x.TradeId)
+        //    .HasDatabaseName("IX_Executions_TradeId");
 
         // Time-range queries per symbol (P&L reports, charts)
         builder.HasIndex(x => new { x.Symbol, x.ExecutedAt })
@@ -105,7 +108,9 @@ public class ExecutionConfiguration : IEntityTypeConfiguration<Execution>
         builder.HasOne(x => x.Trade)
             .WithMany(t => t.Executions)
             .HasForeignKey(x => x.TradeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne(x => x.Account);
 
         builder.HasOne(x => x.ImportSession)
             .WithMany(s => s.Executions)

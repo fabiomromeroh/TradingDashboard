@@ -4,6 +4,7 @@ using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
 using TradingDashboard.Application.Features.Trades.Commands.DeleteTrade;
 using TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
+using TradingDashboard.Application.Features.Trades.Queries.GetExecutionsByTradeId;
 using TradingDashboard.Application.Features.Trades.Queries.GetTradeById;
 
 namespace TradingDashboard.API.Controllers;
@@ -81,6 +82,14 @@ public class TradesController : ControllerBase
         await mediator.Send(new DeleteTradeCommand() { Id = id }, cancellationToken);
 
         return NoContent();
+    }
+
+    [HttpGet("{id}/executions")]
+    public async Task<ActionResult> GetExecutions(Guid id, CancellationToken cancellationToken)
+    {
+        var executions = await mediator.Send(new GetExecutionsByTradeIdQuery(id), cancellationToken);
+
+        return executions.ToActionResult();
     }
 
 

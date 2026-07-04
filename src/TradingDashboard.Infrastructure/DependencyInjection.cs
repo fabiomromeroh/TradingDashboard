@@ -2,12 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TradingDashboard.Application.Common.Interfaces;
-using TradingDashboard.Application.Services.Import;
-using TradingDashboard.Infrastructure.Identity;
-using TradingDashboard.Infrastructure.Import;
-using TradingDashboard.Infrastructure.Import.Ibkr;
+using TradingDashboard.Application.Services.Import.Interfaces;
 using TradingDashboard.Infrastructure.Persistence;
 using TradingDashboard.Infrastructure.Persistence.Repositories;
+using TradingDashboard.Infrastructure.Services.Identity;
+using TradingDashboard.Infrastructure.Services.Import;
+using TradingDashboard.Infrastructure.Services.Import.Ibkr;
 
 namespace TradingDashboard.Infrastructure;
 
@@ -36,12 +36,7 @@ public static class DependencyInjection
         // --- Database ---
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
-                configuration.GetConnectionString("DefaultConnection"),
-                sqlOptions => sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null)
-                    .MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+                configuration.GetConnectionString("DefaultConnection")));
 
         // --- Repositories ---
         services.AddScoped<ITradeRepository, TradeRepository>();
@@ -60,6 +55,7 @@ public static class DependencyInjection
         ////---Import---
         services.AddScoped<IBrokerParser, IbkrCsvParser>();
         services.AddScoped<IBrokerParserFactory, BrokerParserFactory>();
+        services.AddScoped<IImportService, ImportSessionService>();
 
         return services;
     }

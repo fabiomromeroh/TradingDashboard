@@ -41,11 +41,11 @@ public class ImportSession : BaseEntity
         };
     }
 
-    public void Complete(int total, int imported, int skipped,
+    public void Complete(int total, int skipped,
                          DateTimeOffset periodStart, DateTimeOffset periodEnd)
     {
         TotalRows = total;
-        ProcessedRows = imported;
+        ProcessedRows = total - skipped;
         SkippedRows = skipped;
         PeriodStart = periodStart;
         PeriodEnd = periodEnd;

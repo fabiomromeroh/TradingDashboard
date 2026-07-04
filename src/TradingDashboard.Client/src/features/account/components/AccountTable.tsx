@@ -85,7 +85,6 @@ export function AccountTable() {
     <DataTable
       columns={columns}
       data={accounts}
-      showFilter={false}
       toolbar={<CreateAccountModal handleOnAccountChange={refetch} />}
     />
   );

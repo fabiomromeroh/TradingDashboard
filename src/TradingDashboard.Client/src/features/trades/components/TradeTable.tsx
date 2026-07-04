@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTrades } from "../hooks/useTrades";
 import { TradeStatusBadge } from "./TradeStatusBadge";
-import type { Trade } from "../types/trade.types";
+import type { Execution, Trade } from "../types/trade.types";
 import { DataTable } from "@/components/shared/DataTable";
+import { getTradeExecutions } from "../api/tradesApi";
+import { getDateFormat } from "@/lib/utils";
 
 const columns: ColumnDef<Trade, unknown>[] = [
   { accessorKey: "symbol", header: "Symbol" },
@@ -22,27 +24,43 @@ const columns: ColumnDef<Trade, unknown>[] = [
     cell: ({ getValue }) => {
       const val = getValue() as string;
       return (
-        <span className={val === "Long" ? "text-green-600" : "text-red-600"}>
+        <span
+          className={val === "Long" ? "text-primary " : " text-destructive "}
+        >
           {val}
         </span>
       );
     },
   },
+  { accessorKey: "quantity", header: "Qty" },
+  { accessorKey: "positionSize", header: "Position" },
   {
     accessorKey: "entryPrice",
     header: "Entry Price",
     cell: ({ getValue }) => `$${(getValue() as number).toFixed(2)}`,
   },
   {
+    accessorKey: "openedAt",
+    header: "Open Date",
+    cell: ({ getValue }) => getDateFormat(getValue() as string),
+  },
+  {
     accessorKey: "closePrice",
     header: "Close Price",
     cell: ({ getValue }) => {
-      const val = getValue() as number | undefined;
-      return val !== undefined ? `$${val.toFixed(2)}` : "—";
+      const val = (getValue() as number | null) || undefined;
+      return val !== undefined && val !== null ? `$${val.toFixed(2)}` : "—";
     },
   },
-  { accessorKey: "quantity", header: "Qty" },
-  { accessorKey: "positionSize", header: "Position" },
+  {
+    accessorKey: "closedAt",
+    header: "Close Date",
+    cell: ({ getValue }) => getDateFormat(getValue() as string),
+  },
+
+  { accessorKey: "totalCommissions", header: "Commissions" },
+  { accessorKey: "averageEntryPrice", header: "Avg Entry Price" },
+  { accessorKey: "averageClosePrice", header: "Avg Close Price" },
   {
     accessorKey: "netReturn",
     header: "Net Return",
@@ -50,11 +68,7 @@ const columns: ColumnDef<Trade, unknown>[] = [
       const val = getValue() as number | undefined | null;
       if (val === undefined || val === null) return "—";
       return (
-        <span
-          className={
-            val >= 0 ? "text-green-600 font-medium" : "text-red-600 font-medium"
-          }
-        >
+        <span className={val >= 0 ? "text-primary" : "text-destructive"}>
           {val >= 0 ? "+" : ""}
           {val.toFixed(2)}
         </span>
@@ -68,11 +82,7 @@ const columns: ColumnDef<Trade, unknown>[] = [
       const val = getValue() as number | undefined | null;
       if (val === undefined || val === null) return "—";
       return (
-        <span
-          className={
-            val >= 0 ? "text-green-600 font-medium" : "text-red-600 font-medium"
-          }
-        >
+        <span className={val >= 0 ? "text-primary" : "text-destructive"}>
           {val >= 0 ? "+" : ""}
           {val.toFixed(2)}%
         </span>
@@ -81,10 +91,10 @@ const columns: ColumnDef<Trade, unknown>[] = [
   },
   {
     accessorKey: "status",
+    accessorFn: (row) =>
+      row.netReturn == null ? "Open" : row.netReturn > 0 ? "Win" : "Loss",
     header: "Status",
-    cell: ({ getValue }) => (
-      <TradeStatusBadge status={getValue() as Trade["status"]} />
-    ),
+    cell: ({ getValue }) => <TradeStatusBadge status={getValue() as string} />,
   },
   {
     id: "actions",
@@ -118,6 +128,21 @@ const columns: ColumnDef<Trade, unknown>[] = [
   },
 ];
 
+const executionColumns: ColumnDef<Execution, unknown>[] = [
+  { accessorKey: "side", header: "Side" },
+  { accessorKey: "instrumentType", header: "Type" },
+  {
+    accessorKey: "executedAt",
+    header: "Executed At",
+    cell: ({ getValue }) => {
+      const raw = getValue<string>();
+      return getDateFormat(raw);
+    },
+  },
+  { accessorKey: "quantity", header: "Quantity" },
+  { accessorKey: "price", header: "Price" },
+];
+
 export function TradeTable() {
   const { trades, isLoading, error, refetch } = useTrades();
 
@@ -145,6 +170,11 @@ export function TradeTable() {
       filterPlaceholder="Filter trades..."
       withColumnVisibilityToggle
       withPagination
+      withViewDetails
+      withFilter
+      detailColumns={executionColumns}
+      detailsFetcher={(trade) => getTradeExecutions(trade.id)}
+      detailTitle="Executions"
     />
   );
 }

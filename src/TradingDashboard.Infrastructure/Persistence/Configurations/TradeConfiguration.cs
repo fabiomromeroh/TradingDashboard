@@ -103,12 +103,12 @@ public class TradeConfiguration : IEntityTypeConfiguration<Trade>
         builder.HasOne(x => x.Account)
             .WithMany(a => a.Trades)    // adjust to match Account's collection name
             .HasForeignKey(x => x.AccountId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasMany(x => x.Executions)
             .WithOne(e => e.Trade)
             .HasForeignKey(e => e.TradeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.Navigation(x => x.Executions)
             .UsePropertyAccessMode(PropertyAccessMode.Field)

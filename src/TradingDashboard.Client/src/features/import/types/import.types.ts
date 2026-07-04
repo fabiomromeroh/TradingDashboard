@@ -23,12 +23,14 @@ export interface UploadImport {
   rows: UploadImportRow[];
   cancelUpload: () => void;
   showPreview: boolean;
+  setShowPreview: (value: boolean) => void;
   accountId: string;
 }
 
 export interface ConfirmImportCommand {
   accountId: string;
   fileName: string;
+  brokerName: string;
   totalRows: number;
   newRows: number;
   invalidRows: number;
@@ -36,7 +38,8 @@ export interface ConfirmImportCommand {
   rows: UploadImportRow[];
 }
 
-export interface ImportHistoryTableProps {
+export interface ImportHistory {
+  id: string;
   accountId: string;
   fileName?: string;
   fileFormat?: string;
@@ -49,4 +52,5 @@ export interface ImportHistoryTableProps {
   newRows: number;
   skippedRows: number;
   brokerName: string;
+  isRolledBack: boolean;
 }

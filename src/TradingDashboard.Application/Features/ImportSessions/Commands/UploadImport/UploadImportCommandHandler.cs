@@ -3,7 +3,7 @@ using System.Net;
 using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
-using TradingDashboard.Application.Services.Import;
+using TradingDashboard.Application.Services.Import.Interfaces;
 
 namespace TradingDashboard.Application.Features.ImportSessions.Commands.UploadImport
 {
@@ -52,6 +52,13 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.UploadIm
 
             var existingIds = await executionRepository
                 .GetExistingBrokerExecutionIdsAsync(brokerExecutionIds, command.AccountId, ct);
+
+            if (existingIds.Count == brokerExecutionIds.Count)
+            {
+                return Result<ImportPreviewtDto>.Failure(
+                    new Error("DuplicatedFile", "This file was uploaded already or all trades in this file already exist in this account."),
+                    HttpStatusCode.BadRequest);
+            }
 
 
             // 5 — Build preview rows

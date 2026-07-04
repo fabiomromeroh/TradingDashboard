@@ -1,5 +1,9 @@
 import apiClient from "@/lib/apiClient";
-import type { ConfirmImportCommand, UploadImport } from "../types/import.types";
+import type {
+  ConfirmImportCommand,
+  ImportHistory,
+  UploadImport,
+} from "../types/import.types";
 
 export async function uploadImport(
   file: File,
@@ -22,4 +26,14 @@ export async function confirmImport(
   confirmImportCommand: ConfirmImportCommand,
 ): Promise<string> {
   return apiClient.post("/imports/confirm", confirmImportCommand);
+}
+
+export async function getImportHistoryApi(
+  accountId: string,
+): Promise<ImportHistory[]> {
+  return apiClient.get(`/imports/account/${accountId}`);
+}
+
+export async function rollbackImportApi(id: string): Promise<void> {
+  return apiClient.post(`/imports/rollback/${id}`);
 }

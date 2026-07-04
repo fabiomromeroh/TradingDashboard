@@ -1,6 +1,6 @@
 // Union types act as enums but are plain strings — easier to work with
-export type TradeDirection = 'Long' | 'Short';
-export type TradeStatus = 'Open' | 'Closed' | 'Cancelled';
+export type TradeDirection = "Long" | "Short";
+export type TradeStatus = "Open" | "Closed" | "Cancelled";
 
 export interface Trade {
   id: string;
@@ -8,11 +8,23 @@ export interface Trade {
   direction: TradeDirection;
   status: TradeStatus;
   entryPrice: number;
-  exitPrice?: number;   // optional: only set when the trade is closed
+  closePrice?: number; // optional: only set when the trade is closed
   quantity: number;
-  openedAt: string;     // ISO date string from the API
+  openedAt: string; // ISO date string from the API
   closedAt?: string;
-  pnl?: number;         // optional: only available on closed trades
+  netReturn?: number | null;
+  percentageReturn?: number;
+}
+
+export interface Execution {
+  id: string;
+  tradeId: string;
+  price: number;
+  quantity: number;
+  executedAt: string; // ISO date string from the API
+  side: string; // "buy" or "sell"
+  commission?: number | null; // optional: only set
+  instrumentType: string; // "stock" or "future"
 }
 
 export interface UseTradesResult {

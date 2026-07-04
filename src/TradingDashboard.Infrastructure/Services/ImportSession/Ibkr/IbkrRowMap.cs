@@ -1,6 +1,6 @@
 ﻿using CsvHelper.Configuration;
 
-namespace TradingDashboard.Infrastructure.Import.Ibkr
+namespace TradingDashboard.Infrastructure.Services.Import.Ibkr
 {
     public class IbkrRowMap : ClassMap<IbkrRawRecord>
     {

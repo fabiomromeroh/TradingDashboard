@@ -9,14 +9,14 @@ interface FileUploadProps {
   handleUpload: (file: File) => void;
   className?: string;
   disabled?: boolean;
-  isImporting: boolean;
+  isUploading: boolean;
 }
 
 export function FileUpload({
   handleUpload,
   className,
   disabled,
-  isImporting,
+  isUploading,
 }: FileUploadProps) {
   const [fileName, setFileName] = useState("");
 
@@ -35,7 +35,7 @@ export function FileUpload({
         <p className="text-sm text-muted-foreground">Selected: {fileName}</p>
       ) : null}
       <Button
-        disabled={!fileName || disabled || isImporting}
+        disabled={!fileName || disabled || isUploading}
         className="mt-2"
         onClick={() => {
           const fileInput = document.getElementById("file") as HTMLInputElement;
@@ -45,7 +45,7 @@ export function FileUpload({
           }
         }}
       >
-        {isImporting && <Spinner />}
+        {isUploading && <Spinner />}
         Import
       </Button>
     </div>

@@ -17,6 +17,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Label } from "@/components/ui/label";
 import { useConfirmImport } from "../hooks/useConfirmImport";
 import { toast } from "sonner";
+import { getDateFormat } from "@/lib/utils";
 
 const columns: ColumnDef<UploadImportRow>[] = [
   { accessorKey: "symbol", header: "Symbol" },
@@ -29,16 +30,7 @@ const columns: ColumnDef<UploadImportRow>[] = [
     header: "Executed At",
     cell: ({ getValue }) => {
       const raw = getValue<string>();
-      if (!raw) return "—";
-      return new Date(raw).toLocaleString("en-IE", {
-        year: "numeric",
-        month: "short",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        timeZone: "UTC",
-      });
+      return getDateFormat(raw);
     },
   },
   { accessorKey: "commission", header: "Commission" },
@@ -50,6 +42,7 @@ export function PreviewImportModal(importPreview: UploadImport) {
   const handleConfirm = async () => {
     const confirmImportCommand: ConfirmImportCommand = {
       fileName: importPreview.fileName,
+      brokerName: importPreview.brokerName,
       accountId: importPreview.accountId,
       totalRows: importPreview.totalRows,
       newRows: importPreview.newRows,
@@ -60,6 +53,7 @@ export function PreviewImportModal(importPreview: UploadImport) {
     const success = await confirm(confirmImportCommand);
 
     if (success) {
+      importPreview.setShowPreview(false);
       toast.success("Trades imported to account successfully");
     } else {
       toast.error(error ?? "Failed to import trades to account");
@@ -72,7 +66,11 @@ export function PreviewImportModal(importPreview: UploadImport) {
         open={importPreview.showPreview}
         onOpenChange={importPreview.cancelUpload}
       >
-        <DialogContent className="sm:max-w-6xl">
+        <DialogContent
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          className="sm:max-w-6xl"
+        >
           <DialogHeader>
             <DialogTitle>Import Preview</DialogTitle>
           </DialogHeader>
@@ -86,7 +84,7 @@ export function PreviewImportModal(importPreview: UploadImport) {
             <DataTable
               columns={columns}
               data={importPreview.rows}
-              showFilter={true}
+              withFilter
               withPagination
             />
           </div>
