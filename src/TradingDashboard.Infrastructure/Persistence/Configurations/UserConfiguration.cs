@@ -15,11 +15,22 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.PasswordHash).IsRequired();
         builder.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
         builder.Property(u => u.LastName).HasMaxLength(100).IsRequired();
+        builder.Property(u => u.Role)
+                .IsRequired()
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+
         builder.HasIndex(u => u.Email).IsUnique();
 
         builder.HasMany(u => u.Accounts)
                .WithOne(a => a.User)
                .HasForeignKey(a => a.UserId)
                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(u => u.RefreshTokens)
+               .WithOne(a => a.User)
+               .HasForeignKey(a => a.UserId)
+               .OnDelete(DeleteBehavior.NoAction);
     }
 }

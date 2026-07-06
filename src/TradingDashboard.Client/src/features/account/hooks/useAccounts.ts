@@ -14,19 +14,20 @@ export function useAccounts(): UseAccountsResult {
   const [accounts, setAccounts] = useState<AccountQuery[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const userId = useAppSelector((state) => state.user.id);
+  const userId = useAppSelector((state) => state.auth.user?.id);
 
   const fetchAccounts = useCallback(async () => {
-    await getAccounts(userId)
-      .then((data) => {
-        setAccounts(data);
-        setError(null);
-      })
-      .catch((err: Error) => {
-        setError(err.message ?? "Failed to fetch accounts");
-        setAccounts([]);
-      })
-      .finally(() => setIsLoading(false));
+    if (userId)
+      await getAccounts(userId)
+        .then((data) => {
+          setAccounts(data);
+          setError(null);
+        })
+        .catch((err: Error) => {
+          setError(err.message ?? "Failed to fetch accounts");
+          setAccounts([]);
+        })
+        .finally(() => setIsLoading(false));
   }, [userId]);
 
   useEffect(() => {

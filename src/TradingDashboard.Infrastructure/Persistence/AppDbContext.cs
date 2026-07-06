@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Broker> Brokers => Set<Broker>();
     public DbSet<ImportSession> ImportSessions => Set<ImportSession>();
     public DbSet<Execution> Executions => Set<Execution>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.Accounts.Commands.CreateAccount;
@@ -11,6 +12,7 @@ namespace TradingDashboard.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class AccountsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -23,7 +25,8 @@ public class AccountsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAccountCommand command, CancellationToken cancellationToken)
     {
-        Guid userId = Guid.Parse("cf9da4a8-fa83-4c99-8dd0-166e043c1c76");
+        Guid userId = HttpContext.User.GetUserId();
+        if (userId == Guid.Empty) return Unauthorized();
 
         var enrichedCommand = command with { UserId = userId };
 

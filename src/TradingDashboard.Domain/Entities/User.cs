@@ -1,4 +1,5 @@
 using TradingDashboard.Domain.Common;
+using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Domain.Entities;
 
@@ -10,8 +11,12 @@ public class User : BaseEntity
     public string LastName { get; private set; } = string.Empty;
     public bool IsActive { get; private set; } = true;
 
+    public UserRole Role { get; set; } = UserRole.User;
+
     public IReadOnlyCollection<Account> Accounts => _accounts.AsReadOnly();
     private readonly List<Account> _accounts = [];
+
+    public IReadOnlyCollection<RefreshToken> RefreshTokens { get; }
 
     private User() { }
 
@@ -22,7 +27,8 @@ public class User : BaseEntity
             Email = email,
             PasswordHash = passwordHash,
             FirstName = firstName,
-            LastName = lastName
+            LastName = lastName,
+            Role = UserRole.User
         };
     }
 

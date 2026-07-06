@@ -8,17 +8,26 @@ import {
   Users,
 } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
-
-const navItems = [
-  { to: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
-  { to: "/users", icon: Users, label: "Users" },
-  { to: "/trades", icon: ArrowLeftRight, label: "Trades" },
-  { to: "/accounts", icon: Briefcase, label: "Accounts" },
-  { to: "/reports", icon: ChartBar, label: "Reports" },
-];
+import { useLogoutUser } from "@/features/auth/hooks/useLogoutUser";
+import { AvatarDropdown } from "../shared/AvatarDropdown";
+import { useAuth } from "@/app/AuthContext";
 
 export default function Sidebar() {
-  const user = useAppSelector((x) => x.user);
+  const user = useAppSelector((x) => x.auth.user);
+  const { logoutUser } = useLogoutUser();
+  const { hasRole } = useAuth();
+
+  const navItems = [
+    { to: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
+
+    { to: "/trades", icon: ArrowLeftRight, label: "Trades" },
+    { to: "/accounts", icon: Briefcase, label: "Accounts" },
+    { to: "/reports", icon: ChartBar, label: "Reports" },
+  ];
+
+  if (hasRole("Admin")) {
+    navItems.push({ to: "/users", icon: Users, label: "Users" });
+  }
 
   return (
     <aside className="h-screen bg-sidebar flex flex-col">
@@ -62,9 +71,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-sidebar-border">
-        {user.name}
-        <p className="text-xs text-muted-foreground">v0.1.0</p>
+      <div className="px-5 py-4 items-center flex justify-between  mr-auto gap-2">
+        <AvatarDropdown onClick={logoutUser} />
+
+        {user?.fullName}
       </div>
     </aside>
   );

@@ -22,6 +22,12 @@ public class BrokerConfiguration : IEntityTypeConfiguration<Broker>
         builder.Property(b => b.Website).HasMaxLength(250);
         builder.Property(b => b.SupportedImportFormat).HasMaxLength(100);
         builder.HasIndex(b => b.Name).IsUnique();
+
+        builder.HasMany(x => x.Accounts)
+            .WithOne(x => x.Broker)
+            .HasForeignKey(x => x.BrokerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasData(
             new
             {

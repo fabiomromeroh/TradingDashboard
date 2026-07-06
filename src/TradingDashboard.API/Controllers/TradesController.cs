@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
@@ -11,6 +12,7 @@ namespace TradingDashboard.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TradesController : ControllerBase
 {
     private readonly IMediator mediator;

@@ -3,25 +3,20 @@ import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import { useAccounts } from "@/features/account/hooks/useAccounts";
 import { useAppDispatch } from "@/store/hooks";
-import { setAccounts, setSelectedAccounts, setUser } from "@/store/store";
+import { setAccounts, setSelectedAccounts } from "@/store/store";
 import { useEffect } from "react";
-import { useUsers } from "@/features/users";
 
 export default function AppLayout() {
   const dispatch = useAppDispatch();
-  const { users } = useUsers();
 
   const { accounts } = useAccounts();
 
   useEffect(() => {
-    if (users.length > 0) {
-      dispatch(setUser(users[0]));
-    }
     if (accounts.length > 0) {
       dispatch(setAccounts(accounts));
       dispatch(setSelectedAccounts([accounts[0].id]));
     }
-  }, [accounts, users, dispatch]);
+  }, [accounts, dispatch]);
 
   return (
     <div className="flex h-screen bg-background text-foreground">

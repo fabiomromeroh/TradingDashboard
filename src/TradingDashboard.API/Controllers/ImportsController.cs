@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmImport;
@@ -12,6 +13,7 @@ namespace TradingDashboard.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ImportsController : ControllerBase
 {
     private readonly IMediator _mediator;

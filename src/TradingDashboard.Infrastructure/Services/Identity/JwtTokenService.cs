@@ -9,18 +9,13 @@ using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Services.Identity;
 
-public class JwtTokenService : IJwtTokenService
+public class JwtTokenService(
+    IOptions<JwtSettings> jwtSettings,
+    ILogger<JwtTokenService> logger) : IJwtTokenService
 {
-    private readonly JwtSettings _jwtSettings;
-    private readonly ILogger<JwtTokenService> _logger;
-
-    public JwtTokenService(
-        IOptions<JwtSettings> jwtSettings,
-        ILogger<JwtTokenService> logger)
-    {
-        _jwtSettings = jwtSettings.Value;
-        _logger = logger;
-    }
+    private readonly JwtSettings _jwtSettings = jwtSettings.Value;
+    private readonly ILogger<JwtTokenService> _logger = logger;
+    private static readonly JwtSecurityTokenHandler TokenHandler = new();
 
     public string GenerateToken(User user)
     {
@@ -35,7 +30,17 @@ public class JwtTokenService : IJwtTokenService
         _logger.LogDebug("Generating JWT token with Issuer={Issuer}, Audience={Audience}, ExpiryMinutes={ExpiryMinutes}",
             _jwtSettings.Issuer, _jwtSettings.Audience, _jwtSettings.ExpiryMinutes);
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
+
+        var keyBytes = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+
+        if (keyBytes.Length < 32)
+        {
+            _logger.LogError("JWT SecretKey must be at least 32 bytes (256 bits) for HmacSha256.");
+            throw new InvalidOperationException("JWT SecretKey is too short for HmacSha256.");
+        }
+
+        var key = new SymmetricSecurityKey(keyBytes);
+
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
@@ -44,17 +49,23 @@ public class JwtTokenService : IJwtTokenService
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
             new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
         };
+
+        //Todo- add user roles here
+        //foreach (var role in user.Roles) // if you have roles
+        //claims.Add(new Claim(ClaimTypes.Role, role));
 
         var token = new JwtSecurityToken(
             issuer: _jwtSettings.Issuer,
             audience: _jwtSettings.Audience,
             claims: claims,
+            notBefore: DateTime.UtcNow, //protects against edge cases where server clocks drift slightly
             expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
             signingCredentials: credentials);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return TokenHandler.WriteToken(token);
     }
 }
 

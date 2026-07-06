@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.ImportSessions.Queries.GetBrokers;
@@ -7,6 +8,7 @@ namespace TradingDashboard.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class BrokersController : ControllerBase
     {
         private readonly IMediator mediator;

@@ -3,9 +3,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+import { useLoginUser } from "../hooks/useLoginUser";
+import { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const { loginUser, loading, errors } = useLoginUser();
+
+  const handleLoginUser = async () => {
+    const loginUserCommand = {
+      email: email,
+      password: password,
+    };
+
+    const success = await loginUser(loginUserCommand);
+
+    if (success) {
+      navigate("/dashboard");
+    }
+  };
 
   return (
     <div className="w-full max-w-md">
@@ -23,6 +44,8 @@ export default function LoginForm() {
                   id="username"
                   type="text"
                   placeholder="Max Leiter"
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
                 />
               </Field>
               <Field>
@@ -33,10 +56,31 @@ export default function LoginForm() {
                   id="password"
                   type="password"
                   placeholder="••••••••"
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
                 />
               </Field>
+              {errors.length > 0 && (
+                <Alert variant="destructive" className="max-w-md">
+                  <AlertCircleIcon />
+                  <AlertTitle>Login failed</AlertTitle>
+                  <AlertDescription>
+                    <ul className="list-disc list-inside space-y-1">
+                      {errors.map((error, index) => (
+                        <li key={index}>{error.message}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
               <Field>
-                <Button type="submit">Login</Button>
+                <Button
+                  onClick={handleLoginUser}
+                  disabled={loading}
+                  type="submit"
+                >
+                  Login
+                </Button>
               </Field>
               <div className="flex flex-col-2 items-center mt-4">
                 <Field>

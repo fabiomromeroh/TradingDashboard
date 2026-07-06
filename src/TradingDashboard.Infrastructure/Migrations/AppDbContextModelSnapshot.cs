@@ -31,9 +31,6 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.Property<Guid>("BrokerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("BrokerId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -68,8 +65,6 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BrokerId");
-
-                    b.HasIndex("BrokerId1");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("IX_Accounts_UserId");
@@ -308,6 +303,46 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.ToTable("ImportSessions", (string)null);
                 });
 
+            modelBuilder.Entity("TradingDashboard.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ReplacedByTokenHash")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens", (string)null);
+                });
+
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Trade", b =>
                 {
                     b.Property<Guid>("Id")
@@ -433,6 +468,11 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -447,14 +487,10 @@ namespace TradingDashboard.Infrastructure.Migrations
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Account", b =>
                 {
                     b.HasOne("TradingDashboard.Domain.Entities.Broker", "Broker")
-                        .WithMany()
+                        .WithMany("Accounts")
                         .HasForeignKey("BrokerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("TradingDashboard.Domain.Entities.Broker", null)
-                        .WithMany("Accounts")
-                        .HasForeignKey("BrokerId1");
 
                     b.HasOne("TradingDashboard.Domain.Entities.User", "User")
                         .WithMany("Accounts")
@@ -504,6 +540,17 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("TradingDashboard.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("TradingDashboard.Domain.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Trade", b =>
                 {
                     b.HasOne("TradingDashboard.Domain.Entities.Account", "Account")
@@ -540,6 +587,8 @@ namespace TradingDashboard.Infrastructure.Migrations
             modelBuilder.Entity("TradingDashboard.Domain.Entities.User", b =>
                 {
                     b.Navigation("Accounts");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

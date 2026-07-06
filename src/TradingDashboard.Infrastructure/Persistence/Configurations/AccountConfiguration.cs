@@ -58,12 +58,12 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
         // ── Relationships ─────────────────────────────────────────────────
 
         builder.HasOne(x => x.User)
-            .WithMany(u => u.Accounts)     // adjust to match User's collection name
+            .WithMany(u => u.Accounts)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(x => x.Broker)
-            .WithMany()                    // adjust if Broker exposes an Accounts collection
+            .WithMany(x => x.Accounts)
             .HasForeignKey(x => x.BrokerId)
             .OnDelete(DeleteBehavior.Restrict);
 

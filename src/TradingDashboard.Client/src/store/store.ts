@@ -2,22 +2,6 @@ import { accountSlice } from "@/features/account/store/accountSlice";
 import { authSlice } from "@/features/auth/store/authSlice";
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
-const userSlice = createSlice({
-  name: "user",
-  initialState: {
-    id: "",
-    name: "John Doe",
-    email: "",
-  },
-  reducers: {
-    setUser(state, action) {
-      state.id = action.payload.id;
-      state.name = `${action.payload.firstName} ${action.payload.lastName}`;
-      state.email = action.payload.email;
-    },
-  },
-});
-
 const themeSlice = createSlice({
   name: "theme",
   initialState: {
@@ -36,7 +20,6 @@ const themeSlice = createSlice({
 
 const store = configureStore({
   reducer: {
-    user: userSlice.reducer,
     theme: themeSlice.reducer,
     account: accountSlice.reducer,
     auth: authSlice.reducer,
@@ -45,11 +28,11 @@ const store = configureStore({
   },
 });
 
-export const { setUser } = userSlice.actions;
 export const { setTheme } = themeSlice.actions;
 export const { setSelectedAccounts } = accountSlice.actions;
 export const { setAccounts } = accountSlice.actions;
-export const { setCredentials, logout } = authSlice.actions;
+export const { logout, setAccessToken, setAuthCheckComplete, setUser } =
+  authSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

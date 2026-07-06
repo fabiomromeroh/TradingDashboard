@@ -1,19 +1,44 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 using System.Text.Json.Serialization;
 using TradingDashboard.API.Middleware;
 using TradingDashboard.API.Swagger;
 using TradingDashboard.Application;
 using TradingDashboard.Infrastructure;
+using TradingDashboard.Infrastructure.Persistence.Seed;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+ .AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!))
+    };
+});
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:3000/", "https://tradingdashboard.azurewebsites.net")
+            .AllowCredentials()   // required for cookies to be sent cross-origin
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
@@ -53,6 +78,12 @@ builder.Host.UseSerilog((context, configuration) =>
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseAuthentication();
+    app.UseAuthorization();
+}
+
 app.UseDefaultFiles();   // serves index.html on "/"
 app.UseStaticFiles();    // serves JS/CSS/assets from wwwroot
 
@@ -63,13 +94,13 @@ app.UseCors("AllowFrontend");
 
 //if (app.Environment.IsDevelopment())
 //{
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/openapi/v1.json", "Trading Dashboard API");
-        c.RoutePrefix = "swagger";
-    });
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/openapi/v1.json", "Trading Dashboard API");
+    c.RoutePrefix = "swagger";
+});
 
 //}
 
@@ -79,6 +110,7 @@ app.MapControllers();
 
 app.MapFallbackToFile("index.html");   // React Router fallback
 
+app.Services.ApplyMigrationsAndSeed(app.Configuration);
 
 app.Run();
 

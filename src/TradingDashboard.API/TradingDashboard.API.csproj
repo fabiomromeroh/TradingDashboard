@@ -7,6 +7,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <UserSecretsId>7422c343-6845-4ab8-b7de-5c2c0b39fe7d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

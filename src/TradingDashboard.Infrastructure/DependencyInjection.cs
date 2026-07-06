@@ -45,6 +45,7 @@ public static class DependencyInjection
         services.AddScoped<IBrokerRepository, BrokerRepository>();
         services.AddScoped<IImportSessionRepository, ImportSessionRepository>();
         services.AddScoped<IExecutionRepository, ExecutionRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
         // --- Unit of Work ---
         services.AddScoped<IUnitOfWork, UnitOfWork>();
