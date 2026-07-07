@@ -1,5 +1,5 @@
-import { accountSlice } from "@/features/account/store/accountSlice";
-import { authSlice } from "@/features/auth/store/authSlice";
+import { accountSlice } from "@/features/account/store/account.slice";
+import { userSlice } from "@/features/users/store/user.slice";
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
 const themeSlice = createSlice({
@@ -22,7 +22,7 @@ const store = configureStore({
   reducer: {
     theme: themeSlice.reducer,
     account: accountSlice.reducer,
-    auth: authSlice.reducer,
+    auth: userSlice.reducer,
 
     // ...other reducers
   },
@@ -32,7 +32,7 @@ export const { setTheme } = themeSlice.actions;
 export const { setSelectedAccounts } = accountSlice.actions;
 export const { setAccounts } = accountSlice.actions;
 export const { logout, setAccessToken, setAuthCheckComplete, setUser } =
-  authSlice.actions;
+  userSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

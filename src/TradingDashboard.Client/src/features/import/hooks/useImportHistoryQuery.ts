@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { getImportHistoryApi } from "../api/importApi";
+import { getImportHistory } from "../api/import.api";
 import { handleApiError } from "@/lib/utils";
 import type { ApiError } from "@/types/api.types";
 import type { ImportHistory } from "../types/import.types";
 
-export function useImportHistory(accountId?: string) {
+export function useImportHistoryQuery(accountId?: string) {
   const [importHistory, setImportHistory] = useState<ImportHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState<ApiError[]>([]);
 
-  const getImportHistory = useCallback(async () => {
+  const fetchImportHistory = useCallback(async () => {
     if (!accountId) {
       setImportHistory([]);
       setErrors([]);
@@ -19,7 +19,7 @@ export function useImportHistory(accountId?: string) {
 
     setIsLoading(true);
 
-    getImportHistoryApi(accountId)
+    getImportHistory(accountId)
       .then((data) => {
         setImportHistory(data);
       })
@@ -33,8 +33,8 @@ export function useImportHistory(accountId?: string) {
   }, [accountId]);
 
   useEffect(() => {
-    getImportHistory();
-  }, [getImportHistory]);
+    fetchImportHistory();
+  }, [fetchImportHistory]);
 
-  return { getImportHistory, importHistory, isLoading, errors };
+  return { importHistory, isLoading, errors, refetch: fetchImportHistory };
 }

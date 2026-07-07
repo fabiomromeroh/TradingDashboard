@@ -9,11 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTrades } from "../hooks/useTrades";
+import { useTradesQuery } from "../hooks/useTradesQuery";
 import { TradeStatusBadge } from "./TradeStatusBadge";
 import type { Execution, Trade } from "../types/trade.types";
 import { DataTable } from "@/components/shared/DataTable";
-import { getTradeExecutions } from "../api/tradesApi";
+import { getTradeExecutions } from "../api/trades.api";
 import { getDateFormat } from "@/lib/utils";
 
 const columns: ColumnDef<Trade, unknown>[] = [
@@ -144,7 +144,7 @@ const executionColumns: ColumnDef<Execution, unknown>[] = [
 ];
 
 export function TradeTable() {
-  const { trades, isLoading, error, refetch } = useTrades();
+  const { trades, isLoading, error, refetch } = useTradesQuery();
 
   if (isLoading) {
     return (

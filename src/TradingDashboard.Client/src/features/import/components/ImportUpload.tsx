@@ -1,12 +1,12 @@
 import { FileUpload } from "@/components/shared/FileUpload";
-import { useUploadImport } from "../hooks/useUploadImport";
+import { useUploadImportMutation } from "../hooks/useUploadImportMutation";
 import { PreviewImportModal } from "./PreviewImportModal";
 import { useEffect, useState } from "react";
 import { AppSelect } from "@/components/shared/AppSelect";
 import { useAppSelector } from "@/store/hooks";
 import { toSelectOptions } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
-import { useBrokers } from "../hooks/useBrokers";
+import { useBrokersQuery } from "../hooks/useBrokersQuery";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function ImportUpload({
@@ -18,13 +18,17 @@ export function ImportUpload({
   selectedAccount: string;
   onSelectedAccountChange: (value: string) => void;
 }) {
-  const { uploadFile, importResult, isUploading } = useUploadImport();
+  const {
+    mutate: uploadFile,
+    importResult,
+    isPending: isUploading,
+  } = useUploadImportMutation();
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [uploadKey, setUploadKey] = useState(0);
   const [selectedBroker, setSelectedBroker] = useState<string>("");
   const [selectedBrokerLabel, setSelectedBrokerLabel] = useState<string>("");
 
-  const { brokers: brokerOptions } = useBrokers();
+  const { brokers: brokerOptions } = useBrokersQuery();
 
   const accounts = useAppSelector((x) => x.account.accounts);
   const accountOptions = toSelectOptions(accounts);

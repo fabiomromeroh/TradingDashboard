@@ -1,4 +1,4 @@
-import type { UserQuery } from "@/features/users";
+import type { UserQuery } from "@/features/users/types/user.types";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthState {
@@ -15,7 +15,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
 };
 
-export const authSlice = createSlice({
+export const userSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {

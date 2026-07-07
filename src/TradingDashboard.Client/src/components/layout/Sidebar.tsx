@@ -8,18 +8,17 @@ import {
   Users,
 } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
-import { useLogoutUser } from "@/features/auth/hooks/useLogoutUser";
+import { useLogoutMutation } from "@/features/users/hooks/useLogoutMutation";
 import { AvatarDropdown } from "../shared/AvatarDropdown";
 import { useAuth } from "@/app/AuthContext";
 
 export default function Sidebar() {
   const user = useAppSelector((x) => x.auth.user);
-  const { logoutUser } = useLogoutUser();
+  const { mutate: logoutUser } = useLogoutMutation();
   const { hasRole } = useAuth();
 
   const navItems = [
     { to: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
-
     { to: "/trades", icon: ArrowLeftRight, label: "Trades" },
     { to: "/accounts", icon: Briefcase, label: "Accounts" },
     { to: "/reports", icon: ChartBar, label: "Reports" },

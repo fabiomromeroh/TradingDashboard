@@ -11,12 +11,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
-import { useBrokers } from "@/features/import/hooks/useBrokers";
+import { useBrokersQuery } from "@/features/import/hooks/useBrokersQuery";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { useCreateAccount } from "../hooks/useCreateAccount";
+import { useCreateAccountMutation } from "../hooks/useCreateAccountMutation";
 import { toast } from "sonner";
 
 const accountSchema = z.object({
@@ -38,11 +38,11 @@ export function CreateAccountModal(props: CreateAccountModalProps) {
     defaultValues: { name: "", broker: "", currency: "" },
   });
 
-  const { brokers } = useBrokers();
-  const { create, error } = useCreateAccount();
+  const { brokers } = useBrokersQuery();
+  const { mutate: createAccount, error } = useCreateAccountMutation();
 
   async function handleFormSubmit(values: CreateAccountFormValues) {
-    const success = await create({
+    const success = await createAccount({
       name: values.name,
       brokerId: values.broker,
       currency: values.currency,

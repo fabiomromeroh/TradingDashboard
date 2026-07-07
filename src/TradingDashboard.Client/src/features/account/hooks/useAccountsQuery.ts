@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { AccountQuery } from "../types/account.types";
-import { getAccounts } from "../api/accountApi";
+import { getAccounts } from "../api/account.api";
 import { useAppSelector } from "@/store/hooks";
 
 interface UseAccountsResult {
@@ -10,7 +10,7 @@ interface UseAccountsResult {
   refetch: () => void;
 }
 
-export function useAccounts(): UseAccountsResult {
+export function useAccountsQuery(): UseAccountsResult {
   const [accounts, setAccounts] = useState<AccountQuery[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

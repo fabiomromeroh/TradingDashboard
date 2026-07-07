@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { getBrokers } from "../api/brokerApi";
+import { getBrokers } from "../api/broker.api";
 import { toSelectOptions } from "@/lib/utils";
 import type { SelectOption } from "@/types/api.types";
 
-export function useBrokers() {
+export function useBrokersQuery() {
   const [brokers, setBrokers] = useState<SelectOption[]>([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);

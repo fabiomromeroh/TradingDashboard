@@ -15,9 +15,9 @@ import type {
 } from "../types/import.types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Label } from "@/components/ui/label";
-import { useConfirmImport } from "../hooks/useConfirmImport";
 import { toast } from "sonner";
 import { getDateFormat } from "@/lib/utils";
+import { useConfirmImportMutation } from "../hooks/useConfirmImportMutation";
 
 const columns: ColumnDef<UploadImportRow>[] = [
   { accessorKey: "symbol", header: "Symbol" },
@@ -37,7 +37,7 @@ const columns: ColumnDef<UploadImportRow>[] = [
 ];
 
 export function PreviewImportModal(importPreview: UploadImport) {
-  const { confirm, error } = useConfirmImport();
+  const { mutate: confirmImport, error } = useConfirmImportMutation();
 
   const handleConfirm = async () => {
     const confirmImportCommand: ConfirmImportCommand = {
@@ -50,7 +50,7 @@ export function PreviewImportModal(importPreview: UploadImport) {
       invalidRows: importPreview.invalidRows,
       rows: importPreview.rows,
     };
-    const success = await confirm(confirmImportCommand);
+    const success = await confirmImport(confirmImportCommand);
 
     if (success) {
       importPreview.setShowPreview(false);

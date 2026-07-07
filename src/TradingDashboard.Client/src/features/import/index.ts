@@ -1,6 +1,6 @@
 export { ImportHistoryTable } from "./components/ImportHistoryTable";
 export { ImportUpload } from "./components/ImportUpload";
-export { useBrokers } from "./hooks/useBrokers";
+export { useBrokersQuery } from "./hooks/useBrokersQuery";
 
 export type {
   UploadImportRow,

@@ -1,17 +1,17 @@
 import { useCallback, useState } from "react";
-import { uploadImport } from "../api/importApi";
+import { uploadImport } from "../api/import.api";
 import type { UploadImport } from "../types/import.types";
 import { handleApiError } from "@/lib/utils";
 import type { ApiError } from "@/types/api.types";
 
-export function useUploadImport() {
+export function useUploadImportMutation() {
   const [importResult, setImportResult] = useState<UploadImport>();
-  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(false);
   const [errors, setErrors] = useState<ApiError[] | null>(null);
 
-  const uploadFile = useCallback(
+  const mutate = useCallback(
     async (file: File, accountId?: string, brokerName?: string) => {
-      setIsUploading(true);
+      setIsPending(true);
       return await uploadImport(file, accountId, brokerName)
         .then((result) => {
           setImportResult(result);
@@ -24,11 +24,11 @@ export function useUploadImport() {
           return false;
         })
         .finally(() => {
-          setIsUploading(false);
+          setIsPending(false);
         });
     },
     [],
   );
 
-  return { uploadFile, importResult, isUploading, errors };
+  return { mutate, importResult, isPending, error: errors };
 }

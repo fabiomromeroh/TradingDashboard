@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
-import { useAccounts } from "@/features/account/hooks/useAccounts";
+import { useAccountsQuery } from "@/features/account/hooks/useAccountsQuery";
 import { useAppDispatch } from "@/store/hooks";
 import { setAccounts, setSelectedAccounts } from "@/store/store";
 import { useEffect } from "react";
@@ -9,7 +9,7 @@ import { useEffect } from "react";
 export default function AppLayout() {
   const dispatch = useAppDispatch();
 
-  const { accounts } = useAccounts();
+  const { accounts } = useAccountsQuery();
 
   useEffect(() => {
     if (accounts.length > 0) {

@@ -2,7 +2,7 @@ import { DataTable } from "@/components/shared/DataTable";
 import type { AccountQuery } from "../types/account.types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableActions } from "@/components/shared/DataTableActions";
-import { useAccounts } from "../hooks/useAccounts";
+import { useAccountsQuery } from "../hooks/useAccountsQuery";
 import { CreateAccountModal } from "./CreateAccountModal";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -11,7 +11,7 @@ import { useAppDispatch } from "@/store/hooks";
 
 export function AccountTable() {
   const dispatch = useAppDispatch();
-  const { accounts, isLoading, error, refetch } = useAccounts();
+  const { accounts, isLoading, error, refetch } = useAccountsQuery();
 
   useEffect(() => {
     if (accounts.length > 0) {

@@ -2,14 +2,15 @@ import { DataTable } from "@/components/shared/DataTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ImportHistory } from "../types/import.types";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useImportHistory } from "../hooks/useImportHistory";
+import { useImportHistoryQuery } from "../hooks/useImportHistoryQuery";
 import { getDateFormat } from "@/lib/utils";
 import { ConfirmDeleteButton } from "@/components/shared/ConfirmDeleteButton";
-import { useRollbackImport } from "../hooks/useRollbackImport";
+import { useRollbackImportMutation } from "../hooks/useRollbackImportMutation";
 
 export function ImportHistoryTable({ accountId = "" }: { accountId?: string }) {
-  const { importHistory, getImportHistory } = useImportHistory(accountId);
-  const { rollbackImport } = useRollbackImport();
+  const { importHistory, refetch: getImportHistory } =
+    useImportHistoryQuery(accountId);
+  const { mutate: rollbackImport } = useRollbackImportMutation();
 
   const handleRollbackImport = async (id: string) => {
     const success = await rollbackImport(id);

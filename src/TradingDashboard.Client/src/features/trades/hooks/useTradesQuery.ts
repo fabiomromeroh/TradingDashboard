@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { getTradesByAccountId } from "../api/tradesApi";
+import { getTradesByAccountId } from "../api/trades.api";
 import type { Trade, UseTradesResult } from "../types/trade.types";
 import { useAppSelector } from "@/store/hooks";
 
-export function useTrades(): UseTradesResult {
+export function useTradesQuery(): UseTradesResult {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

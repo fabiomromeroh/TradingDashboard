@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useCreateUser } from "@/features/users/hooks/useCreateUser";
+import { useCreateUserMutation } from "@/features/users/hooks/useCreateUserMutation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +34,7 @@ const userSchema = z.object({
 type CreateUserFormValues = z.infer<typeof userSchema>;
 
 export default function RegisterForm() {
-  const { execute: createUser, error } = useCreateUser();
+  const { mutate: createUser, error } = useCreateUserMutation();
   const form = useForm<CreateUserFormValues>({
     resolver: zodResolver(userSchema),
     defaultValues: { firstName: "", lastName: "", email: "", password: "" },

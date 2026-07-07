@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { useLoginUser } from "../hooks/useLoginUser";
+import { useLoginMutation } from "../hooks/useLoginMutation";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
@@ -13,7 +13,11 @@ export default function LoginForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const { loginUser, loading, errors } = useLoginUser();
+  const {
+    mutate: loginUser,
+    isPending: loading,
+    error: errors,
+  } = useLoginMutation();
 
   const handleLoginUser = async () => {
     const loginUserCommand = {
@@ -92,7 +96,7 @@ export default function LoginForm() {
                   <Button
                     className="text-gray-500 hover:text-gray-7"
                     variant="link"
-                    onClick={() => navigate("/reset-password")}
+                    // onClick={() => navigate("/reset-password")}
                   >
                     Forgot Password?
                   </Button>

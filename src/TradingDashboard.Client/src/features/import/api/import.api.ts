@@ -28,12 +28,12 @@ export async function confirmImport(
   return apiClient.post("/imports/confirm", confirmImportCommand);
 }
 
-export async function getImportHistoryApi(
+export async function getImportHistory(
   accountId: string,
 ): Promise<ImportHistory[]> {
   return apiClient.get(`/imports/account/${accountId}`);
 }
 
-export async function rollbackImportApi(id: string): Promise<void> {
+export async function rollbackImport(id: string): Promise<void> {
   return apiClient.post(`/imports/rollback/${id}`);
 }

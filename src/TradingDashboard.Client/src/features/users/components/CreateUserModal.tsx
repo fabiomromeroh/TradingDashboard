@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useCreateUser } from "../hooks/useCreateUser";
+import { useCreateUserMutation } from "../hooks/useCreateUserMutation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -39,7 +39,7 @@ interface CreateUserModalProps {
 }
 
 export function CreateUserModal({ reload }: CreateUserModalProps) {
-  const { execute: createUser, error } = useCreateUser();
+  const { mutate: createUser, error } = useCreateUserMutation();
   const [open, setOpen] = useState(false);
 
   const form = useForm<CreateUserFormValues>({
