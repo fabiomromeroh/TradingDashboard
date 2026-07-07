@@ -79,37 +79,71 @@ jobs:
           name: ${{ env.API_PUBLISH_ARTIFACT }}
           path: ${{ env.PUBLISH_PATH }}
           if-no-files-found: error
-
   migrations:
-    name: Apply DB Migrations
-    needs: build-test-publish
-    runs-on: ubuntu-latest
-    if: ${{ needs.build-test-publish.result == 'success' }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      name: Apply DB Migrations
+      needs: build-test-publish
+      runs-on: ubuntu-latest
+      if: ${{ needs.build-test-publish.result == 'success' }}
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+        - name: Setup .NET
+          uses: actions/setup-dotnet@v4
+          with:
+            dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Restore
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
+        - name: Restore
+          run: dotnet restore ${{ env.SOLUTION_PATH }}
 
-      - name: Install EF Core Tools
-        run: dotnet tool install -g dotnet-ef
+        - name: Install EF Core Tools
+          run: dotnet tool install -g dotnet-ef
 
-      - name: Apply Database Migrations
-        run: |
-          dotnet ef database update \
-            --project src/TradingDashboard.Infrastructure \
-            --startup-project src/TradingDashboard.API \
-            --verbose
-        env:
-          ASPNETCORE_ENVIRONMENT: Production
-          DOTNET_ENVIRONMENT: Production
-          ConnectionStrings__DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
+        - name: Install sqlcmd
+          run: |
+            sudo ACCEPT_EULA=Y apt-get update
+            sudo ACCEPT_EULA=Y apt-get install -y mssql-tools18 unixodbc-dev
+            echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+
+        - name: Warm up Azure SQL
+          shell: bash
+          env:
+            SQL_SERVER: ${{ secrets.AZURE_SQL_SERVER }}
+            SQLCMDPASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
+          run: |
+            set -euo pipefail
+
+            for attempt in {1..20}; do
+              echo "Warm-up attempt $attempt..."
+
+              if sqlcmd -S "${SQL_SERVER}.database.windows.net" \
+                        -d "master" \
+                        -U "${{ secrets.AZURE_SQL_USERNAME }}" \
+                        -C \
+                        -l 30 \
+                        -Q "SELECT 1" > /dev/null 2>&1; then
+                echo "Azure SQL is awake."
+                break
+              fi
+
+              if [ "$attempt" -eq 20 ]; then
+                echo "Azure SQL did not wake up in time."
+                exit 1
+              fi
+
+              sleep 15
+            done
+
+        - name: Apply Database Migrations
+          run: |
+            dotnet ef database update \
+              --project src/TradingDashboard.Infrastructure \
+              --startup-project src/TradingDashboard.API \
+              --verbose
+          env:
+            ASPNETCORE_ENVIRONMENT: Production
+            DOTNET_ENVIRONMENT: Production
+            ConnectionStrings__DefaultConnection: ${{ secrets.DATABASE_CONNECTION_STRING }}
 
   deploy:
     name: Deploy to Azure
