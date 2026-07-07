@@ -39,7 +39,7 @@ interface CreateUserModalProps {
 }
 
 export function CreateUserModal({ reload }: CreateUserModalProps) {
-  const { mutate: createUser, error } = useCreateUserMutation();
+  const { mutate: createUser } = useCreateUserMutation();
   const [open, setOpen] = useState(false);
 
   const form = useForm<CreateUserFormValues>({
@@ -55,8 +55,6 @@ export function CreateUserModal({ reload }: CreateUserModalProps) {
       setOpen(false);
       form.reset();
       reload();
-    } else {
-      toast.error(error ?? "Failed to create user");
     }
   }
 

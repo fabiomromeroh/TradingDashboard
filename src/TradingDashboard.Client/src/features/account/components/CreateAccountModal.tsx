@@ -39,7 +39,7 @@ export function CreateAccountModal(props: CreateAccountModalProps) {
   });
 
   const { brokers } = useBrokersQuery();
-  const { mutate: createAccount, error } = useCreateAccountMutation();
+  const { mutate: createAccount } = useCreateAccountMutation();
 
   async function handleFormSubmit(values: CreateAccountFormValues) {
     const success = await createAccount({
@@ -54,8 +54,6 @@ export function CreateAccountModal(props: CreateAccountModalProps) {
       setOpen(false);
       form.reset();
       props.handleOnAccountChange();
-    } else {
-      toast.error(error ?? "Failed to create account");
     }
     setOpen(false);
   }

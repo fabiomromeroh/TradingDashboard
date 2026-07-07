@@ -34,7 +34,7 @@ const userSchema = z.object({
 type CreateUserFormValues = z.infer<typeof userSchema>;
 
 export default function RegisterForm() {
-  const { mutate: createUser, error } = useCreateUserMutation();
+  const { mutate: createUser } = useCreateUserMutation();
   const form = useForm<CreateUserFormValues>({
     resolver: zodResolver(userSchema),
     defaultValues: { firstName: "", lastName: "", email: "", password: "" },
@@ -48,8 +48,6 @@ export default function RegisterForm() {
     if (success) {
       toast.success("User created successfully");
       form.reset();
-    } else {
-      toast.error(error ?? "Failed to create user");
     }
   }
 

@@ -54,10 +54,10 @@ export function UserTable() {
     );
   }
 
-  if (error) {
+  if (error && error.length > 0) {
     return (
       <div className="py-8 text-center">
-        <p className="text-red-600 mb-2">{error}</p>
+        <p className="text-red-600 mb-2">{error[0].message}</p>
         <button onClick={refetch} className="text-sm underline">
           Try again
         </button>
