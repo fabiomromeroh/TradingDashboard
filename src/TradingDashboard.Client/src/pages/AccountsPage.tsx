@@ -1,12 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { AccountTable } from "@/features/account/components/AccountTable";
+// import { AccountTable } from "@/features/account/components/AccountTable";
 
 export default function AccountsPage() {
   return (
     <Card>
-      <CardContent>
-        <AccountTable />
-      </CardContent>
+      <CardContent>{/* <AccountTable /> */}</CardContent>
     </Card>
   );
 }
