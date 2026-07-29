@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Interfaces;
 
 namespace TradingDashboard.Infrastructure.Persistence
 {

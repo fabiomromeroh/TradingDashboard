@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Persistence.Repositories;
@@ -11,7 +11,7 @@ public class ImportSessionRepository : IImportSessionRepository
     public ImportSessionRepository(AppDbContext context) => _context = context;
 
     public async Task<IEnumerable<ImportSession>> GetAllByAccountIdAsync(Guid accountId, CancellationToken cancellationToken)
-        => await _context.ImportSessions.AsNoTracking().Where(i => i.AccountId == accountId).ToListAsync(cancellationToken);
+        => await _context.ImportSessions.AsNoTracking().Where(i => i.AccountId == accountId).OrderByDescending(x => x.CompletedAt).ToListAsync(cancellationToken);
 
     public async Task<ImportSession?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         => await _context.ImportSessions.AsNoTracking().Include(x => x.Executions).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);

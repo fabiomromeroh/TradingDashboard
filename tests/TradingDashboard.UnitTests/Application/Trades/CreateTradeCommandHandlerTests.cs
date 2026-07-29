@@ -1,6 +1,7 @@
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Common;
-using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
+using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
 

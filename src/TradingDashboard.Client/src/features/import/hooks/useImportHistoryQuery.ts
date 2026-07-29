@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { getImportHistory } from "../api/import.api";
 import { handleApiError } from "@/lib/utils";
 import type { ApiError } from "@/types/api.types";
-import type { ImportHistory } from "../types/import.types";
+import type { ImportHistoryDto } from "../types/import.types";
 
 export function useImportHistoryQuery(accountId?: string) {
-  const [importHistory, setImportHistory] = useState<ImportHistory[]>([]);
+  const [importHistory, setImportHistory] = useState<ImportHistoryDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState<ApiError[]>([]);
 

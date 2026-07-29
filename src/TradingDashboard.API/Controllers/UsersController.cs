@@ -111,7 +111,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
+    //[Authorize]
     public async Task<ActionResult> Get(CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetUsersQuery(), cancellationToken);

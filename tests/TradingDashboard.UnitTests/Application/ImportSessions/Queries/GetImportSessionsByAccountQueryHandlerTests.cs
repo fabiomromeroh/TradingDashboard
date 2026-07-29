@@ -1,8 +1,9 @@
 using AutoMapper;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
 using TradingDashboard.Application.Features.ImportSessions.Queries.GetImportSessionsByAccount;
 using TradingDashboard.Domain.Entities;
+using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.UnitTests.Application.ImportSessions.Queries;
 
@@ -30,9 +31,9 @@ public class GetImportSessionsByAccountQueryHandlerTests
 
         var importSessions = new List<ImportSession>
         {
-            ImportSession.Create(accountId, "import1.csv"),
-            ImportSession.Create(accountId, "import2.csv"),
-            ImportSession.Create(accountId, "import3.csv")
+            ImportSession.Create(accountId, "IBKR", ImportSourceType.FileUpload, "import1.csv"),
+            ImportSession.Create(accountId, "IBKR", ImportSourceType.FileUpload, "import2.csv"),
+            ImportSession.Create(accountId, "IBKR", ImportSourceType.FileUpload, "import3.csv")
         };
 
         var importSessionDtos = new List<ImportSessionDto>
@@ -157,7 +158,7 @@ public class GetImportSessionsByAccountQueryHandlerTests
         // Only return sessions for the queried account
         var importSessions = new List<ImportSession>
         {
-            ImportSession.Create(accountId, "import1.csv")
+            ImportSession.Create(accountId, "IBKR", ImportSourceType.FileUpload, "import1.csv")
         };
 
         var importSessionDtos = new List<ImportSessionDto>

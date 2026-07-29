@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TradingDashboard.Domain.Entities;
+using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Infrastructure.Persistence.Configurations;
 
@@ -32,10 +33,17 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .IsRequired()
             .HasDefaultValue(true);
 
+        builder.Property(x => x.ImportSourceType)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasDefaultValue(ImportSourceType.BrokerSync);
+
         // ── Foreign keys ─────────────────────────────────────────────────
 
         builder.Property(x => x.UserId)
             .IsRequired();
+
 
         builder.Property(x => x.BrokerId)
             .IsRequired();
@@ -80,6 +88,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
             .WithOne(s => s.Account)
             .HasForeignKey(s => s.AccountId)
             .OnDelete(DeleteBehavior.Restrict);
+
 
         builder.Navigation(x => x.ImportSessions)
             .UsePropertyAccessMode(PropertyAccessMode.Field)

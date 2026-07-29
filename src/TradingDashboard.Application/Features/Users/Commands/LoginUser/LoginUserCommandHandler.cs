@@ -1,10 +1,12 @@
 using AutoMapper;
 using MediatR;
 using System.Security.Cryptography;
+using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services;
 using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Helpers;
-using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.Users.Dtos;
+using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Users.Commands.LoginUser;

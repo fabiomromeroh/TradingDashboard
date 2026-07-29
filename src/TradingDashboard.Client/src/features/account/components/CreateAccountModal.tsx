@@ -1,5 +1,6 @@
 import { AppInputField } from "@/components/shared/AppInputField";
 import { AppSelectField } from "@/components/shared/AppSelectField";
+import type { CreateAccountModalProps } from "../types/account.types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,20 +23,16 @@ import { toast } from "sonner";
 const accountSchema = z.object({
   name: z.string().min(1, "Account name is required"),
   broker: z.string().min(1, "Broker is required"),
-  currency: z.string().min(1, "Currency is required"),
+  type: z.string().min(1, "Type is required"),
 });
 
 type CreateAccountFormValues = z.infer<typeof accountSchema>;
-
-type CreateAccountModalProps = {
-  handleOnAccountChange: () => void;
-};
 
 export function CreateAccountModal(props: CreateAccountModalProps) {
   const [open, setOpen] = useState(false);
   const form = useForm<CreateAccountFormValues>({
     resolver: zodResolver(accountSchema),
-    defaultValues: { name: "", broker: "", currency: "" },
+    defaultValues: { name: "", broker: "", type: "" },
   });
 
   const { brokers } = useBrokersQuery();
@@ -44,8 +41,8 @@ export function CreateAccountModal(props: CreateAccountModalProps) {
   async function handleFormSubmit(values: CreateAccountFormValues) {
     const success = await createAccount({
       name: values.name,
+      importSourceType: values.type,
       brokerId: values.broker,
-      currency: values.currency,
       initialBalance: 0, // Set initial balance to 0
     });
 
@@ -91,14 +88,15 @@ export function CreateAccountModal(props: CreateAccountModalProps) {
               />
 
               <AppSelectField
-                name="currency"
+                name="type"
                 control={form.control}
-                label="Currency"
-                placeholder="Select a currency"
+                label="Type"
+                placeholder="Select a type"
                 className="w-full"
                 options={[
-                  { value: "USD", label: "USD" },
-                  { value: "EUR", label: "EUR" },
+                  { value: "FileUpload", label: "File Upload" },
+                  { value: "BrokerSync", label: "Broker Sync" },
+                  { value: "ManualEntry", label: "Manual" },
                 ]}
               />
             </div>

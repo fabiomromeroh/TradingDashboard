@@ -1,7 +1,7 @@
 using AutoMapper;
 using MediatR;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Common;
-using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
 
 namespace TradingDashboard.Application.Features.ImportSessions.Queries.GetImportSessionById;

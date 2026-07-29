@@ -1,6 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Features.Accounts.Dtos;
 using TradingDashboard.Domain.Entities;
 
@@ -20,15 +20,22 @@ public class AccountRepository : IAccountRepository
     public async Task<IEnumerable<AccountDto>> GetAllByUserIdAsync(Guid userId, CancellationToken cancellationToken)
         => await _context.Accounts.AsNoTracking()
         .Include(x => x.Broker)
-        .Where(a => a.UserId == userId)
+        .Include(x => x.BrokerAccountCredentials)
+        .Where(a => a.UserId == userId && a.IsActive)
         .Select(x => mapper.Map<AccountDto>(x))
         .ToListAsync(cancellationToken);
 
     public async Task<Account?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
-        => await _context.Accounts.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+        => await _context.Accounts
+        .Include(x => x.Broker)
+        .FirstOrDefaultAsync(a => a.Id == id && a.IsActive, cancellationToken);
 
-    public async Task AddAsync(Account account, CancellationToken cancellationToken)
-        => await _context.Accounts.AddAsync(account, cancellationToken);
+    public async Task<Guid> AddAsync(Account account, CancellationToken cancellationToken)
+    {
+        var entityEntry = await _context.Accounts.AddAsync(account, cancellationToken);
+        return entityEntry.Entity.Id;
+    }
+
 
     public Task UpdateAsync(Account account, CancellationToken cancellationToken)
     {

@@ -4,16 +4,16 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Services;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Services.Identity;
 
 public class JwtTokenService(
-    IOptions<JwtSettings> jwtSettings,
+    IOptions<JwtSettingsOptions> jwtSettings,
     ILogger<JwtTokenService> logger) : IJwtTokenService
 {
-    private readonly JwtSettings _jwtSettings = jwtSettings.Value;
+    private readonly JwtSettingsOptions _jwtSettings = jwtSettings.Value;
     private readonly ILogger<JwtTokenService> _logger = logger;
     private static readonly JwtSecurityTokenHandler TokenHandler = new();
 

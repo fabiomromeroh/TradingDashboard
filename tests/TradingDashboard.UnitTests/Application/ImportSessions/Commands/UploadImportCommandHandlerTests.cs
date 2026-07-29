@@ -1,8 +1,9 @@
 using System.Net;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services.FileUpload.Models;
+using TradingDashboard.Application.Abstractions.Services.Import;
+using TradingDashboard.Application.Abstractions.Services.Import.Models;
 using TradingDashboard.Application.Features.ImportSessions.Commands.UploadImport;
-using TradingDashboard.Application.Services.Import.Interfaces;
-using TradingDashboard.Application.Services.Import.Models;
 
 namespace TradingDashboard.UnitTests.Application.ImportSessions.Commands;
 

@@ -1,7 +1,8 @@
 using MediatR;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Exceptions;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Users.Commands.DeleteUser;

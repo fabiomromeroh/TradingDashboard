@@ -1,7 +1,8 @@
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services.Import;
 using TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmImport;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
-using TradingDashboard.Application.Services.Import.Interfaces;
+using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.UnitTests.Application.ImportSessions.Commands;

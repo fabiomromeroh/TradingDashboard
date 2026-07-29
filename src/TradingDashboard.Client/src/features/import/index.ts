@@ -4,6 +4,6 @@ export { useBrokersQuery } from "./hooks/useBrokersQuery";
 
 export type {
   UploadImportRow,
-  UploadImport,
+  UploadImportDto,
   ConfirmImportCommand,
 } from "./types/import.types";

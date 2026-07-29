@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmImport;
 using TradingDashboard.Application.Features.ImportSessions.Commands.DeleteImport;
+using TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrokerImport;
 using TradingDashboard.Application.Features.ImportSessions.Commands.UploadImport;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
 using TradingDashboard.Application.Features.ImportSessions.Queries.GetImportSessionById;
@@ -71,4 +72,10 @@ public class ImportsController : ControllerBase
         return result.ToActionResult(() => NoContent());
     }
 
+    [HttpPost("sync-broker")]
+    public async Task<ActionResult> SyncBroker([FromBody] SyncBrokerImportCommand command, CancellationToken ct)
+    {
+        var result = await _mediator.Send(command, ct);
+        return result.ToActionResult();
+    }
 }

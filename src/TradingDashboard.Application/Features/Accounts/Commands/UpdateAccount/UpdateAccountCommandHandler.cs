@@ -1,8 +1,9 @@
 using AutoMapper;
 using MediatR;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Common;
-using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.Accounts.Dtos;
+using TradingDashboard.Application.Interfaces;
 
 namespace TradingDashboard.Application.Features.Accounts.Commands.UpdateAccount;
 

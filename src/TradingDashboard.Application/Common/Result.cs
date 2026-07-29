@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using System.Net;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Models;
 
 namespace TradingDashboard.Application.Common
 {

@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
+import type { AccountDto } from "../types/account.types";
 
 export const accountSlice = createSlice({
   name: "account",
   initialState: {
     selectedAccounts: [],
-    accounts: [],
+    accounts: [] as AccountDto[],
   },
   reducers: {
     setSelectedAccounts(state, action) {

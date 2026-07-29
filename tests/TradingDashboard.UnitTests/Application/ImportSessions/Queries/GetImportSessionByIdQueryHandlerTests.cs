@@ -1,9 +1,10 @@
 using AutoMapper;
 using System.Net;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
 using TradingDashboard.Application.Features.ImportSessions.Queries.GetImportSessionById;
 using TradingDashboard.Domain.Entities;
+using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.UnitTests.Application.ImportSessions.Queries;
 
@@ -31,7 +32,7 @@ public class GetImportSessionByIdQueryHandlerTests
         var fileName = "test_import.csv";
         var createdAt = DateTimeOffset.UtcNow;
 
-        var importSession = ImportSession.Create(accountId, fileName);
+        var importSession = ImportSession.Create(accountId, "IBKR", ImportSourceType.FileUpload, fileName);
 
         var importSessionDto = new ImportSessionDto(
             Id: sessionId,

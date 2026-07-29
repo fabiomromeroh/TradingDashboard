@@ -1,26 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TradingDashboard.Application.Common.Interfaces;
-using TradingDashboard.Application.Services.Import.Interfaces;
+using Polly;
+using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services;
+using TradingDashboard.Application.Abstractions.Services.BrokerSync;
+using TradingDashboard.Application.Abstractions.Services.BrokerSync.Ibkr;
+using TradingDashboard.Application.Abstractions.Services.Import;
+using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Infrastructure.Persistence;
 using TradingDashboard.Infrastructure.Persistence.Repositories;
+using TradingDashboard.Infrastructure.Services.BrokerSync;
+using TradingDashboard.Infrastructure.Services.BrokerSync.Ibkr;
 using TradingDashboard.Infrastructure.Services.Identity;
 using TradingDashboard.Infrastructure.Services.Import;
 using TradingDashboard.Infrastructure.Services.Import.Ibkr;
 
 namespace TradingDashboard.Infrastructure;
-
-/// <summary>
-/// JWT Settings configuration class for dependency injection
-/// </summary>
-public class JwtSettings
-{
-    public string SecretKey { get; set; } = string.Empty;
-    public string Issuer { get; set; } = "TradingDashboard";
-    public string Audience { get; set; } = "TradingDashboard";
-    public int ExpiryMinutes { get; set; } = 60;
-}
 
 public static class DependencyInjection
 {
@@ -28,10 +24,10 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // --- JWT Configuration ---
-        // Binds environment variables to strongly-typed JwtSettings
-        // Supports both appsettings.json and App Service environment variables
-        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        // --- Options Configuration ---
+        services.Configure<JwtSettingsOptions>(configuration.GetSection("JwtSettings"));
+        services.Configure<IbkrFlexOptions>(configuration.GetSection("IbkrFlex"));
+
 
         // --- Database ---
         services.AddDbContext<AppDbContext>(options =>
@@ -46,6 +42,7 @@ public static class DependencyInjection
         services.AddScoped<IImportSessionRepository, ImportSessionRepository>();
         services.AddScoped<IExecutionRepository, ExecutionRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IBrokerAccountCredentialRepository, BrokerAccountCredentialRepository>();
 
         // --- Unit of Work ---
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -57,6 +54,15 @@ public static class DependencyInjection
         services.AddScoped<IBrokerParser, IbkrCsvParser>();
         services.AddScoped<IBrokerParserFactory, BrokerParserFactory>();
         services.AddScoped<IImportService, ImportSessionService>();
+
+        ////--- Broker Sync ---
+        services.AddHttpClient<IIbkrFlexApiClient, IbkrFlexApiClient>()
+            .AddTransientHttpErrorPolicy(policy => policy.WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+        services.AddScoped<IBrokerSyncFactory, BrokerSyncFactory>();
+        services.AddScoped<IBrokerSyncService, IbkrSyncService>();
+        services.AddScoped<IBrokerAccountCredentialService, BrokerAccountCredentialService>();
+        services.AddScoped<IbkrFlexReportParser>();
+        services.AddScoped<HttpClient>();
 
         return services;
     }

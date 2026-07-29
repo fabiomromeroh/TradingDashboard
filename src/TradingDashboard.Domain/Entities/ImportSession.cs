@@ -30,14 +30,14 @@ public class ImportSession : BaseEntity
 
     private ImportSession() { }
 
-    public static ImportSession Create(Guid accountId, string brokerName, string? fileName = default)
+    public static ImportSession Create(Guid accountId, string brokerName, ImportSourceType sourceType, string? fileName = default)
     {
         return new()
         {
             AccountId = accountId,
             BrokerName = brokerName,
+            SourceType = sourceType,
             FileName = fileName,
-            CompletedAt = DateTimeOffset.UtcNow
         };
     }
 

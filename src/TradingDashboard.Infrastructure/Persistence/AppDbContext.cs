@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<ImportSession> ImportSessions => Set<ImportSession>();
     public DbSet<Execution> Executions => Set<Execution>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<BrokerAccountCredential> BrokerAccountCredentials => Set<BrokerAccountCredential>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

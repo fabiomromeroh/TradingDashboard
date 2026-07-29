@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import type {
   ConfirmImportCommand,
-  UploadImport,
   UploadImportRow,
+  PreviewImportModalProps,
 } from "../types/import.types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Label } from "@/components/ui/label";
@@ -36,8 +36,8 @@ const columns: ColumnDef<UploadImportRow>[] = [
   { accessorKey: "commission", header: "Commission" },
 ];
 
-export function PreviewImportModal(importPreview: UploadImport) {
-  const { mutate: confirmImport, error } = useConfirmImportMutation();
+export function PreviewImportModal(importPreview: PreviewImportModalProps) {
+  const { mutate: confirmImport } = useConfirmImportMutation();
 
   const handleConfirm = async () => {
     const confirmImportCommand: ConfirmImportCommand = {
@@ -54,9 +54,8 @@ export function PreviewImportModal(importPreview: UploadImport) {
 
     if (success) {
       importPreview.setShowPreview(false);
+      importPreview.onImportCompleted?.();
       toast.success("Trades imported to account successfully");
-    } else {
-      toast.error(error ?? "Failed to import trades to account");
     }
   };
 

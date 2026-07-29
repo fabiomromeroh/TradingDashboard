@@ -53,17 +53,17 @@ public class ExceptionHandlingMiddleware : IExceptionHandler
             {
                 title = "Not Found";
             }
-            else if(statusCode == 401)
+            else if (statusCode == 401)
             {
                 title = "Unauthtorized";
             }
-            else 
+            else
             {
-                    title = "An unexpected error occurred.";
-                    logger.LogError(exception, "An unhandled exception occurred.");
+                title = "An unexpected error occurred.";
+                logger.LogError(exception, "An unhandled exception occurred.");
             }
 
-            
+
 
             // Detailed error in development, generic in production
             var detail = environment.IsDevelopment()
@@ -88,6 +88,7 @@ public class ExceptionHandlingMiddleware : IExceptionHandler
     private static int GetStatusCode(Exception exception) => exception switch
     {
         ValidationException => StatusCodes.Status400BadRequest,
+        NotSupportedException => StatusCodes.Status400BadRequest,
         NotFoundException => StatusCodes.Status404NotFound,
         AuthenticationException => StatusCodes.Status401Unauthorized,
         ArgumentNullException => StatusCodes.Status400BadRequest,

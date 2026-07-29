@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Persistence.Repositories;

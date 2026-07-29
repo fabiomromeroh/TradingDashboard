@@ -1,10 +1,10 @@
-import type { UserQuery } from "@/features/users/types/user.types";
+import type { UserDto } from "@/features/users/types/user.types";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthState {
   accessToken: string | null;
   authCheckComplete: boolean;
-  user: UserQuery | null;
+  user: UserDto | null;
   isAuthenticated: boolean;
 }
 

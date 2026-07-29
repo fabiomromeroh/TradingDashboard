@@ -1,7 +1,8 @@
 ﻿using MediatR;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Helpers;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Interfaces;
 
 namespace TradingDashboard.Application.Features.Users.Commands.LogoutUser
 {

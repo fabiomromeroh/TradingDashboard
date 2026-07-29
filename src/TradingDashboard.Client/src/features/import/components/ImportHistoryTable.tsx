@@ -1,26 +1,29 @@
 import { DataTable } from "@/components/shared/DataTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ImportHistory } from "../types/import.types";
+import type {
+  ImportHistoryDto,
+  ImportHistoryTableProps,
+} from "../types/import.types";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useImportHistoryQuery } from "../hooks/useImportHistoryQuery";
 import { getDateFormat } from "@/lib/utils";
 import { ConfirmDeleteButton } from "@/components/shared/ConfirmDeleteButton";
 import { useRollbackImportMutation } from "../hooks/useRollbackImportMutation";
 
-export function ImportHistoryTable({ accountId = "" }: { accountId?: string }) {
-  const { importHistory, refetch: getImportHistory } =
-    useImportHistoryQuery(accountId);
+export function ImportHistoryTable({
+  importHistory,
+  onRollbackCompleted,
+}: ImportHistoryTableProps) {
   const { mutate: rollbackImport } = useRollbackImportMutation();
 
   const handleRollbackImport = async (id: string) => {
     const success = await rollbackImport(id);
 
     if (success) {
-      getImportHistory();
+      onRollbackCompleted();
     }
   };
 
-  const columns: ColumnDef<ImportHistory, unknown>[] = [
+  const columns: ColumnDef<ImportHistoryDto, unknown>[] = [
     { accessorKey: "sourceType", header: "Source Type" },
 
     {
@@ -49,11 +52,11 @@ export function ImportHistoryTable({ accountId = "" }: { accountId?: string }) {
     },
     {
       accessorKey: "totalRows",
-      header: "Total Rows",
+      header: "Executions",
     },
     {
       accessorKey: "processedRows",
-      header: "Proccesed",
+      header: "Processed",
     },
     {
       accessorKey: "skippedRows",
@@ -98,6 +101,7 @@ export function ImportHistoryTable({ accountId = "" }: { accountId?: string }) {
             disabled={history.isRolledBack}
             label="Import History"
             handleOnClick={() => handleRollbackImport(history.id)}
+            buttonType="Icon"
           />
         );
       },

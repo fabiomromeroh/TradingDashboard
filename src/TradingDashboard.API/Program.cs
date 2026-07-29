@@ -4,7 +4,6 @@ using Serilog;
 using System.Text;
 using System.Text.Json.Serialization;
 using TradingDashboard.API.Middleware;
-using TradingDashboard.API.Swagger;
 using TradingDashboard.Application;
 using TradingDashboard.Infrastructure;
 using TradingDashboard.Infrastructure.Persistence.Seed;
@@ -37,7 +36,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000/", "https://tradingdashboard.azurewebsites.net")
+        policy.WithOrigins("http://localhost:3000", "https://tradingdashboard.azurewebsites.net")
             .AllowCredentials()   // required for cookies to be sent cross-origin
             .AllowAnyMethod()
             .AllowAnyHeader();
@@ -53,17 +52,7 @@ builder.Services.AddControllers()
 
 // Add services to the container.
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen(options =>
-{
-    // Converts enums to strings + shows per-value XML descriptions in Swagger
-    options.SchemaFilter<EnumSchemaFilter>();
-
-    // Load XML comments from all projects
-    foreach (var xmlFile in Directory.GetFiles(AppContext.BaseDirectory, "TradingDashboard.*.xml"))
-    {
-        options.IncludeXmlComments(xmlFile);
-    }
-});
+builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddApplication();
@@ -78,11 +67,11 @@ builder.Host.UseSerilog((context, configuration) =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseAuthentication();
-    app.UseAuthorization();
-}
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+
 
 app.UseDefaultFiles();   // serves index.html on "/"
 app.UseStaticFiles();    // serves JS/CSS/assets from wwwroot
@@ -92,17 +81,17 @@ app.UseExceptionHandler();
 
 app.UseCors("AllowFrontend");
 
-//if (app.Environment.IsDevelopment())
-//{
-app.MapOpenApi();
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/openapi/v1.json", "Trading Dashboard API");
-    c.RoutePrefix = "swagger";
-});
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/openapi/v1.json", "Trading Dashboard API");
+        c.RoutePrefix = "swagger";
+    });
 
-//}
+}
 
 
 app.UseHttpsRedirection();
@@ -110,7 +99,13 @@ app.MapControllers();
 
 app.MapFallbackToFile("index.html");   // React Router fallback
 
-app.Services.ApplyMigrationsAndSeed(app.Configuration);
+if (!app.Environment.IsDevelopment())
+{
+    app.Services.ApplyMigrationsAndSeed(app.Configuration);
+
+}
 
 app.Run();
 
+// Required for WebApplicationFactory<TEntryPoint>
+public partial class Program { }

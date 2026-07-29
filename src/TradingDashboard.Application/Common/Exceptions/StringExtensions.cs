@@ -6,5 +6,6 @@
         {
             return value == "Buy" ? Domain.Enums.Side.Buy : Domain.Enums.Side.Sell;
         }
+
     }
 }

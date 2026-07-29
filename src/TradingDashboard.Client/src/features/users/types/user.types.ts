@@ -1,4 +1,4 @@
-export interface UserQuery {
+export interface UserDto {
   id: string;
   firstName: string;
   lastName: string;
@@ -17,7 +17,7 @@ export interface CreateUserCommand {
 
 export interface LoginResponse {
   accessToken: string;
-  user: UserQuery;
+  user: UserDto;
 }
 
 export interface LoginUserCommand {

@@ -1,11 +1,11 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import type { UserQuery } from "../types/user.types";
+import type { UserDto } from "../types/user.types";
 import { CreateUserModal } from "./CreateUserModal";
 import { useUsersQuery } from "../hooks/useUsersQuery";
 import { DataTable } from "@/components/shared/DataTable";
 import { DataTableActions } from "@/components/shared/DataTableActions";
 
-const columns: ColumnDef<UserQuery, unknown>[] = [
+const columns: ColumnDef<UserDto, unknown>[] = [
   { accessorKey: "firstName", header: "First Name" },
   { accessorKey: "lastName", header: "Last Name" },
   { accessorKey: "email", header: "Email" },

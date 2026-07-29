@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import {
   ArrowLeftRight,
-  Briefcase,
   ChartBar,
   LayoutDashboardIcon,
   Plus,
@@ -20,7 +19,7 @@ export default function Sidebar() {
   const navItems = [
     { to: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
     { to: "/trades", icon: ArrowLeftRight, label: "Trades" },
-    { to: "/accounts", icon: Briefcase, label: "Accounts" },
+    // { to: "/accounts", icon: Briefcase, label: "Accounts" },
     { to: "/reports", icon: ChartBar, label: "Reports" },
   ];
 

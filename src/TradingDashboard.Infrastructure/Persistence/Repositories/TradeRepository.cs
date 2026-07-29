@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
@@ -67,12 +67,18 @@ public class TradeRepository : ITradeRepository
 
     public async Task<IEnumerable<Trade>> GetOpenTradesByAccountIdAsync(Guid accountId, CancellationToken cancellationToken)
     {
-        return await context.Trades.Where(x => x.AccountId == accountId && x.Status == TradeStatus.Open).ToListAsync(cancellationToken);
+        return await context.Trades
+            .AsNoTracking()
+            .Where(x => x.AccountId == accountId && x.Status == TradeStatus.Open)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<Trade>> GetTradesByAccountId(List<Guid> accountIds, CancellationToken cancellationToken)
     {
-        return await context.Trades.Where(x => accountIds.Contains(x.AccountId)).ToListAsync(cancellationToken);
+        return await context.Trades
+            .AsNoTracking()
+            .Where(x => accountIds.Contains(x.AccountId))
+            .ToListAsync(cancellationToken);
     }
 
     public Task AddTradeRangeAsync(IEnumerable<Trade> trades, CancellationToken cancellationToken)

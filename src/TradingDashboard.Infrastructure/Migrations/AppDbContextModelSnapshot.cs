@@ -40,6 +40,13 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .HasColumnType("nvarchar(10)")
                         .HasDefaultValue("USD");
 
+                    b.Property<string>("ImportSourceType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("BrokerSync");
+
                     b.Property<decimal>("InitialBalance")
                         .ValueGeneratedOnAdd()
                         .HasPrecision(18, 4)
@@ -125,6 +132,36 @@ namespace TradingDashboard.Infrastructure.Migrations
                             Name = "Interactive Brokers",
                             Website = "https://www.interactivebrokers.com"
                         });
+                });
+
+            modelBuilder.Entity("TradingDashboard.Domain.Entities.BrokerAccountCredential", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("EncryptedPayload")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly?>("LastSyncDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .IsUnique();
+
+                    b.ToTable("BrokerAccountCredentials", (string)null);
                 });
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Execution", b =>
@@ -503,6 +540,17 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TradingDashboard.Domain.Entities.BrokerAccountCredential", b =>
+                {
+                    b.HasOne("TradingDashboard.Domain.Entities.Account", "Account")
+                        .WithOne("BrokerAccountCredentials")
+                        .HasForeignKey("TradingDashboard.Domain.Entities.BrokerAccountCredential", "AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Execution", b =>
                 {
                     b.HasOne("TradingDashboard.Domain.Entities.Account", "Account")
@@ -564,6 +612,9 @@ namespace TradingDashboard.Infrastructure.Migrations
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Account", b =>
                 {
+                    b.Navigation("BrokerAccountCredentials")
+                        .IsRequired();
+
                     b.Navigation("ImportSessions");
 
                     b.Navigation("Trades");

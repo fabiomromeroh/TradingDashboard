@@ -11,12 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTradesQuery } from "../hooks/useTradesQuery";
 import { TradeStatusBadge } from "./TradeStatusBadge";
-import type { Execution, Trade } from "../types/trade.types";
+import type { ExecutionDto, TradeDto } from "../types/trade.types";
 import { DataTable } from "@/components/shared/DataTable";
 import { getTradeExecutions } from "../api/trades.api";
 import { getDateFormat } from "@/lib/utils";
 
-const columns: ColumnDef<Trade, unknown>[] = [
+const columns: ColumnDef<TradeDto, unknown>[] = [
   { accessorKey: "symbol", header: "Symbol" },
   {
     accessorKey: "direction",
@@ -128,7 +128,7 @@ const columns: ColumnDef<Trade, unknown>[] = [
   },
 ];
 
-const executionColumns: ColumnDef<Execution, unknown>[] = [
+const executionColumns: ColumnDef<ExecutionDto, unknown>[] = [
   { accessorKey: "side", header: "Side" },
   { accessorKey: "instrumentType", header: "Type" },
   {

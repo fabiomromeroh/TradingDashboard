@@ -1,6 +1,6 @@
 export { CreateUserModal } from "./components/CreateUserModal";
 export { UserTable } from "./components/UserTable";
-export type { UserQuery } from "./types/user.types";
+export type { UserDto } from "./types/user.types";
 export { useUsersQuery } from "./hooks/useUsersQuery";
 export { useCreateUserMutation } from "./hooks/useCreateUserMutation";
 export { useLoginMutation } from "./hooks/useLoginMutation";

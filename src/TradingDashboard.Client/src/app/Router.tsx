@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import LoginPage from "../pages/LoginPage";
 import TradesPage from "../pages/TradesPage";
-import AccountsPage from "../pages/AccountsPage";
 import UsersPage from "@/pages/UsersPage";
 import { AddTradesPage } from "@/pages/AddTradesPage";
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -30,7 +29,7 @@ export default function Router() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/trades" element={<TradesPage />} />
-              <Route path="/accounts" element={<AccountsPage />} />
+              {/* <Route path="/accounts" element={<AccountsPage />} /> */}
               <Route path="/add-trades" element={<AddTradesPage />} />
               <Route path="/reports" element={<ReportsPage />} />
 

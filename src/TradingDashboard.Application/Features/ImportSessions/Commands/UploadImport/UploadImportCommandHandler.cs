@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using System.Net;
+using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services.Import;
 using TradingDashboard.Application.Common;
-using TradingDashboard.Application.Common.Interfaces;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
-using TradingDashboard.Application.Services.Import.Interfaces;
 
 namespace TradingDashboard.Application.Features.ImportSessions.Commands.UploadImport
 {

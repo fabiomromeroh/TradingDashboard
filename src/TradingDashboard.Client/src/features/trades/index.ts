@@ -3,4 +3,8 @@
 export { TradeTable } from "./components/TradeTable";
 export { TradeStatusBadge } from "./components/TradeStatusBadge";
 export { useTradesQuery } from "./hooks/useTradesQuery";
-export type { Trade, TradeDirection, TradeStatus } from "./types/trade.types";
+export type {
+  TradeDto,
+  TradeDirection,
+  TradeStatus,
+} from "./types/trade.types";

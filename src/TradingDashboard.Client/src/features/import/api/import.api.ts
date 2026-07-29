@@ -1,15 +1,17 @@
 import apiClient from "@/lib/apiClient";
 import type {
   ConfirmImportCommand,
-  ImportHistory,
-  UploadImport,
+  ImportHistoryDto,
+  SyncBrokerCommand,
+  SyncBrokerDto,
+  UploadImportDto,
 } from "../types/import.types";
 
 export async function uploadImport(
   file: File,
   accountId?: string,
   brokerName?: string,
-): Promise<UploadImport> {
+): Promise<UploadImportDto> {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("brokerName", brokerName || "");
@@ -23,17 +25,23 @@ export async function uploadImport(
 }
 
 export async function confirmImport(
-  confirmImportCommand: ConfirmImportCommand,
+  command: ConfirmImportCommand,
 ): Promise<string> {
-  return apiClient.post("/imports/confirm", confirmImportCommand);
+  return apiClient.post("/imports/confirm", command);
 }
 
 export async function getImportHistory(
   accountId: string,
-): Promise<ImportHistory[]> {
+): Promise<ImportHistoryDto[]> {
   return apiClient.get(`/imports/account/${accountId}`);
 }
 
 export async function rollbackImport(id: string): Promise<void> {
   return apiClient.post(`/imports/rollback/${id}`);
+}
+
+export async function syncBroker(
+  syncBrokerCommand: SyncBrokerCommand,
+): Promise<SyncBrokerDto> {
+  return apiClient.post("/imports/sync-broker", syncBrokerCommand);
 }

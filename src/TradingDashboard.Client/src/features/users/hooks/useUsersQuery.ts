@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { getUsers } from "../api/users.api";
-import type { UserQuery } from "../types/user.types";
+import type { UserDto } from "../types/user.types";
 import { handleApiError } from "@/lib/utils";
 import type { ApiError } from "@/types/api.types";
 
 interface UseUsersResult {
-  data: UserQuery[];
+  data: UserDto[];
   error: ApiError[] | null;
   isLoading: boolean;
   refetch: () => void;
 }
 
 export function useUsersQuery(): UseUsersResult {
-  const [users, setUsers] = useState<UserQuery[]>([]);
+  const [users, setUsers] = useState<UserDto[]>([]);
   const [error, setErrors] = useState<ApiError[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

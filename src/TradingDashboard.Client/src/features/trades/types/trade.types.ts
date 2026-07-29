@@ -2,7 +2,7 @@
 export type TradeDirection = "Long" | "Short";
 export type TradeStatus = "Open" | "Closed" | "Cancelled";
 
-export interface Trade {
+export interface TradeDto {
   id: string;
   symbol: string;
   direction: TradeDirection;
@@ -16,7 +16,7 @@ export interface Trade {
   percentageReturn?: number;
 }
 
-export interface Execution {
+export interface ExecutionDto {
   id: string;
   tradeId: string;
   price: number;
@@ -28,7 +28,7 @@ export interface Execution {
 }
 
 export interface UseTradesResult {
-  trades: Trade[];
+  trades: TradeDto[];
   isLoading: boolean;
   error: string | null;
   refetch: () => void; // lets the UI trigger a manual refresh

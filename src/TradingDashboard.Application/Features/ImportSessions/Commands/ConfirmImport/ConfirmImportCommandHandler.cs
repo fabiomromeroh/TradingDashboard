@@ -1,10 +1,12 @@
 ﻿using MediatR;
 using System.Data;
+using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services.Import;
 using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Exceptions;
-using TradingDashboard.Application.Common.Interfaces;
-using TradingDashboard.Application.Services.Import.Interfaces;
+using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
+using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmImport
 {
@@ -35,9 +37,8 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmI
             var startPeriod = orderedRows.Min(x => x.ExecutedAt);
             var endPeriod = orderedRows.Max(x => x.ExecutedAt);
 
-
             //create Import Session
-            var importSession = ImportSession.Create(command.AccountId, command.BrokerName, command.FileName);
+            var importSession = ImportSession.Create(command.AccountId, command.BrokerName, ImportSourceType.FileUpload, command.FileName);
             importSession.Complete(command.TotalRows, command.DuplicateRows, startPeriod, endPeriod);
 
             try
@@ -88,7 +89,6 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmI
                 await unitOfWork.RollbackAsync(ct);
                 throw;
             }
-
 
         }
 

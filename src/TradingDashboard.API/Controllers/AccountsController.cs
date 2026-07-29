@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.Accounts.Commands.CreateAccount;
 using TradingDashboard.Application.Features.Accounts.Commands.DeleteAccount;
+using TradingDashboard.Application.Features.Accounts.Commands.SetBrokerCredentials;
 using TradingDashboard.Application.Features.Accounts.Commands.UpdateAccount;
 using TradingDashboard.Application.Features.Accounts.Queries.GetAccountById;
 using TradingDashboard.Application.Features.Accounts.Queries.GetAccountsByUser;
@@ -61,5 +62,12 @@ public class AccountsController : ControllerBase
     {
         await _mediator.Send(new DeleteAccountCommand(id), cancellationToken);
         return NoContent();
+    }
+
+    [HttpPut("credentials/{id:guid}")]
+    public async Task<ActionResult> SetBrokerCredentials(Guid id, [FromBody] SetBrokerCredentialsCommand command, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command with { AccountId = id }, cancellationToken);
+        return result.ToActionResult();
     }
 }

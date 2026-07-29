@@ -1,10 +1,12 @@
 import { useCallback, useState } from "react";
 import type { ConfirmImportCommand } from "../types/import.types";
 import { confirmImport } from "../api/import.api";
+import { handleApiError } from "@/lib/utils";
+import type { ApiError } from "@/types/api.types";
 
 export function useConfirmImportMutation() {
   const [isPending, setIsPending] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ApiError[] | null>(null);
 
   const mutate = useCallback(
     async (confirmImportCommand: ConfirmImportCommand) => {
@@ -14,7 +16,8 @@ export function useConfirmImportMutation() {
           return true;
         })
         .catch((error) => {
-          setError(error.message);
+          const errors = handleApiError(error);
+          setError(errors);
           return false;
         })
         .finally(() => {

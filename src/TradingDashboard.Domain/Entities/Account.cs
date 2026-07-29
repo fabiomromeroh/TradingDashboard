@@ -1,4 +1,5 @@
 using TradingDashboard.Domain.Common;
+using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Domain.Entities;
 
@@ -8,6 +9,7 @@ public class Account : BaseEntity
     public string? Currency { get; private set; } = "USD";
     public decimal InitialBalance { get; private set; } = 0;
     public bool IsActive { get; private set; } = true;
+    public ImportSourceType ImportSourceType { get; set; }
 
     public Guid UserId { get; private set; }
 
@@ -15,6 +17,7 @@ public class Account : BaseEntity
 
     public User User { get; private set; } = null!;
     public Broker Broker { get; private set; } = null!;
+    public BrokerAccountCredential BrokerAccountCredentials { get; set; } = null!;
 
     public IReadOnlyCollection<Trade> Trades => _trades.AsReadOnly();
     private readonly List<Trade> _trades = [];
@@ -24,7 +27,7 @@ public class Account : BaseEntity
 
     private Account() { }
 
-    public static Account Create(string name, Guid userId, Guid brokerId, decimal initialBalance = default, string? currency = default)
+    public static Account Create(string name, Guid userId, Guid brokerId, ImportSourceType importSourceType, decimal initialBalance = default, string? currency = default)
     {
         return new()
         {
@@ -32,7 +35,9 @@ public class Account : BaseEntity
             Currency = currency,
             InitialBalance = initialBalance,
             UserId = userId,
-            BrokerId = brokerId
+            BrokerId = brokerId,
+            ImportSourceType = importSourceType
+
         };
     }
 

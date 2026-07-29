@@ -3,14 +3,14 @@ import type {
   CreateUserCommand,
   LoginResponse,
   LoginUserCommand,
-  UserQuery,
+  UserDto,
 } from "../types/user.types";
 
-export async function getUsers(): Promise<UserQuery[]> {
+export async function getUsers(): Promise<UserDto[]> {
   return apiClient.get("/users");
 }
 
-export async function createUser(user: CreateUserCommand) {
+export async function createUser(user: CreateUserCommand): Promise<void> {
   return apiClient.post("/users/register", user);
 }
 

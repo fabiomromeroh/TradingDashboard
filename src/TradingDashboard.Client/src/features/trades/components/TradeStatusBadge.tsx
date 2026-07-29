@@ -1,6 +1,4 @@
-interface TradeStatusBadgeProps {
-  status: string;
-}
+import type { TradeStatusBadgeProps } from "../api/trades.api";
 
 // A lookup table instead of if/else chains — easy to extend with new statuses.
 const statusStyles: Record<string, string> = {

@@ -1,68 +1,118 @@
 import { DataTable } from "@/components/shared/DataTable";
-import type { AccountQuery } from "../types/account.types";
+import type { AccountDto, AccountTableProps } from "../types/account.types";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableActions } from "@/components/shared/DataTableActions";
-import { useAccountsQuery } from "../hooks/useAccountsQuery";
 import { CreateAccountModal } from "./CreateAccountModal";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { setAccounts } from "@/store/store";
-import { useAppDispatch } from "@/store/hooks";
+import { useState } from "react";
+import { PlusIcon, RefreshCcw } from "lucide-react";
+import { AppButton } from "@/components/shared/AppButton";
+import { useDeleteAccountMutation } from "../hooks/useDeleteAccountMutation";
+import { useSyncBrokerMutation } from "@/features/import/hooks/useSyncBrokerMutation";
+import { toast } from "sonner";
 
-export function AccountTable() {
-  const dispatch = useAppDispatch();
-  const { accounts, isLoading, error, refetch } = useAccountsQuery();
+export function AccountTable(props: AccountTableProps) {
+  const { mutate: deleteAccount } = useDeleteAccountMutation();
+  const { mutate: syncBroker } = useSyncBrokerMutation();
+  const [loadingRows, setLoadingRows] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (accounts.length > 0) {
-      dispatch(setAccounts(accounts));
+  const handleImportTrades = async (account: AccountDto) => {
+    if (account.importSourceType === "BrokerSync") {
+      // Check if the account has broker credentials
+      if (!account.brokerCredentials) {
+        toast.error(
+          `Account ${account.name} does not have broker credentials. Please set them up first.`,
+        );
+        return;
+      }
+      setLoadingRows((prev) => new Set(prev).add(account.id));
+
+      await syncBroker({
+        AccountId: account.id,
+      })
+        .then(() => {
+          props.handleRefresh();
+        })
+        .finally(() => {
+          setLoadingRows((prev) => {
+            const next = new Set(prev);
+            next.delete(account.id);
+            return next;
+          });
+        });
     }
-  }, [accounts, dispatch]);
-
-  const navigate = useNavigate();
-
-  const importTrades = (account: AccountQuery) => {
-    const accountId = account.id ?? account.name;
-    const brokerName = account.brokerName ?? "";
-    const accountName = account.name ?? "";
-
-    navigate("/import", {
-      state: {
-        accountId,
-        accountName,
-        brokerName,
-      },
-    });
+    if (account.importSourceType === "FileUpload") {
+      // Handle file upload import logic here
+    }
   };
 
-  const columns: ColumnDef<AccountQuery, unknown>[] = [
+  const handleDeleteAccount = (account: AccountDto) => {
+    if (account.id) {
+      deleteAccount(account.id).then((success) => {
+        if (success) {
+          props.handleRefresh();
+        }
+      });
+    }
+  };
+
+  const columns: ColumnDef<AccountDto, unknown>[] = [
     { accessorKey: "name", header: "Account Name" },
     { accessorKey: "brokerName", header: "Broker" },
-    { accessorKey: "currency", header: "Currency" },
-    { accessorKey: "Trades", header: "Trades" },
+    { accessorKey: "tradesCount", header: "#Trades" },
+    { accessorKey: "importSourceType", header: "Type" },
     {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
         const account = row.original;
-
+        const tooltipText =
+          account.importSourceType === "BrokerSync"
+            ? "Sync now"
+            : "Add manual trades";
         return (
-          <DataTableActions
-            entity={account}
-            actions={[
-              {
-                label: "Import Trades",
-                onClick: () => importTrades(account),
-              },
-              { label: "Edit", onClick: () => {} },
-            ]}
-          />
+          <>
+            <AppButton
+              variant="ghost"
+              onClick={() => handleImportTrades(account)}
+              tooltip={tooltipText}
+              disabled={loadingRows.has(account.id)}
+            >
+              {account.importSourceType === "BrokerSync" ? (
+                <RefreshCcw
+                  className={`h-4 w-4 ${loadingRows.has(account.id) ? "animate-spin" : ""}`}
+                />
+              ) : (
+                <PlusIcon className=" h-4 w-4" />
+              )}
+            </AppButton>
+
+            <DataTableActions
+              entity={account}
+              actions={[
+                {
+                  label: "Import Trades",
+                  onClick: () => handleImportTrades(account),
+                },
+                { label: "Edit", onClick: () => {} },
+                {
+                  label: "Delete",
+                  className: "text-destructive",
+                  needsConfirm: true,
+                  needsConfirmButtonType: "button",
+                  needsConfirmLabel: "Account",
+                  buttonVariant: "ghost",
+
+                  onClick: () => handleDeleteAccount(account),
+                },
+              ]}
+            />
+          </>
         );
       },
     },
   ];
 
-  if (isLoading) {
+  if (props.isLoading) {
     return (
       <p className="py-8 text-center text-muted-foreground">
         Loading accounts...
@@ -70,11 +120,11 @@ export function AccountTable() {
     );
   }
 
-  if (error) {
+  if (props.error) {
     return (
       <div className="py-8 text-center">
-        <p className="text-red-600 mb-2">{error}</p>
-        <button onClick={refetch} className="text-sm underline">
+        <p className="text-red-600 mb-2">{props.error}</p>
+        <button onClick={props.handleRefresh} className="text-sm underline">
           Try again
         </button>
       </div>
@@ -84,8 +134,10 @@ export function AccountTable() {
   return (
     <DataTable
       columns={columns}
-      data={accounts}
-      toolbar={<CreateAccountModal handleOnAccountChange={refetch} />}
+      data={props.accounts || []}
+      toolbar={
+        <CreateAccountModal handleOnAccountChange={props.handleRefresh} />
+      }
     />
   );
 }

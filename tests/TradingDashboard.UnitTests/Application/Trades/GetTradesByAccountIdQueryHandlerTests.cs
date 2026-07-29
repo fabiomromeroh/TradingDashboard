@@ -1,5 +1,5 @@
 using AutoMapper;
-using TradingDashboard.Application.Common.Interfaces;
+using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Features.Trades.Dtos;
 using TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
 using TradingDashboard.Domain.Entities;

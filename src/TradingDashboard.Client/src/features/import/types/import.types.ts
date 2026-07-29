@@ -1,3 +1,5 @@
+import type { AccountDto } from "@/features/account/types/account.types";
+
 export interface UploadImportRow {
   RowNumber: number;
   Symbol: string;
@@ -13,7 +15,7 @@ export interface UploadImportRow {
   ParseError: string | null;
 }
 
-export interface UploadImport {
+export interface UploadImportDto {
   brokerName: string;
   duplicateRows: number;
   fileName: string;
@@ -38,7 +40,7 @@ export interface ConfirmImportCommand {
   rows: UploadImportRow[];
 }
 
-export interface ImportHistory {
+export interface ImportHistoryDto {
   id: string;
   accountId: string;
   fileName?: string;
@@ -53,4 +55,39 @@ export interface ImportHistory {
   skippedRows: number;
   brokerName: string;
   isRolledBack: boolean;
+}
+
+export interface SyncBrokerCommand {
+  AccountId: string;
+}
+
+export interface SyncBrokerDto {
+  newTrades: string;
+}
+
+export interface ImportHistoryTableProps {
+  accountId?: string;
+  isLoading?: boolean;
+  importHistory: ImportHistoryDto[];
+  onRollbackCompleted: () => void;
+}
+
+export interface ImportUploadProps {
+  selectedAccount: string;
+  brokerName: string;
+  onImportCompleted: () => void;
+}
+
+export type PreviewImportModalProps = UploadImportDto & {
+  cancelUpload: () => void;
+  showPreview: boolean;
+  setShowPreview: (value: boolean) => void;
+  onImportCompleted?: () => void;
+};
+
+export interface BrokerSyncProps {
+  selectedAccount: string;
+  brokerName: string;
+  accounts: AccountDto[];
+  onSaveCredentials: (queryId: string, flexToken: string) => void;
 }
