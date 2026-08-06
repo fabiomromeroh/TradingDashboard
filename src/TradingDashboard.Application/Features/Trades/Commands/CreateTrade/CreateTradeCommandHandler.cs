@@ -1,6 +1,6 @@
 using MediatR;
 using TradingDashboard.Application.Abstractions.Repositories;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 

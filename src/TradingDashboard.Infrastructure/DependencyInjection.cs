@@ -6,12 +6,14 @@ using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services;
 using TradingDashboard.Application.Abstractions.Services.BrokerSync;
 using TradingDashboard.Application.Abstractions.Services.BrokerSync.Ibkr;
+using TradingDashboard.Application.Abstractions.Services.Dashboard;
 using TradingDashboard.Application.Abstractions.Services.Import;
 using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Infrastructure.Persistence;
 using TradingDashboard.Infrastructure.Persistence.Repositories;
 using TradingDashboard.Infrastructure.Services.BrokerSync;
 using TradingDashboard.Infrastructure.Services.BrokerSync.Ibkr;
+using TradingDashboard.Infrastructure.Services.Dashboard;
 using TradingDashboard.Infrastructure.Services.Identity;
 using TradingDashboard.Infrastructure.Services.Import;
 using TradingDashboard.Infrastructure.Services.Import.Ibkr;
@@ -43,6 +45,9 @@ public static class DependencyInjection
         services.AddScoped<IExecutionRepository, ExecutionRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IBrokerAccountCredentialRepository, BrokerAccountCredentialRepository>();
+
+        //---Query Services---
+        services.AddScoped<IDashboardQueryService, DashboardQueryService>();
 
         // --- Unit of Work ---
         services.AddScoped<IUnitOfWork, UnitOfWork>();

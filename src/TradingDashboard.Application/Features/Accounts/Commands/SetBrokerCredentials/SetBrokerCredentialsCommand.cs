@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using System.Text.Json;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 
 namespace TradingDashboard.Application.Features.Accounts.Commands.SetBrokerCredentials
 {

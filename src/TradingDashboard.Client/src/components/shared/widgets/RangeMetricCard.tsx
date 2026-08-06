@@ -1,4 +1,4 @@
-import { MetricWidgetShell } from "./metric-widget-shell";
+import { MetricWidgetShell } from "./MetricWidgetShell";
 import { clamp } from "./widget-utils";
 import type { RangeMetricWidgetProps } from "./widget-types";
 

@@ -1,10 +1,10 @@
-import { Pie, PieChart } from "recharts"
+import { Pie, PieChart } from "recharts";
 
-import { ChartContainer } from "@/components/ui/chart"
+import { ChartContainer } from "@/components/ui/chart";
 
-import { MetricWidgetShell } from "./metric-widget-shell"
-import { clamp } from "./widget-utils"
-import type { RingMetricWidgetProps } from "./widget-types"
+import { MetricWidgetShell } from "./MetricWidgetShell";
+import { clamp } from "./widget-utils";
+import type { RingMetricWidgetProps } from "./widget-types";
 
 export function RingMetricCard({
   valueNumber,
@@ -13,11 +13,11 @@ export function RingMetricCard({
   trackColor = "hsl(var(--muted))",
   ...props
 }: RingMetricWidgetProps) {
-  const safeValue = clamp(valueNumber, 0, total)
+  const safeValue = clamp(valueNumber, 0, total);
   const chartData = [
     { name: "value", value: safeValue, fill: color },
     { name: "rest", value: Math.max(total - safeValue, 0), fill: trackColor },
-  ]
+  ];
 
   return (
     <MetricWidgetShell
@@ -45,5 +45,5 @@ export function RingMetricCard({
         </ChartContainer>
       }
     />
-  )
+  );
 }

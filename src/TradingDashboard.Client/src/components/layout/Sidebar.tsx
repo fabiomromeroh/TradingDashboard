@@ -28,9 +28,9 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="h-screen bg-sidebar flex flex-col">
+    <aside className="h-screen bg-sidebar flex flex-col border-r border-slate-200 dark:border-slate-800">
       {/* Logo */}
-      <div className="px-5 py-4 border-b border-sidebar-border">
+      <div className="h-13 px-5 py-4 border-b border-sidebar-border">
         <span className="text-sidebar-foreground font-bold text-base tracking-tight">
           Trading Dashboard
         </span>

@@ -2,7 +2,7 @@
 using System.Net;
 using TradingDashboard.Application.Abstractions.Models;
 
-namespace TradingDashboard.Application.Common
+namespace TradingDashboard.Application.Common.Models
 {
     public class Result<T> : IResult
     {

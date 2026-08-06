@@ -1,5 +1,5 @@
 using MediatR;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Application.Features.Trades.Commands.CreateTrade;

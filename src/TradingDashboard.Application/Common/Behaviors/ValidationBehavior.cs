@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using System.Reflection;
 using TradingDashboard.Application.Abstractions.Models;
+using TradingDashboard.Application.Common.Models;
 
 namespace TradingDashboard.Application.Common.Behaviors;
 

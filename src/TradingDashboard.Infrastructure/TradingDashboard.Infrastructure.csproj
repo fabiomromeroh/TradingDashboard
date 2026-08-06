@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TradingDashboard.Domain\TradingDashboard.Domain.csproj" />
     <ProjectReference Include="..\TradingDashboard.Application\TradingDashboard.Application.csproj" />
   </ItemGroup>
 

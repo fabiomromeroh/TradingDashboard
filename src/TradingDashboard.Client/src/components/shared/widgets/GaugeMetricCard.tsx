@@ -1,4 +1,4 @@
-import { MetricWidgetShell } from "./metric-widget-shell";
+import { MetricWidgetShell } from "./MetricWidgetShell";
 import { clamp, cn, describeArc } from "./widget-utils";
 import type { GaugeMetricWidgetProps } from "./widget-types";
 
@@ -14,9 +14,10 @@ function Gauge({
   const defaultSegments = segments?.length
     ? segments
     : [
-        { value: 0.7, color: "var(--color-emerald-500, #10b981)" },
+        { value: 0.3, color: "var(--color-rose-400, #fb7185)" },
         { value: 0.2, color: "var(--color-amber-400, #f59e0b)" },
-        { value: 0.1, color: "var(--color-rose-400, #fb7185)" },
+
+        { value: 0.5, color: "var(--color-emerald-500, #10b981)" },
       ];
 
   const arcSegments = defaultSegments.map((segment, index, arr) => {
@@ -36,7 +37,7 @@ function Gauge({
   });
 
   return (
-    <svg viewBox="0 0 140 88" className="h-[72px] w-[120px] overflow-visible">
+    <svg viewBox="0 0 140 88" className="h-[65px] w-[120px] overflow-visible">
       <path
         d={describeArc(70, 70, 48, 0, 180)}
         fill="none"

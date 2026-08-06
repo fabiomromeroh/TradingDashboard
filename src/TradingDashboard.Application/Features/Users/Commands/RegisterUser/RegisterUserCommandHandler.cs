@@ -1,8 +1,8 @@
 using AutoMapper;
 using MediatR;
 using TradingDashboard.Application.Abstractions.Repositories;
-using TradingDashboard.Application.Common;
 using TradingDashboard.Application.Common.Exceptions;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Features.Users.Dtos;
 using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;

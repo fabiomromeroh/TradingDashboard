@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 
 namespace TradingDashboard.API.Extensions
 {

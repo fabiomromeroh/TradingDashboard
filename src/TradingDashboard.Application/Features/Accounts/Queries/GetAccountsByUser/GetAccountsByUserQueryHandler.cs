@@ -2,7 +2,7 @@ using AutoMapper;
 using MediatR;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services.BrokerSync;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Features.Accounts.Dtos;
 
 namespace TradingDashboard.Application.Features.Accounts.Queries.GetAccountsByUser;

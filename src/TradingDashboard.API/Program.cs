@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
@@ -7,7 +8,6 @@ using TradingDashboard.API.Middleware;
 using TradingDashboard.Application;
 using TradingDashboard.Infrastructure;
 using TradingDashboard.Infrastructure.Persistence.Seed;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +30,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddAuthorization(options =>
+    {
+        options.DefaultPolicy = new AuthorizationPolicyBuilder()
+            .RequireAssertion(_ => true) // always allow
+            .Build();
+    });
+}
+else
+{
+    builder.Services.AddAuthorization(); // normal policies
+}
 
 builder.Services.AddCors(options =>
 {
@@ -53,7 +65,6 @@ builder.Services.AddControllers()
 // Add services to the container.
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
-
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);

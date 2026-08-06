@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services.Import;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Interfaces;
 
 namespace TradingDashboard.Application.Features.ImportSessions.Commands.DeleteImport

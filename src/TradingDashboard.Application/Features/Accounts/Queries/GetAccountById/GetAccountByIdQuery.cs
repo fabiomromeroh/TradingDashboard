@@ -1,5 +1,5 @@
 using MediatR;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Features.Accounts.Dtos;
 
 namespace TradingDashboard.Application.Features.Accounts.Queries.GetAccountById;

@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 
 namespace TradingDashboard.Application.Features.Users.Commands.LogoutUser
 {

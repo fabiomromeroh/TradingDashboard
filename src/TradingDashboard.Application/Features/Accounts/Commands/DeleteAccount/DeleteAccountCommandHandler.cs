@@ -1,5 +1,5 @@
 using TradingDashboard.Application.Abstractions.Repositories;
-using TradingDashboard.Application.Common;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Interfaces;
 
 namespace TradingDashboard.Application.Features.Accounts.Commands.DeleteAccount;
