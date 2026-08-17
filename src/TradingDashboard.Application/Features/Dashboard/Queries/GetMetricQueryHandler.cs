@@ -21,10 +21,19 @@ namespace TradingDashboard.Application.Features.Dashboard.Queries
         }
         public async Task<Result<WidgetDto>> Handle(GetMetricQuery request, CancellationToken cancellationToken)
         {
-            //TODO - Get filter from db
             var config = await _userRepository.GetUserConfigurationAsync(request.UserId, cancellationToken);
 
+            if (config is null)
+            {
+                return Result<WidgetDto>.NotFound(nameof(config));
+            }
+
             var queryFilter = JsonSerializer.Deserialize<QueryFilter>(config.FiltersJson);
+
+            if (queryFilter is null)
+            {
+                return Result<WidgetDto>.NotFound(nameof(config));
+            }
 
             ISpecification<Trade> spec = new MetricFilterSpecification(queryFilter);
 

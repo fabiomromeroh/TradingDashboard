@@ -20,7 +20,7 @@ namespace TradingDashboard.Application.Features.Config.Queries
             {
                 return Result<UserConfigurationDto>.NotFound("User configuration not found.");
             }
-            QueryFilter filters = JsonSerializer.Deserialize<QueryFilter>(userConfig.FiltersJson);
+            QueryFilter? filters = JsonSerializer.Deserialize<QueryFilter>(userConfig.FiltersJson);
             var userConfigDto = new UserConfigurationDto
             {
                 Filters = filters
