@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -7,9 +6,13 @@ import { useLoginMutation } from "../hooks/useLoginMutation";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircleIcon } from "lucide-react";
+import { AppButton } from "@/components/shared/AppButton";
+import { useAppDispatch } from "@/store/hooks";
+import { setAccessToken, setUser } from "@/store/store";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
@@ -25,11 +28,13 @@ export default function LoginForm() {
       password: password,
     };
 
-    const success = await loginUser(loginUserCommand);
-
-    if (success) {
-      navigate("/dashboard");
-    }
+    await loginUser(loginUserCommand, {
+      onSuccess: (result) => {
+        dispatch(setAccessToken(result.accessToken));
+        dispatch(setUser(result.user));
+        return navigate("/dashboard");
+      },
+    });
   };
 
   return (
@@ -64,7 +69,7 @@ export default function LoginForm() {
                   value={password}
                 />
               </Field>
-              {errors.length > 0 && (
+              {errors && errors.length > 0 && (
                 <Alert variant="destructive" className="max-w-md">
                   <AlertCircleIcon />
                   <AlertTitle>Login failed</AlertTitle>
@@ -78,28 +83,31 @@ export default function LoginForm() {
                 </Alert>
               )}
               <Field>
-                <Button
+                <AppButton
                   onClick={handleLoginUser}
                   disabled={loading}
                   type="submit"
                 >
                   Login
-                </Button>
+                </AppButton>
               </Field>
               <div className="flex flex-col-2 items-center mt-4">
                 <Field>
-                  <Button variant="link" onClick={() => navigate("/register")}>
+                  <AppButton
+                    variant="link"
+                    onClick={() => navigate("/register")}
+                  >
                     Register
-                  </Button>
+                  </AppButton>
                 </Field>
                 <Field>
-                  <Button
+                  <AppButton
                     className="text-gray-500 hover:text-gray-7"
                     variant="link"
                     // onClick={() => navigate("/reset-password")}
                   >
                     Forgot Password?
-                  </Button>
+                  </AppButton>
                 </Field>
               </div>
             </FieldGroup>

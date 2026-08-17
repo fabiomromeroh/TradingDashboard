@@ -123,10 +123,12 @@ export function AccountTable(props: AccountTableProps) {
   if (props.error) {
     return (
       <div className="py-8 text-center">
-        <p className="text-red-600 mb-2">{props.error}</p>
-        <button onClick={props.handleRefresh} className="text-sm underline">
+        <p className="text-red-600 mb-2">
+          {props.error.map((e) => e.message).join(", ")}
+        </p>
+        <AppButton onClick={props.handleRefresh} className="text-sm underline">
           Try again
-        </button>
+        </AppButton>
       </div>
     );
   }

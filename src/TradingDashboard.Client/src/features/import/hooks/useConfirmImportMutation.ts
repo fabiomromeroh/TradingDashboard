@@ -15,9 +15,8 @@ export function useConfirmImportMutation() {
         .then(() => {
           return true;
         })
-        .catch((error) => {
-          const errors = handleApiError(error);
-          setError(errors);
+        .catch((response) => {
+          setError(handleApiError(response));
           return false;
         })
         .finally(() => {

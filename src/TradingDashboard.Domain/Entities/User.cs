@@ -18,6 +18,8 @@ public class User : BaseEntity
 
     public IReadOnlyCollection<RefreshToken> RefreshTokens { get; } = null!;
 
+    public UserConfiguration Configuration { get; }
+
     private User() { }
 
     public static User Create(string email, string passwordHash, string firstName, string lastName)

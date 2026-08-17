@@ -2,9 +2,9 @@ import { Pie, PieChart } from "recharts";
 
 import { ChartContainer } from "@/components/ui/chart";
 
-import { MetricWidgetShell } from "./MetricWidgetShell";
-import { clamp } from "./widget-utils";
-import type { RingMetricWidgetProps } from "./widget-types";
+import { MetricWidgetShell } from "./base/MetricWidgetShell";
+import type { RingMetricWidgetProps } from "./base/widget-types";
+import { clamp } from "./base/widget-utils";
 
 export function RingMetricCard({
   valueNumber,

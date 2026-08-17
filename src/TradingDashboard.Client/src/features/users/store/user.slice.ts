@@ -1,4 +1,7 @@
-import type { UserDto } from "@/features/users/types/user.types";
+import type {
+  ConfigFiltersDto,
+  UserDto,
+} from "@/features/users/types/user.types";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthState {
@@ -6,6 +9,11 @@ interface AuthState {
   authCheckComplete: boolean;
   user: UserDto | null;
   isAuthenticated: boolean;
+  configFilters: ConfigFiltersDto;
+}
+
+interface ConfigFilterState {
+  accountIds: string[];
 }
 
 const initialState: AuthState = {
@@ -13,7 +21,10 @@ const initialState: AuthState = {
   authCheckComplete: false,
   user: null,
   isAuthenticated: false,
+  configFilters: { accountIds: [] },
 };
+
+type PatchFiltersPayload = Partial<ConfigFilterState>;
 
 export const userSlice = createSlice({
   name: "auth",
@@ -36,6 +47,9 @@ export const userSlice = createSlice({
         ...action.payload,
         fullName: `${action.payload.firstName} ${action.payload.lastName}`,
       };
+    },
+    setConfigFilters(state, action: { payload: PatchFiltersPayload }) {
+      state.configFilters = { ...state.configFilters, ...action.payload };
     },
   },
 });

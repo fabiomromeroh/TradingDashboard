@@ -1,6 +1,6 @@
-import { MetricWidgetShell } from "./MetricWidgetShell";
-import { clamp } from "./widget-utils";
-import type { RangeMetricWidgetProps } from "./widget-types";
+import { MetricWidgetShell } from "./base/MetricWidgetShell";
+import { clamp } from "./base/widget-utils";
+import type { RangeMetricWidgetProps } from "./base/widget-types";
 
 export function RangeMetricCard({
   leftLabel,
@@ -16,8 +16,8 @@ export function RangeMetricCard({
     <MetricWidgetShell
       {...props}
       rightSlot={
-        <div className="flex min-w-[132px] flex-col gap-2 pt-2">
-          <div className="h-2.5 overflow-hidden rounded-full bg-muted">
+        <div className="flex min-w-[132px] flex-col gap-2 pt-7">
+          <div className="h-2 overflow-hidden rounded-full bg-muted">
             <div className="flex h-full w-full">
               <div
                 className="bg-emerald-500"
@@ -29,13 +29,13 @@ export function RangeMetricCard({
               />
             </div>
           </div>
-          <div className="flex items-center justify-between gap-4 text-[11px] font-medium tabular-nums">
+          <div className="flex flex-col items-center justify-between gap-4 text-[11px] font-medium tabular-nums ">
             <div className="text-emerald-600 dark:text-emerald-400">
-              <span className="mr-1 text-muted-foreground">{leftLabel}</span>
+              <span className="mr-1 text-muted-foreground">{leftLabel}</span>$
               {leftValue}
             </div>
             <div className="text-rose-600 dark:text-rose-400">
-              <span className="mr-1 text-muted-foreground">{rightLabel}</span>
+              <span className="mr-1 text-muted-foreground">{rightLabel}</span>$
               {rightValue}
             </div>
           </div>

@@ -1,5 +1,7 @@
 import apiClient from "@/lib/apiClient";
 import type {
+  ConfigDto,
+  ConfigFiltersCommand,
   CreateUserCommand,
   LoginResponse,
   LoginUserCommand,
@@ -22,4 +24,14 @@ export async function login(
 
 export async function logout(): Promise<void> {
   return apiClient.post("/users/logout");
+}
+
+export async function updateConfigFilters(
+  filters: ConfigFiltersCommand,
+): Promise<void> {
+  return apiClient.post("/config", { filters });
+}
+
+export async function getConfigFilters(): Promise<ConfigDto> {
+  return apiClient.get("/config");
 }

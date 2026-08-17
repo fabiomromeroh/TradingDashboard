@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
-export default function RequireRole({ roles }: { roles: string[] }) {
+export default function RequiredRole({ roles }: { roles: string[] }) {
   const { hasAnyRole, authCheckComplete } = useAuth();
 
   if (!authCheckComplete) return null;

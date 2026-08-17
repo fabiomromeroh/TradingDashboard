@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -13,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   MAIN_CATALOG,
   OVERVIEW_CATALOG,
-} from "../../../components/shared/widgets/WidgetRegistry";
+} from "../../../components/shared/widgets/base/WidgetRegistry";
 import type { WidgetCatalogItem } from "../types/dashboard.types";
 import type { WidgetType, WidgetZone } from "../types/dashboard.types";
 
@@ -76,6 +77,7 @@ export function WidgetCatalogModal({
       <DialogContent className="sm:max-w-6xl">
         <DialogHeader>
           <DialogTitle>Add Widget</DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
 
         <Tabs

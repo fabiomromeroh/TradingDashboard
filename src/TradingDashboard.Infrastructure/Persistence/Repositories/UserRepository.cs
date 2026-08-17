@@ -33,4 +33,21 @@ public class UserRepository : IUserRepository
         _context.Users.Remove(user);
         return Task.CompletedTask;
     }
+
+    public async Task<UserConfiguration> CreateUserConfigurationAsync(UserConfiguration userConfiguration, CancellationToken cancellationToken)
+    {
+        var result = await _context.UserConfigurations.AddAsync(userConfiguration, cancellationToken);
+        return result.Entity;
+    }
+
+    public Task UpdateUserConfiguration(UserConfiguration userConfiguration, CancellationToken cancellationToken)
+    {
+        _context.UserConfigurations.Update(userConfiguration);
+        return Task.CompletedTask;
+    }
+
+    public async Task<UserConfiguration?> GetUserConfigurationAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return await _context.UserConfigurations.AsNoTracking().FirstOrDefaultAsync(uc => uc.UserId == userId, cancellationToken);
+    }
 }

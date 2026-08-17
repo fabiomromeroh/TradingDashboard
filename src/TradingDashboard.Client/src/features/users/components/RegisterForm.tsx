@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { AppButton } from "@/components/shared/AppButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 // import {
@@ -138,12 +138,14 @@ export default function RegisterForm() {
               )}
             />
             <Field>
-              <Button type="submit">Register</Button>
+              <AppButton variant="destructive" type="submit">
+                Register
+              </AppButton>
             </Field>
             <Field>
-              <Button variant="link" onClick={() => navigate("/login")}>
+              <AppButton variant="link" onClick={() => navigate("/login")}>
                 Login
-              </Button>
+              </AppButton>
             </Field>
           </form>
         </CardContent>

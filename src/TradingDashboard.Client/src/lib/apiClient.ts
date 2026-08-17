@@ -5,7 +5,6 @@ import { toast } from "sonner";
 function handleSessionExpired() {
   store.dispatch(logout());
   toast.error("Your session has expired. Please log in again.");
-  // navigateTo("/login");
 }
 
 const apiClient = axios.create({

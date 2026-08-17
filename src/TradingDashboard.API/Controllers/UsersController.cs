@@ -2,6 +2,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
+using TradingDashboard.Application.Features.Config.Commands.UpdateFilterCommand;
+using TradingDashboard.Application.Features.Config.Queries;
 using TradingDashboard.Application.Features.Users.Commands.DeleteUser;
 using TradingDashboard.Application.Features.Users.Commands.LoginUser;
 using TradingDashboard.Application.Features.Users.Commands.LogoutUser;
@@ -111,12 +113,32 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    //[Authorize]
     public async Task<ActionResult> Get(CancellationToken cancellationToken)
     {
+
         var result = await _mediator.Send(new GetUsersQuery(), cancellationToken);
 
         return result.ToActionResult();
 
+    }
+
+    [HttpPost("config")]
+    [Authorize]
+    public async Task<IActionResult> UpdateUserConfiguration([FromBody] UpdateUserConfigCommand command, CancellationToken cancellationToken)
+    {
+        Guid userId = HttpContext.User.GetUserId();
+
+        var result = await _mediator.Send(command with { UserId = userId }, cancellationToken);
+
+        return result.ToActionResult();
+    }
+
+    [HttpGet("config")]
+    [Authorize]
+    public async Task<IActionResult> GetUserConfiguration(CancellationToken cancellationToken)
+    {
+        Guid userId = HttpContext.User.GetUserId();
+        var result = await _mediator.Send(new GetUserConfigurationQuery(userId), cancellationToken);
+        return result.ToActionResult();
     }
 }

@@ -1,3 +1,5 @@
+import type { ApiError } from "@/types/api.types";
+
 // Union types act as enums but are plain strings — easier to work with
 export type TradeDirection = "Long" | "Short";
 export type TradeStatus = "Open" | "Closed" | "Cancelled";
@@ -30,6 +32,6 @@ export interface ExecutionDto {
 export interface UseTradesResult {
   trades: TradeDto[];
   isLoading: boolean;
-  error: string | null;
+  error: ApiError[] | null;
   refetch: () => void; // lets the UI trigger a manual refresh
 }

@@ -19,7 +19,6 @@ export default function Sidebar() {
   const navItems = [
     { to: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
     { to: "/trades", icon: ArrowLeftRight, label: "Trades" },
-    // { to: "/accounts", icon: Briefcase, label: "Accounts" },
     { to: "/reports", icon: ChartBar, label: "Reports" },
   ];
 

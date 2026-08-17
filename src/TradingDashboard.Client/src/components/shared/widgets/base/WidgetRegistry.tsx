@@ -6,12 +6,16 @@ import { RangeMetricCard } from "@/components/shared/widgets/RangeMetricCard";
 import { AreaChartWidget } from "@/components/shared/widgets/AreaChartWidget";
 import { BarChartWidget } from "@/components/shared/widgets/BarChartWidget";
 import { DonutChartWidget } from "@/components/shared/widgets/DonutChartWidget";
+
+import { toneClass } from "./widget-utils";
 import type {
   MainWidgetType,
-  WidgetCatalogItem,
   WidgetType,
+  WidgetCatalogItem,
+  WidgetDto,
   WidgetZone,
-} from "../../../features/dashboard/types/dashboard.types";
+} from "@/features/dashboard/types/dashboard.types";
+import { AreaChartCurve } from "../AreaChartCurve";
 
 // ─── Column span per main widget ─────────────────────────────────────────────
 // Set colSpan: 2 to span both columns (full width); 1 for half-width.
@@ -21,7 +25,7 @@ export const MAIN_WIDGET_SIZES: Record<
   MainWidgetType,
   { colSpan: 1 | 2; chartHeight: number }
 > = {
-  "equity-curve": { colSpan: 2, chartHeight: 260 },
+  "net-pnl-curve": { colSpan: 2, chartHeight: 260 },
   "daily-pnl-bar": { colSpan: 2, chartHeight: 260 },
   "win-loss-donut": { colSpan: 1, chartHeight: 260 },
   "monthly-pnl": { colSpan: 1, chartHeight: 260 },
@@ -123,7 +127,7 @@ const monthlyPnLData = [
   { month: "Dec", pnl: 9700 },
 ];
 
-const fmtUsd = (v: number) => `$${(v / 1000).toFixed(0)}k`;
+const fmtUsd = (v: number) => `$${(v / 1000).toFixed(0)}`;
 const fmtUsdFull = (v: number) => {
   const abs = `$${Math.abs(v).toLocaleString("en-US")}`;
   return v < 0 ? `-${abs}` : abs;
@@ -175,7 +179,7 @@ export const WIDGET_CATALOG: WidgetCatalogItem[] = [
     description: "Largest peak-to-trough decline in equity.",
   },
   {
-    type: "equity-curve",
+    type: "net-pnl-curve",
     zone: "main",
     label: "Equity Curve",
     description: "Cumulative P&L over time as an area chart.",
@@ -292,7 +296,7 @@ export function renderWidget(type: WidgetType): ReactNode {
           valueClassName="text-rose-600 dark:text-rose-400"
         />
       );
-    case "equity-curve":
+    case "net-pnl-curve":
       return (
         <AreaChartWidget
           title="Equity Curve"
@@ -300,7 +304,7 @@ export function renderWidget(type: WidgetType): ReactNode {
           data={equityCurveData}
           dataKey="equity"
           config={{ equity: { label: "Equity", color: "var(--chart-2)" } }}
-          chartHeight={MAIN_WIDGET_SIZES["equity-curve"].chartHeight}
+          chartHeight={MAIN_WIDGET_SIZES["net-pnl-curve"].chartHeight}
           showGradient
           showZeroLine
           yTickFormatter={fmtUsd}
@@ -361,4 +365,166 @@ export function renderWidget(type: WidgetType): ReactNode {
 
 export function getWidgetZone(type: WidgetType): WidgetZone {
   return WIDGET_CATALOG.find((w) => w.type === type)?.zone ?? "main";
+}
+
+// ─── Distribution segment colour palette ─────────────────────────────────────
+
+// const SEGMENT_COLORS = [
+//   "var(--chart-1)",
+//   "var(--chart-2)",
+//   "var(--chart-3)",
+//   "var(--chart-4)",
+//   "var(--chart-5)",
+// ];
+
+// ─── DTO → component renderer ─────────────────────────────────────────────────
+
+/** Renders a widget from a live API WidgetDto. */
+export function renderWidgetFromDto(dto: WidgetDto): ReactNode {
+  const label =
+    WIDGET_CATALOG.find((w) => w.type === dto.widgetType)?.label ??
+    dto.widgetType;
+
+  switch (dto.renderType) {
+    case "metric":
+      return (
+        <MetricCard
+          title={label}
+          value={`${dto.payload.displayValue}`}
+          valueClassName={toneClass(dto.payload.tone)}
+          info={dto.payload.description}
+          rightSlot={
+            dto.payload.points && (
+              <AreaChartCurve
+                data={
+                  dto.payload.points as unknown as Record<string, unknown>[]
+                }
+                dataKey="y"
+                xAxisKey="x"
+                config={{
+                  y: { label, color: "var(--chart-2)" },
+                }}
+                chartHeight={86}
+                yTickFormatter={fmtUsd}
+                tooltipValueFormatter={(v) => `${v.toLocaleString("en-US")}`}
+                color="var(--chart-2)"
+              />
+            )
+          }
+        />
+      );
+
+    case "gauge":
+      return (
+        <GaugeMetricCard
+          title={label}
+          value={dto.payload.displayValue}
+          valueNumber={dto.payload.percent}
+          footerStats={dto.payload.stats}
+          info={dto.payload.description}
+        />
+      );
+
+    case "ring": {
+      const pct =
+        dto.payload.denominator > 0
+          ? (dto.payload.numerator / dto.payload.denominator) * 100
+          : 0;
+      return (
+        <RingMetricCard
+          title={label}
+          value={dto.payload.displayValue}
+          valueNumber={pct}
+          total={100}
+          footerStats={dto.payload.stats}
+          info={dto.payload.description}
+        />
+      );
+    }
+
+    case "range":
+      return (
+        <RangeMetricCard
+          title={label}
+          value={dto.payload.displayValue}
+          leftLabel={dto.payload.left.label}
+          leftValue={dto.payload.left.value}
+          rightLabel={dto.payload.right.label}
+          rightValue={dto.payload.right.value}
+          ratio={dto.payload.ratio}
+          info={dto.payload.description}
+        />
+      );
+
+    case "area-chart":
+      return (
+        <AreaChartWidget
+          title={label}
+          data={dto.payload.points as unknown as Record<string, unknown>[]}
+          dataKey="y"
+          xAxisKey="x"
+          config={{ y: { label, color: "var(--chart-2)" } }}
+          chartHeight={
+            (dto.widgetType as MainWidgetType) in MAIN_WIDGET_SIZES
+              ? MAIN_WIDGET_SIZES[dto.widgetType as MainWidgetType].chartHeight
+              : 220
+          }
+          showGradient
+          showZeroLine
+          yTickFormatter={fmtUsd}
+          tooltipValueFormatter={(v) => `$${v.toLocaleString("en-US")}`}
+          info={dto.payload.description}
+          color="var(--chart-1)"
+          splitAtZero
+        />
+      );
+
+    case "bar-chart":
+      return (
+        <BarChartWidget
+          title={label}
+          data={dto.payload.points as unknown as Record<string, unknown>[]}
+          dataKey="y"
+          xAxisKey="x"
+          config={{ y: { label } }}
+          chartHeight={
+            (dto.widgetType as MainWidgetType) in MAIN_WIDGET_SIZES
+              ? MAIN_WIDGET_SIZES[dto.widgetType as MainWidgetType].chartHeight
+              : 220
+          }
+          colorByValue
+          yTickFormatter={fmtUsd}
+          tooltipValueFormatter={fmtUsdFull}
+          info={dto.payload.description}
+        />
+      );
+    // case "distribution": {
+    //   const total = dto.payload.segments.reduce((s, g) => s + g.value, 0);
+    //   return (
+    //     <DonutChartWidget
+    //       title={label}
+    //       data={dto.payload.segments.map((seg, i) => ({
+    //         name: seg.name,
+    //         value: seg.value,
+    //         fill: SEGMENT_COLORS[i % SEGMENT_COLORS.length],
+    //       }))}
+    //       chartHeight={
+    //         (dto.widgetType as MainWidgetType) in MAIN_WIDGET_SIZES
+    //           ? MAIN_WIDGET_SIZES[dto.widgetType as MainWidgetType].chartHeight
+    //           : 220
+    //       }
+    //       innerRadius={52}
+    //       outerRadius={76}
+    //       centerValue={total}
+    //       centerLabel="trades"
+    //       tooltipFormatter={(v, t) =>
+    //         `${v} trades (${t > 0 ? ((v / t) * 100).toFixed(1) : 0}%)`
+    //       }
+    //     />
+    //   );
+    // }
+
+    default:
+      return null;
+  }
 }

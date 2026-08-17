@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<Execution> Executions => Set<Execution>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<BrokerAccountCredential> BrokerAccountCredentials => Set<BrokerAccountCredential>();
+    public DbSet<UserConfiguration> UserConfigurations => Set<UserConfiguration>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

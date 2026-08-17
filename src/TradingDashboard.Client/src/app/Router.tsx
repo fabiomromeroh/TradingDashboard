@@ -8,7 +8,7 @@ import { DashboardPage } from "@/pages/DashboardPage";
 import { ReportsPage } from "@/pages/ReportsPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ProtectedRoute from "./ProtectedRoute";
-import RequireRole from "./RequiredRole";
+import RequiredRole from "./RequiredRole";
 import { AuthProvider } from "./AuthContext";
 import Forbidden403Page from "@/pages/Forbidden403Page";
 
@@ -33,7 +33,7 @@ export default function Router() {
               <Route path="/add-trades" element={<AddTradesPage />} />
               <Route path="/reports" element={<ReportsPage />} />
 
-              <Route element={<RequireRole roles={["Admin"]} />}>
+              <Route element={<RequiredRole roles={["Admin"]} />}>
                 <Route path="/users" element={<UsersPage />} />
               </Route>
             </Route>

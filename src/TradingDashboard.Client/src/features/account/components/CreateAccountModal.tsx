@@ -1,11 +1,11 @@
 import { AppInputField } from "@/components/shared/AppInputField";
 import { AppSelectField } from "@/components/shared/AppSelectField";
 import type { CreateAccountModalProps } from "../types/account.types";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { useCreateAccountMutation } from "../hooks/useCreateAccountMutation";
 import { toast } from "sonner";
+import { AppButton } from "@/components/shared/AppButton";
 
 const accountSchema = z.object({
   name: z.string().min(1, "Account name is required"),
@@ -59,13 +60,14 @@ export function CreateAccountModal(props: CreateAccountModalProps) {
     <Form {...form}>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="float-right" variant="outline">
+          <AppButton className="float-right" variant="outline">
             Add Account
-          </Button>
+          </AppButton>
         </DialogTrigger>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Add Account</DialogTitle>
+            <DialogDescription>Add a new brokerage account</DialogDescription>
           </DialogHeader>
           <form
             onSubmit={form.handleSubmit(handleFormSubmit)}
@@ -102,11 +104,11 @@ export function CreateAccountModal(props: CreateAccountModalProps) {
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" type="button">
+                <AppButton variant="outline" type="button">
                   Cancel
-                </Button>
+                </AppButton>
               </DialogClose>
-              <Button type="submit">Save</Button>
+              <AppButton type="submit">Save</AppButton>
             </DialogFooter>
           </form>
         </DialogContent>

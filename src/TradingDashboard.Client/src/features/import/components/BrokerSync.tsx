@@ -1,8 +1,8 @@
 import { AppInput } from "@/components/shared/AppInput";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import type { BrokerSyncProps } from "../types/import.types";
+import { AppButton } from "@/components/shared/AppButton";
 
 export function BrokerSync({
   brokerName,
@@ -56,12 +56,12 @@ export function BrokerSync({
         )}
       </CardContent>
       <CardFooter>
-        <Button
+        <AppButton
           className="primary"
           onClick={() => onSaveCredentials(queryId, flexToken)}
         >
           Save Credentials
-        </Button>
+        </AppButton>
       </CardFooter>
     </Card>
   );

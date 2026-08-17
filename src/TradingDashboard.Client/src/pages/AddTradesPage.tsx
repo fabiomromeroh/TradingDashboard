@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toSelectOptions } from "@/lib/utils";
-import { useSetBrokerCredentialsMutation } from "@/features/account/hooks/setBrokerCredentialsMutation";
+import { useSetBrokerCredentialsMutation } from "@/features/account/hooks/useSetBrokerCredentialsMutation";
 import { useLocation } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,7 +33,6 @@ export function AddTradesPage() {
 
   useEffect(() => {
     if (accounts.length > 0) {
-      console.log("Layout useEffect triggered");
       dispatch(setAccounts(accounts));
     }
   }, [accounts, dispatch]);

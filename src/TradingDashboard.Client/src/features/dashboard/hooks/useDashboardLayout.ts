@@ -13,11 +13,11 @@ const defaultLayout: DashboardLayout = {
     { id: "default-net-pnl", type: "net-pnl", zone: "overview" },
     { id: "default-win-rate", type: "win-rate", zone: "overview" },
     { id: "default-profit-factor", type: "profit-factor", zone: "overview" },
-    { id: "default-day-win-rate", type: "day-win-rate", zone: "overview" },
+    // { id: "default-day-win-rate", type: "day-win-rate", zone: "overview" },
     { id: "default-avg-win-loss", type: "avg-win-loss", zone: "overview" },
   ],
   main: [
-    { id: "default-equity-curve", type: "equity-curve", zone: "main" },
+    { id: "default-equity-curve", type: "net-pnl-curve", zone: "main" },
     { id: "default-daily-pnl-bar", type: "daily-pnl-bar", zone: "main" },
     { id: "default-win-loss-donut", type: "win-loss-donut", zone: "main" },
     { id: "default-monthly-pnl", type: "monthly-pnl", zone: "main" },

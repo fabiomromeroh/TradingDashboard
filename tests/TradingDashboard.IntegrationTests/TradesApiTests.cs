@@ -14,7 +14,6 @@ namespace TradingDashboard.IntegrationTests;
 public class TradesApiTests
 {
     private readonly TradingDashboardWebApplicationFactory _factory;
-    private readonly IHostEnvironment _environment;
     private readonly HttpClient _client;
 
     public TradesApiTests(TradingDashboardWebApplicationFactory factory)

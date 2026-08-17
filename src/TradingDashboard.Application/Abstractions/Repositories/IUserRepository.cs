@@ -10,4 +10,7 @@ public interface IUserRepository
     Task AddAsync(User user, CancellationToken cancellationToken);
     Task UpdateAsync(User user, CancellationToken cancellationToken);
     Task DeleteAsync(User user, CancellationToken cancellationToken);
+    Task UpdateUserConfiguration(UserConfiguration userConfiguration, CancellationToken cancellationToken);
+    Task<UserConfiguration?> GetUserConfigurationAsync(Guid userId, CancellationToken cancellationToken);
+    Task<UserConfiguration> CreateUserConfigurationAsync(UserConfiguration userConfiguration, CancellationToken cancellationToken);
 }

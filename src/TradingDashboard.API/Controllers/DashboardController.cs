@@ -18,10 +18,12 @@ public class DashboardController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("summary")]
-    public async Task<IActionResult> GetDashboardSummary([FromQuery] IReadOnlyCollection<Guid> accountIds, CancellationToken cancellationToken)
+    [HttpGet("metric")]
+    public async Task<IActionResult> GetMetric([FromQuery] string metricType, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetDashboardSummaryQuery(accountIds), cancellationToken);
+        Guid userId = HttpContext.User.GetUserId();
+
+        var result = await _mediator.Send(new GetMetricQuery(userId, metricType), cancellationToken);
         return result.ToActionResult();
     }
 }

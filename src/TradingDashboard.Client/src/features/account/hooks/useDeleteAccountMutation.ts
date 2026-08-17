@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { deleteAccount } from "../api/account.api";
 import type { ApiError } from "@/types/api.types";
 import { toast } from "sonner";
+import { handleApiError } from "@/lib/utils";
 
 export function useDeleteAccountMutation() {
   const [isPending, setIsPending] = useState(false);
@@ -15,8 +16,7 @@ export function useDeleteAccountMutation() {
         return true;
       })
       .catch((response) => {
-        const errors = response.data as ApiError[];
-        setError(errors);
+        setError(handleApiError(response));
         return false;
       })
       .finally(() => {

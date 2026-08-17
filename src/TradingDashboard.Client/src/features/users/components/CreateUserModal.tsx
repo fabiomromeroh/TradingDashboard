@@ -20,10 +20,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useCreateUserMutation } from "../hooks/useCreateUserMutation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AppButton } from "@/components/shared/AppButton";
 
 const userSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -62,16 +62,14 @@ export function CreateUserModal({ reload }: CreateUserModalProps) {
     <Form {...form}>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="float-right" variant="outline">
+          <AppButton className="float-right" variant="outline">
             Create user
-          </Button>
+          </AppButton>
         </DialogTrigger>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Create user</DialogTitle>
-            <DialogDescription>
-              Fill in the details below and click save when you&apos;re done.
-            </DialogDescription>
+            <DialogDescription></DialogDescription>
           </DialogHeader>
           <form
             onSubmit={form.handleSubmit(handleFormSubmit)}
@@ -137,11 +135,11 @@ export function CreateUserModal({ reload }: CreateUserModalProps) {
             />
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" type="button">
+                <AppButton variant="outline" type="button">
                   Cancel
-                </Button>
+                </AppButton>
               </DialogClose>
-              <Button type="submit">Save</Button>
+              <AppButton type="submit">Save</AppButton>
             </DialogFooter>
           </form>
         </DialogContent>

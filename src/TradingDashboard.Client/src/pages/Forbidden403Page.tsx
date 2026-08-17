@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShieldAlert, Home, LogIn } from "lucide-react";
+import { AppButton } from "@/components/shared/AppButton";
 
 const Forbidden403Page: React.FC = () => {
   const navigate = useNavigate();
@@ -31,21 +31,21 @@ const Forbidden403Page: React.FC = () => {
           <div className="mb-6 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
           <div className="flex w-full flex-col gap-2.5">
-            <Button
+            <AppButton
               className="w-full bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30 hover:from-blue-600 hover:to-blue-700"
               onClick={() => navigate("/")}
             >
               <Home className="mr-2 h-4 w-4" />
               Back to Dashboard
-            </Button>
-            <Button
+            </AppButton>
+            <AppButton
               variant="outline"
               className="w-full border-white/10 bg-transparent text-slate-300 hover:bg-white/5 hover:text-slate-100"
               onClick={() => navigate("/login")}
             >
               <LogIn className="mr-2 h-4 w-4" />
               Sign in with different account
-            </Button>
+            </AppButton>
           </div>
 
           <p className="mt-6 text-xs text-slate-500">

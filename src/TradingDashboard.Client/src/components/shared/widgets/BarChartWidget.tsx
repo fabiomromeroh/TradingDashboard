@@ -113,10 +113,12 @@ export function BarChartWidget({
             />
             <XAxis
               dataKey={xAxisKey}
-              tick={{ fontSize: 10 }}
+              tick={{ fontSize: 8 }}
               tickLine={false}
               axisLine={false}
-              interval="preserveStartEnd"
+              angle={45}
+              interval={"preserveEnd"}
+              tickCount={2}
             />
             <YAxis
               tick={{ fontSize: 10 }}
@@ -124,6 +126,7 @@ export function BarChartWidget({
               axisLine={false}
               tickFormatter={yTickFormatter}
               width={44}
+              padding={{ bottom: 20 }}
             />
             {colorByValue && (
               <ReferenceLine

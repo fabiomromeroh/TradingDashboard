@@ -521,6 +521,41 @@ namespace TradingDashboard.Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("TradingDashboard.Domain.Entities.UserConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("FiltersJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("{}");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("WidgetLayoutJson")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserConfigurations", (string)null);
+                });
+
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Account", b =>
                 {
                     b.HasOne("TradingDashboard.Domain.Entities.Broker", "Broker")
@@ -608,6 +643,17 @@ namespace TradingDashboard.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("TradingDashboard.Domain.Entities.UserConfiguration", b =>
+                {
+                    b.HasOne("TradingDashboard.Domain.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("TradingDashboard.Domain.Entities.UserConfiguration", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TradingDashboard.Domain.Entities.Account", b =>

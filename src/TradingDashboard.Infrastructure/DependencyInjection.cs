@@ -6,17 +6,18 @@ using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services;
 using TradingDashboard.Application.Abstractions.Services.BrokerSync;
 using TradingDashboard.Application.Abstractions.Services.BrokerSync.Ibkr;
-using TradingDashboard.Application.Abstractions.Services.Dashboard;
 using TradingDashboard.Application.Abstractions.Services.Import;
+using TradingDashboard.Application.Abstractions.Services.Metric;
 using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Infrastructure.Persistence;
 using TradingDashboard.Infrastructure.Persistence.Repositories;
 using TradingDashboard.Infrastructure.Services.BrokerSync;
 using TradingDashboard.Infrastructure.Services.BrokerSync.Ibkr;
-using TradingDashboard.Infrastructure.Services.Dashboard;
 using TradingDashboard.Infrastructure.Services.Identity;
 using TradingDashboard.Infrastructure.Services.Import;
 using TradingDashboard.Infrastructure.Services.Import.Ibkr;
+using TradingDashboard.Infrastructure.Services.Metric;
+using TradingDashboard.Infrastructure.Services.Metric.Calculators;
 
 namespace TradingDashboard.Infrastructure;
 
@@ -47,7 +48,21 @@ public static class DependencyInjection
         services.AddScoped<IBrokerAccountCredentialRepository, BrokerAccountCredentialRepository>();
 
         //---Query Services---
-        services.AddScoped<IDashboardQueryService, DashboardQueryService>();
+        services.AddScoped<IMetricQueryService, MetricQueryService>();
+
+        //---Metric Calculator Factory---
+        services.AddScoped<IMetricCalculatorFactory, MetricCalculatorFactory>();
+        services.AddScoped<IMetricCalculator, WinRateMetricCalculator>();
+        services.AddScoped<IMetricCalculator, NetPnlMetricCalculator>();
+        services.AddScoped<IMetricCalculator, TotalTradesMetricCalculator>();
+        services.AddScoped<IMetricCalculator, AverageWinLossMetricCalculator>();
+        services.AddScoped<IMetricCalculator, ProfitFactorMetricCalculator>();
+        services.AddScoped<IMetricCalculator, NetPnlCurveCalculator>();
+        services.AddScoped<IMetricCalculator, DayWinRateMetricCalculator>();
+        services.AddScoped<IMetricCalculator, DailyPnlMetricCalculator>();
+        services.AddScoped<IMetricCalculator, MonthlyPnlMetricCalculator>();
+
+
 
         // --- Unit of Work ---
         services.AddScoped<IUnitOfWork, UnitOfWork>();

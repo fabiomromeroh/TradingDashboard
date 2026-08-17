@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -17,6 +16,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AppButton } from "./AppButton";
 
 type Align = "start" | "center" | "end";
 
@@ -111,7 +111,7 @@ function renderShortcut(shortcut?: string) {
 
 export function AppDropdownMenu(props: AppDropdownMenuProps) {
   const trigger = props.trigger ?? (
-    <Button variant="outline">{props.label}</Button>
+    <AppButton variant="outline">{props.label}</AppButton>
   );
 
   return (

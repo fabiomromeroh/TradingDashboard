@@ -18,13 +18,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include=".github\agents\Fabio%27s Agent.agent.md" />
+    <None Include=".github\backend.instructions.md" />
+    <None Include=".github\copilot-instructions.md" />
+    <None Include=".github\frontend.instructions.md" />
     <None Include=".github\workflows\main.yml" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.21.0" />
     <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.11.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
       <PrivateAssets>all</PrivateAssets>
@@ -33,6 +36,7 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.ILogger" Version="1.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
@@ -40,6 +44,10 @@
   <ItemGroup>
     <ProjectReference Include="..\TradingDashboard.Application\TradingDashboard.Application.csproj" />
     <ProjectReference Include="..\TradingDashboard.Infrastructure\TradingDashboard.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include=".github\agents\" />
   </ItemGroup>
 
 </Project>

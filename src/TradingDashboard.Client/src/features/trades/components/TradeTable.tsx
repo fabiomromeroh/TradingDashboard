@@ -1,6 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +14,7 @@ import type { ExecutionDto, TradeDto } from "../types/trade.types";
 import { DataTable } from "@/components/shared/DataTable";
 import { getTradeExecutions } from "../api/trades.api";
 import { getDateFormat } from "@/lib/utils";
+import { AppButton } from "@/components/shared/AppButton";
 
 const columns: ColumnDef<TradeDto, unknown>[] = [
   { accessorKey: "symbol", header: "Symbol" },
@@ -104,10 +104,10 @@ const columns: ColumnDef<TradeDto, unknown>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <AppButton variant="ghost" size="sm" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
-            </Button>
+            </AppButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
@@ -152,13 +152,15 @@ export function TradeTable() {
     );
   }
 
-  if (error) {
+  if (error && error.length > 0) {
     return (
       <div className="py-8 text-center">
-        <p className="text-red-600 mb-2">{error}</p>
-        <button onClick={refetch} className="text-sm underline">
+        <p className="text-red-600 mb-2">
+          {error.map((e) => e.message).join(", ")}
+        </p>
+        <AppButton onClick={refetch} className="text-sm underline">
           Try again
-        </button>
+        </AppButton>
       </div>
     );
   }

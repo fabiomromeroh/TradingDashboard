@@ -17,13 +17,14 @@ import {
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { Plus, LayoutDashboard } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useDashboardLayout } from "../hooks/useDashboardLayout";
 import { SortableWidget } from "./SortableWidget";
 import { WidgetCatalogModal } from "./WidgetCatalogModal";
-import { renderWidget } from "../../../components/shared/widgets/WidgetRegistry";
 import type { DashboardWidget } from "../types/dashboard.types";
+import { useAppSelector } from "@/store/hooks";
+import { renderWidgetFromDto } from "@/components/shared/widgets/base/WidgetRegistry";
+import { AppButton } from "@/components/shared/AppButton";
 
 function EmptyZone({ label, onAdd }: { label: string; onAdd: () => void }) {
   return (
@@ -34,19 +35,23 @@ function EmptyZone({ label, onAdd }: { label: string; onAdd: () => void }) {
     >
       <LayoutDashboard className="size-8 text-muted-foreground/40" />
       <p className="text-sm text-muted-foreground">No widgets yet</p>
-      <Button variant="outline" size="sm" onClick={onAdd}>
+      <AppButton variant="outline" size="sm" onClick={onAdd}>
         <Plus className="size-3.5 mr-1.5" />
         Add Widget
-      </Button>
+      </AppButton>
     </div>
   );
 }
 
 /** Overlay preview shown while dragging */
 function DragPreview({ widget }: { widget: DashboardWidget }) {
+  const metricData = useAppSelector((x) =>
+    x.metric.metrics.find((m) => m.widgetType === widget.type),
+  );
+
   return (
     <div className="rotate-1 opacity-90 shadow-2xl pointer-events-none">
-      {renderWidget(widget.type)}
+      {metricData && renderWidgetFromDto(metricData)}
     </div>
   );
 }
@@ -111,10 +116,10 @@ export function DashboardOverview() {
       <div className="flex flex-col gap-6">
         {/* Page header */}
         <div className="flex items-center justify-between gap-4">
-          <Button onClick={() => setCatalogOpen(true)} size="sm">
+          <AppButton onClick={() => setCatalogOpen(true)} size="sm">
             <Plus className="size-4 mr-2" />
             Add Widget
-          </Button>
+          </AppButton>
         </div>
 
         {/* ── Overview zone ── */}
@@ -133,7 +138,7 @@ export function DashboardOverview() {
               items={layout.overview.map((w) => w.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+              <div className="grid gap-4 max-[645px]:grid-cols-1 min-[646px]:max-[917px]:grid-cols-2 min-[918px]:max-[1180px]:grid-cols-3 min-[1180px]:max-[1630px]:grid-cols-4 min-[1630px]:grid-cols-5 min-[1630px]:max-[1800px]:max-[1630px]:grid-cols-4 min-[1800px]:grid-cols-6">
                 {layout.overview.map((widget) => (
                   <SortableWidget
                     key={widget.id}

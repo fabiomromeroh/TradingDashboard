@@ -1,8 +1,13 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { Button } from "../ui/button";
 
 interface AppButtonProps {
-  tooltip: string;
+  tooltip?: string;
   variant?:
     | "default"
     | "destructive"
@@ -15,18 +20,23 @@ interface AppButtonProps {
   type?: "button" | "submit" | "reset";
   className?: string;
   children: React.ReactNode;
+  role?: string;
   onClick?: () => void;
 }
 
 export function AppButton(props: AppButtonProps) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button {...props}>{props.children}</Button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>{props.tooltip}</p>
-      </TooltipContent>
-    </Tooltip>
+  return props.tooltip ? (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button {...props}>{props.children}</Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{props.tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  ) : (
+    <Button {...props}>{props.children}</Button>
   );
 }

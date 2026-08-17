@@ -1,6 +1,6 @@
-import { MetricWidgetShell } from "./MetricWidgetShell";
-import { clamp, cn, describeArc } from "./widget-utils";
-import type { GaugeMetricWidgetProps } from "./widget-types";
+import { MetricWidgetShell } from "./base/MetricWidgetShell";
+import { clamp, cn, describeArc } from "./base/widget-utils";
+import type { GaugeMetricWidgetProps } from "./base/widget-types";
 
 function Gauge({
   valueNumber,
@@ -37,7 +37,7 @@ function Gauge({
   });
 
   return (
-    <svg viewBox="0 0 140 88" className="h-[65px] w-[120px] overflow-visible">
+    <svg viewBox="0 0 140 88" className="h-[60px] w-[120px] overflow-visible">
       <path
         d={describeArc(70, 70, 48, 0, 180)}
         fill="none"
@@ -86,7 +86,7 @@ export function GaugeMetricCard({
       {...props}
       footerStats={footerStats}
       rightSlot={
-        <div className={cn("flex flex-col items-end gap-2 pt-1")}>
+        <div className={cn("flex flex-col items-end gap-2")}>
           <Gauge
             valueNumber={valueNumber}
             min={min}

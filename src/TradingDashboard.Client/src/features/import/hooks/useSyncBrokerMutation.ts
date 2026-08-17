@@ -19,8 +19,7 @@ export function useSyncBrokerMutation() {
         return true;
       })
       .catch((response) => {
-        const errors = handleApiError(response);
-        setError(errors);
+        setError(handleApiError(response));
         return false;
       })
       .finally(() => {

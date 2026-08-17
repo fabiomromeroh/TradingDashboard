@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingDashboard.API.Middleware;
 using TradingDashboard.Application;
@@ -58,8 +59,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         // Configure JSON serializer to use string representation for enums
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
     });
 
 // Add services to the container.
@@ -73,8 +75,19 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
 
-builder.Host.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration));
+var appInsightsConnectionString = builder.Configuration["ApplicationInsights:ConnectionString"];
+
+if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+{
+    builder.Services.AddApplicationInsightsTelemetry();
+}
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services));   // enables DI-based enrichers
+
+builder.Logging.AddFilter("LuckyPennySoftware.AutoMapper.License", LogLevel.None);
+builder.Logging.AddFilter("LuckyPennySoftware.MediatR.License", LogLevel.None);
 
 var app = builder.Build();
 

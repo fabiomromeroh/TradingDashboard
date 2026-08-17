@@ -1,3 +1,5 @@
+import type { ApiError } from "@/types/api.types";
+
 export interface UserDto {
   id: string;
   firstName: string;
@@ -27,4 +29,23 @@ export interface LoginUserCommand {
 
 export interface LogoutUserCommand {
   accessToken: string;
+}
+
+export interface ConfigFiltersCommand {
+  AccountIds: string[];
+}
+
+export interface ConfigDto {
+  filters: ConfigFiltersDto;
+}
+
+export interface ConfigFiltersDto {
+  accountIds: string[];
+}
+
+export interface ConfigFiltersQueryResult {
+  config: ConfigDto | null;
+  isLoading: boolean;
+  error: ApiError[] | null;
+  refetch: () => Promise<ConfigDto | null>;
 }

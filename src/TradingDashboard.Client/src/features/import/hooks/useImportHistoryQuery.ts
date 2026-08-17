@@ -19,13 +19,13 @@ export function useImportHistoryQuery(accountId?: string) {
 
     setIsLoading(true);
 
-    getImportHistory(accountId)
+    return await getImportHistory(accountId)
       .then((data) => {
         setImportHistory(data);
       })
       .catch((response) => {
-        const errors = handleApiError(response);
-        setErrors(errors);
+        setErrors(handleApiError(response));
+        return false;
       })
       .finally(() => {
         setIsLoading(false);

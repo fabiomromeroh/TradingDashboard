@@ -1,5 +1,7 @@
 export type AccountStatus = "active" | "inactive" | "pending";
 
+import type { ApiError } from "@/types/api.types";
+
 export interface AccountDto {
   id: string;
   name: string;
@@ -29,7 +31,7 @@ export interface SetCredentialsCommand {
 export interface AccountTableProps {
   accounts?: AccountDto[];
   isLoading?: boolean;
-  error?: string | null;
+  error?: ApiError[] | null;
   handleRefresh: () => void;
   onAccountChange: () => void;
 }
@@ -40,7 +42,7 @@ export interface CreateAccountModalProps {
 
 export interface UseAccountsResult {
   accounts: AccountDto[];
-  error: string | null;
+  error: ApiError[] | null;
   isLoading: boolean;
   refetch: () => void;
 }

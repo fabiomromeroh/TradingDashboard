@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { Spinner } from "../ui/spinner";
+import { AppButton } from "./AppButton";
 
 interface FileUploadProps {
   handleUpload: (file: File) => void;
@@ -34,7 +34,7 @@ export function FileUpload({
       {fileName ? (
         <p className="text-sm text-muted-foreground">Selected: {fileName}</p>
       ) : null}
-      <Button
+      <AppButton
         disabled={!fileName || disabled || isUploading}
         className="mt-2"
         onClick={() => {
@@ -47,7 +47,7 @@ export function FileUpload({
       >
         {isUploading && <Spinner />}
         Import
-      </Button>
+      </AppButton>
     </div>
   );
 }

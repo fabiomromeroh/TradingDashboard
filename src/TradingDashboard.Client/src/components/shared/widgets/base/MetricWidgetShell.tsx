@@ -1,7 +1,7 @@
 import { Info } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { cn, toneClass } from "./widget-utils";
+import { cn, toneClass } from "../base/widget-utils";
 import type { MetricWidgetBaseProps } from "./widget-types";
 
 export function MetricWidgetShell({
@@ -18,7 +18,7 @@ export function MetricWidgetShell({
   description,
   info,
   badge,
-  footerStats,
+  // footerStats,
   rightSlot,
   className,
   valueClassName,
@@ -26,14 +26,14 @@ export function MetricWidgetShell({
   return (
     <Card
       className={cn(
-        "border-border/60 bg-card shadow-sm h-[165px] mt-2",
+        "border-border/60 bg-card shadow-sm h-[130px] pb-2 pt-3",
         className,
       )}
     >
-      <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-3">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+      <CardContent className="flex flex-row items-start justify-between gap-3 pl-3 pr-3 h-full">
+        <div className="space-y-1.5 ">
+          <div className="flex items-center gap-1 pt-5">
+            <CardTitle className="text-xs font-medium text-muted-foreground">
               {title}
             </CardTitle>
             {info ? (
@@ -69,7 +69,7 @@ export function MetricWidgetShell({
 
           <div
             className={cn(
-              "text-3xl font-semibold tracking-tight tabular-nums",
+              "text-2xl font-semibold tracking-tight tabular-nums",
               valueClassName,
             )}
           >
@@ -81,11 +81,11 @@ export function MetricWidgetShell({
           ) : null}
         </div>
 
-        {rightSlot ? <div className="shrink-0">{rightSlot}</div> : null}
-      </CardHeader>
-
+        {rightSlot ? <div className="">{rightSlot}</div> : null}
+      </CardContent>
+      {/* 
       {footerStats?.length ? (
-        <CardContent className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-0">
+        <CardContent className="flex flex-wrap items-center gap-x-4">
           {footerStats.map((stat) => (
             <div
               key={`${stat.label}-${stat.value}`}
@@ -98,7 +98,7 @@ export function MetricWidgetShell({
             </div>
           ))}
         </CardContent>
-      ) : null}
+      ) : null} */}
     </Card>
   );
 }

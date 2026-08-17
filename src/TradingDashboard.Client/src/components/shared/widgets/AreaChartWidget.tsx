@@ -1,4 +1,5 @@
 import { Info } from "lucide-react";
+import { getZeroOffset } from "@/components/shared/widgets/base/widget-utils";
 import {
   Area,
   AreaChart,
@@ -24,14 +25,13 @@ import {
 import { cn } from "@/lib/utils";
 
 export interface AreaChartWidgetProps {
-  title: string;
+  title?: string;
   description?: string;
   info?: string;
   data: Record<string, unknown>[];
   dataKey: string;
   xAxisKey?: string;
   config: ChartConfig;
-  /** Height in pixels for the chart area. Default: 220 */
   chartHeight?: number;
   className?: string;
   color?: string;
@@ -39,6 +39,12 @@ export interface AreaChartWidgetProps {
   showZeroLine?: boolean;
   yTickFormatter?: (value: number) => string;
   tooltipValueFormatter?: (value: number) => string;
+  /** New: color the area red below 0 / green above 0 */
+  splitAtZero?: boolean;
+  positiveColor?: string;
+  negativeColor?: string;
+  hideXAxis?: boolean;
+  hideYAxis?: boolean;
 }
 
 export function AreaChartWidget({
@@ -56,8 +62,15 @@ export function AreaChartWidget({
   showZeroLine = false,
   yTickFormatter = String,
   tooltipValueFormatter,
+  splitAtZero = false,
+  positiveColor = "var(--primary)", // green-600
+  negativeColor = "var(--destructive)", // red-600
+  hideXAxis = false,
+  hideYAxis = false,
 }: AreaChartWidgetProps) {
   const gradientId = `area-grad-${dataKey}`;
+  const strokeGradientId = `stroke-grad-${dataKey}`;
+  const offset = splitAtZero ? getZeroOffset(data, dataKey) : 0;
 
   return (
     <Card className={cn("border-border/60 shadow-sm", className)}>
@@ -101,14 +114,44 @@ export function AreaChartWidget({
             data={data}
             margin={{ top: 4, right: 8, bottom: 0, left: 0 }}
           >
-            {showGradient && (
-              <defs>
-                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={color} stopOpacity={0.25} />
-                  <stop offset="95%" stopColor={color} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-            )}
+            <defs>
+              {splitAtZero ? (
+                <>
+                  {/* Fill gradient: green above zero, red below */}
+                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset={offset}
+                      stopColor={positiveColor}
+                      stopOpacity={0.3}
+                    />
+                    <stop
+                      offset={offset}
+                      stopColor={negativeColor}
+                      stopOpacity={0.3}
+                    />
+                  </linearGradient>
+                  {/* Stroke gradient: matches the line color to the fill split */}
+                  <linearGradient
+                    id={strokeGradientId}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset={offset} stopColor={positiveColor} />
+                    <stop offset={offset} stopColor={negativeColor} />
+                  </linearGradient>
+                </>
+              ) : (
+                showGradient && (
+                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={color} stopOpacity={0.25} />
+                    <stop offset="95%" stopColor={color} stopOpacity={0} />
+                  </linearGradient>
+                )
+              )}
+            </defs>
+
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="hsl(var(--border))"
@@ -116,10 +159,12 @@ export function AreaChartWidget({
             />
             <XAxis
               dataKey={xAxisKey}
-              tick={{ fontSize: 10 }}
+              tick={{ fontSize: 8 }}
               tickLine={false}
               axisLine={false}
-              interval="preserveStartEnd"
+              interval={"preserveStartEnd"}
+              hide={hideXAxis}
+              angle={45}
             />
             <YAxis
               tick={{ fontSize: 10 }}
@@ -127,8 +172,11 @@ export function AreaChartWidget({
               axisLine={false}
               tickFormatter={yTickFormatter}
               width={44}
+              hide={hideYAxis}
+              interval={"preserveStartEnd"}
+              padding={{ bottom: 30 }}
             />
-            {showZeroLine && (
+            {(showZeroLine || splitAtZero) && (
               <ReferenceLine y={0} stroke="hsl(var(--border))" />
             )}
             <ChartTooltip
@@ -145,9 +193,11 @@ export function AreaChartWidget({
             <Area
               type="monotone"
               dataKey={dataKey}
-              stroke={color}
+              stroke={splitAtZero ? `url(#${strokeGradientId})` : color}
               strokeWidth={2}
-              fill={showGradient ? `url(#${gradientId})` : "none"}
+              fill={
+                splitAtZero || showGradient ? `url(#${gradientId})` : "none"
+              }
               dot={false}
               activeDot={{ r: 4 }}
             />

@@ -1,5 +1,4 @@
 import { DataTable } from "@/components/shared/DataTable";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -18,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { getDateFormat } from "@/lib/utils";
 import { useConfirmImportMutation } from "../hooks/useConfirmImportMutation";
+import { AppButton } from "@/components/shared/AppButton";
 
 const columns: ColumnDef<UploadImportRow>[] = [
   { accessorKey: "symbol", header: "Symbol" },
@@ -89,17 +89,17 @@ export function PreviewImportModal(importPreview: PreviewImportModalProps) {
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button
+              <AppButton
                 onClick={importPreview.cancelUpload}
                 variant="outline"
                 type="button"
               >
                 Cancel
-              </Button>
+              </AppButton>
             </DialogClose>
-            <Button onClick={handleConfirm} type="submit">
+            <AppButton onClick={handleConfirm} type="submit">
               Confirm
-            </Button>
+            </AppButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

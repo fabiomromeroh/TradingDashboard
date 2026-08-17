@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { AppButton } from "./AppButton";
 
 type DeleteConfirmationProps = {
   label: string;
@@ -35,13 +35,13 @@ export function ConfirmDeleteButton(props: DeleteConfirmationProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button
+        <AppButton
           className={props.className}
           disabled={props.disabled}
           variant={props.variant || "destructive"}
         >
           {props.buttonType === "Icon" ? <Trash2Icon /> : props.label}
-        </Button>
+        </AppButton>
       </AlertDialogTrigger>
       <AlertDialogContent size="sm">
         <AlertDialogHeader>

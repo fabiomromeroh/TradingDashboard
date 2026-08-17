@@ -19,8 +19,7 @@ export function useUploadImportMutation() {
           return true;
         })
         .catch((response) => {
-          const errors = handleApiError(response);
-          setErrors(errors);
+          setErrors(handleApiError(response));
           return false;
         })
         .finally(() => {

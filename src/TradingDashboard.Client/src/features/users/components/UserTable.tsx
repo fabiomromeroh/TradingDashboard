@@ -4,6 +4,7 @@ import { CreateUserModal } from "./CreateUserModal";
 import { useUsersQuery } from "../hooks/useUsersQuery";
 import { DataTable } from "@/components/shared/DataTable";
 import { DataTableActions } from "@/components/shared/DataTableActions";
+import { AppButton } from "@/components/shared/AppButton";
 
 const columns: ColumnDef<UserDto, unknown>[] = [
   { accessorKey: "firstName", header: "First Name" },
@@ -58,9 +59,9 @@ export function UserTable() {
     return (
       <div className="py-8 text-center">
         <p className="text-red-600 mb-2">{error[0].message}</p>
-        <button onClick={refetch} className="text-sm underline">
+        <AppButton onClick={refetch} className="text-sm underline">
           Try again
-        </button>
+        </AppButton>
       </div>
     );
   }

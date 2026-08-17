@@ -4,10 +4,8 @@ import { cn } from "@/lib/utils";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import type { DashboardWidget } from "../types/dashboard.types";
-import {
-  renderWidget,
-  getWidgetColSpan,
-} from "../../../components/shared/widgets/WidgetRegistry";
+import { getWidgetColSpan } from "../../../components/shared/widgets/base/WidgetRegistry";
+import { LiveWidget } from "./LiveWidget";
 
 interface SortableWidgetProps {
   widget: DashboardWidget;
@@ -69,7 +67,7 @@ export function SortableWidget({ widget, onRemove }: SortableWidgetProps) {
         <X className="size-3.5" />
       </Button>
 
-      {renderWidget(widget.type)}
+      <LiveWidget widget={widget} />
     </div>
   );
 }

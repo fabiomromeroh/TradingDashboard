@@ -1,4 +1,5 @@
 import { accountSlice } from "@/features/account/store/account.slice";
+import { metricSlice } from "@/features/dashboard/store/metric.slice";
 import { userSlice } from "@/features/users/store/user.slice";
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
@@ -23,6 +24,7 @@ const store = configureStore({
     theme: themeSlice.reducer,
     account: accountSlice.reducer,
     auth: userSlice.reducer,
+    metric: metricSlice.reducer,
 
     // ...other reducers
   },
@@ -31,8 +33,14 @@ const store = configureStore({
 export const { setTheme } = themeSlice.actions;
 export const { setSelectedAccounts } = accountSlice.actions;
 export const { setAccounts } = accountSlice.actions;
-export const { logout, setAccessToken, setAuthCheckComplete, setUser } =
-  userSlice.actions;
+export const {
+  logout,
+  setAccessToken,
+  setAuthCheckComplete,
+  setUser,
+  setConfigFilters,
+} = userSlice.actions;
+export const { setMetrics } = metricSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

@@ -2,13 +2,13 @@ import * as React from "react";
 import { Check, ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { AppButton } from "./AppButton";
 
 export type AppMultiSelectOption = {
   label: string;
@@ -87,7 +87,7 @@ export function AppMultiSelect({
 
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
+          <AppButton
             type="button"
             variant="outline"
             role="combobox"
@@ -101,7 +101,7 @@ export function AppMultiSelect({
           >
             <span className="truncate text-left">{displayValue}</span>
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
+          </AppButton>
         </PopoverTrigger>
 
         <PopoverContent
@@ -153,14 +153,14 @@ export function AppMultiSelect({
           {value.length > 0 ? (
             <>
               <div className="my-2 h-px bg-border" />
-              <Button
+              <AppButton
                 type="button"
                 variant="ghost"
                 className="w-full justify-start"
                 onClick={clearAll}
               >
                 Clear selection
-              </Button>
+              </AppButton>
             </>
           ) : null}
         </PopoverContent>
