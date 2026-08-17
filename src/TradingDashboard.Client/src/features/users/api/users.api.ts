@@ -29,9 +29,9 @@ export async function logout(): Promise<void> {
 export async function updateConfigFilters(
   filters: ConfigFiltersCommand,
 ): Promise<void> {
-  return apiClient.post("/config", { filters });
+  return apiClient.post("/users/config", { filters });
 }
 
 export async function getConfigFilters(): Promise<ConfigDto> {
-  return apiClient.get("/config");
+  return apiClient.get("/users/config");
 }
