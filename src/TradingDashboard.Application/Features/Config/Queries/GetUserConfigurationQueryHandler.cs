@@ -13,7 +13,10 @@ namespace TradingDashboard.Application.Features.Config.Queries
             var userConfig = await userRepository.GetUserConfigurationAsync(request.UserId, cancellationToken);
             if (userConfig is null)
             {
-                return Result<UserConfigurationDto>.NotFound("User configuration not found.");
+                return Result<UserConfigurationDto>.Success(new UserConfigurationDto
+                {
+                    Filters = new QueryFilter([])
+                });
             }
             QueryFilter? filters = JsonSerializer.Deserialize<QueryFilter>(userConfig.FiltersJson);
             var userConfigDto = new UserConfigurationDto

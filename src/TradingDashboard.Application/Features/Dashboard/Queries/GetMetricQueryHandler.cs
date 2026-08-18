@@ -9,35 +9,24 @@ using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Dashboard.Queries
 {
-    public class GetDashboardSummaryQueryHandler : IRequestHandler<GetMetricQuery, Result<WidgetDto>>
+    public class GetDashboardSummaryQueryHandler(IMetricCalculatorFactory factory, IUserRepository userRepository) : IRequestHandler<GetMetricQuery, Result<WidgetDto>>
     {
-        private readonly IMetricCalculatorFactory _factory;
-        private readonly IUserRepository _userRepository;
-
-        public GetDashboardSummaryQueryHandler(IMetricCalculatorFactory factory, IUserRepository userRepository)
-        {
-            _factory = factory;
-            _userRepository = userRepository;
-        }
         public async Task<Result<WidgetDto>> Handle(GetMetricQuery request, CancellationToken cancellationToken)
         {
-            var config = await _userRepository.GetUserConfigurationAsync(request.UserId, cancellationToken);
+            var config = await userRepository.GetUserConfigurationAsync(request.UserId, cancellationToken);
 
-            if (config is null)
+            QueryFilter? queryFilter = new([]);
+
+            if (config is not null)
             {
-                return Result<WidgetDto>.NotFound(nameof(config));
-            }
 
-            var queryFilter = JsonSerializer.Deserialize<QueryFilter>(config.FiltersJson);
+                queryFilter = JsonSerializer.Deserialize<QueryFilter>(config.FiltersJson) ?? new QueryFilter([]);
 
-            if (queryFilter is null)
-            {
-                return Result<WidgetDto>.NotFound(nameof(config));
             }
 
             ISpecification<Trade> spec = new MetricFilterSpecification(queryFilter);
 
-            var metricCalculator = _factory.GetMetricCalculator(request.MetricType);
+            var metricCalculator = factory.GetMetricCalculator(request.MetricType);
 
             var payload = await metricCalculator.CalculateMetricAsync(spec, cancellationToken);
 
