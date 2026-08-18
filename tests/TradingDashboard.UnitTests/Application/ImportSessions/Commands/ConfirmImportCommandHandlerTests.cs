@@ -1,6 +1,7 @@
 using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services.Import;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmImport;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
 using TradingDashboard.Domain.Entities;
@@ -94,8 +95,8 @@ public class ConfirmImportCommandHandlerTests
             .Returns(Task.CompletedTask);
 
         _mockUnitOfWork
-            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(1);
+            .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task<Result<Guid>>>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<CancellationToken, Task<Result<Guid>>>, CancellationToken>((operation, ct) => operation(ct));
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -114,7 +115,7 @@ public class ConfirmImportCommandHandlerTests
             Times.Once);
 
         _mockUnitOfWork.Verify(
-            x => x.SaveChangesAsync(It.IsAny<CancellationToken>()),
+            x => x.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task<Result<Guid>>>>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -183,8 +184,8 @@ public class ConfirmImportCommandHandlerTests
             .Returns(Task.CompletedTask);
 
         _mockUnitOfWork
-            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(1);
+           .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task<Result<Guid>>>>(), It.IsAny<CancellationToken>()))
+           .Returns<Func<CancellationToken, Task<Result<Guid>>>, CancellationToken>((operation, ct) => operation(ct));
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -238,9 +239,17 @@ public class ConfirmImportCommandHandlerTests
             InvalidRows: 0,
             Rows: rows);
 
+        _mockImportSessionRepository
+            .Setup(x => x.AddAsync(It.IsAny<ImportSession>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
         _mockExecutionRepository
             .Setup(x => x.AddAsync(It.IsAny<Execution>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("Database connection failed"));
+
+        _mockUnitOfWork
+           .Setup(x => x.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task<Result<Guid>>>>(), It.IsAny<CancellationToken>()))
+           .Returns<Func<CancellationToken, Task<Result<Guid>>>, CancellationToken>((operation, ct) => operation(ct));
 
         // Act & Assert
         var act = () => _handler.Handle(command, CancellationToken.None);
