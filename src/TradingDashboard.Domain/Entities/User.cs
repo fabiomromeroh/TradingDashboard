@@ -18,7 +18,7 @@ public class User : BaseEntity
 
     public IReadOnlyCollection<RefreshToken> RefreshTokens { get; } = null!;
 
-    public UserConfiguration Configuration { get; }
+    public UserConfiguration? Configuration { get; }
 
     private User() { }
 
