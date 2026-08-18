@@ -1,7 +1,11 @@
 using AutoMapper;
-using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services.Metric;
+using TradingDashboard.Application.Abstractions.Services.Metric.Specifications;
+using TradingDashboard.Application.Abstractions.Services.Trades;
+using TradingDashboard.Application.Abstractions.Services.UserConfig;
+using TradingDashboard.Application.Features.Config.Dtos;
 using TradingDashboard.Application.Features.Trades.Dtos;
-using TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
+using TradingDashboard.Application.Features.Trades.Queries.GetTradesByAccountId;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
 
@@ -9,17 +13,19 @@ namespace TradingDashboard.UnitTests.Application.Trades;
 
 public class GetTradesByAccountIdQueryHandlerTests
 {
-    private readonly Mock<ITradeRepository> _mockTradeRepository;
+    private readonly Mock<ITradeQueryService> _mockTradeQueryService;
     private readonly Mock<IMapper> _mockMapper;
     private readonly GetTradesByAccountIdQueryHandler _handler;
-    private readonly List<Guid> _tradesIds;
+    private readonly Guid _userId;
+    private readonly Mock<IUserConfigQueryService> _userConfigQueryService;
 
     public GetTradesByAccountIdQueryHandlerTests()
     {
-        _mockTradeRepository = new Mock<ITradeRepository>();
+        _mockTradeQueryService = new Mock<ITradeQueryService>();
         _mockMapper = new Mock<IMapper>();
-        _handler = new GetTradesByAccountIdQueryHandler(_mockTradeRepository.Object, _mockMapper.Object);
-        _tradesIds = [Guid.NewGuid(), Guid.NewGuid()];
+        _userConfigQueryService = new Mock<IUserConfigQueryService>();
+        _handler = new GetTradesByAccountIdQueryHandler(_mockTradeQueryService.Object, _mockMapper.Object, _userConfigQueryService.Object);
+        _userId = Guid.NewGuid();
     }
 
     [Fact]
@@ -33,20 +39,24 @@ public class GetTradesByAccountIdQueryHandlerTests
             Trade.Create("USDJPY", 149.50m, 2.0m, TradeDirection.Long, Guid.NewGuid(), DateTimeOffset.UtcNow)
         };
 
-
-
         var dtos = trades.Select(t => new TradeDto(t.Id, t.Symbol, t.EntryPrice, t.ClosePrice, t.Quantity, t.PositionSize,
             t.Direction.ToString(), t.Status.ToString(), t.OpenedAt, t.ClosedAt, t.TotalCommissions, t.AverageEntryPrice, t.AverageClosePrice, t.NetReturn, t.PercentageReturn)).ToList();
 
-        _mockTradeRepository
-            .Setup(x => x.GetTradesByAccountId(_tradesIds, It.IsAny<CancellationToken>()))
+        var userConfig = new UserConfigDto { Filters = null };
+
+        _userConfigQueryService
+            .Setup(x => x.GetUserConfigAsync(_userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(userConfig);
+
+        _mockTradeQueryService
+            .Setup(x => x.GetTradesAsync(_userId, It.IsAny<ISpecification<Trade>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(trades);
 
         _mockMapper
             .Setup(m => m.Map<IEnumerable<TradeDto>>(It.IsAny<IEnumerable<Trade>>()))
             .Returns(dtos);
 
-        var query = new GetTradesByAccountIdQuery(_tradesIds);
+        var query = new GetTradesByAccountIdQuery(_userId);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -61,8 +71,8 @@ public class GetTradesByAccountIdQueryHandlerTests
         resultList[1].Symbol.Should().Be("GBPUSD");
         resultList[2].Symbol.Should().Be("USDJPY");
 
-        _mockTradeRepository.Verify(
-            x => x.GetTradesByAccountId(It.IsAny<List<Guid>>(), It.IsAny<CancellationToken>()),
+        _mockTradeQueryService.Verify(
+            x => x.GetTradesAsync(_userId, It.IsAny<ISpecification<Trade>>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -71,16 +81,21 @@ public class GetTradesByAccountIdQueryHandlerTests
     {
         // Arrange
         var emptyTrades = new List<Trade>();
+        var userConfig = new UserConfigDto { Filters = null };
 
-        _mockTradeRepository
-            .Setup(x => x.GetTradesByAccountId(_tradesIds, It.IsAny<CancellationToken>()))
+        _userConfigQueryService
+            .Setup(x => x.GetUserConfigAsync(_userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(userConfig);
+
+        _mockTradeQueryService
+            .Setup(x => x.GetTradesAsync(_userId, It.IsAny<ISpecification<Trade>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(emptyTrades);
 
         _mockMapper
             .Setup(m => m.Map<IEnumerable<TradeDto>>(It.IsAny<IEnumerable<Trade>>()))
             .Returns([]);
 
-        var query = new GetTradesByAccountIdQuery(_tradesIds);
+        var query = new GetTradesByAccountIdQuery(_userId);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -89,8 +104,8 @@ public class GetTradesByAccountIdQueryHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().BeEmpty();
 
-        _mockTradeRepository.Verify(
-            x => x.GetTradesByAccountId(_tradesIds, It.IsAny<CancellationToken>()),
+        _mockTradeQueryService.Verify(
+            x => x.GetTradesAsync(_userId, It.IsAny<ISpecification<Trade>>(), It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -103,15 +118,21 @@ public class GetTradesByAccountIdQueryHandlerTests
         var expectedDto = new TradeDto(trade.Id, trade.Symbol, trade.EntryPrice, trade.ClosePrice, trade.Quantity, trade.PositionSize,
             trade.Direction.ToString(), trade.Status.ToString(), trade.OpenedAt, trade.ClosedAt, trade.TotalCommissions, trade.AverageEntryPrice, trade.AverageClosePrice, trade.NetReturn, trade.PercentageReturn);
 
-        _mockTradeRepository
-            .Setup(x => x.GetTradesByAccountId(_tradesIds, It.IsAny<CancellationToken>()))
+        var userConfig = new UserConfigDto { Filters = null };
+
+        _userConfigQueryService
+            .Setup(x => x.GetUserConfigAsync(_userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(userConfig);
+
+        _mockTradeQueryService
+            .Setup(x => x.GetTradesAsync(_userId, It.IsAny<ISpecification<Trade>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(trades);
 
         _mockMapper
             .Setup(m => m.Map<IEnumerable<TradeDto>>(It.IsAny<IEnumerable<Trade>>()))
             .Returns([expectedDto]);
 
-        var query = new GetTradesByAccountIdQuery(_tradesIds);
+        var query = new GetTradesByAccountIdQuery(_userId);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);

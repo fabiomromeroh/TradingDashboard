@@ -2,8 +2,8 @@
 
 namespace TradingDashboard.Application.Features.Config.Dtos
 {
-    public class UserConfigurationDto
+    public class UserConfigDto
     {
-        public QueryFilter? Filters { get; set; }
+        public ConfigFilter? Filters { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services.Trades;
 using TradingDashboard.Application.Features.Trades.Commands.DeleteTrade;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
@@ -8,15 +9,17 @@ namespace TradingDashboard.UnitTests.Application.Trades;
 
 public class DeleteTradeCommandHandlerTests
 {
+    private readonly Mock<ITradeQueryService> _mockTradeQueryService;
     private readonly Mock<ITradeRepository> _mockTradeRepository;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly DeleteTradeCommandHandler _handler;
 
     public DeleteTradeCommandHandlerTests()
     {
+        _mockTradeQueryService = new Mock<ITradeQueryService>();
         _mockTradeRepository = new Mock<ITradeRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _handler = new DeleteTradeCommandHandler(_mockTradeRepository.Object, _mockUnitOfWork.Object);
+        _handler = new DeleteTradeCommandHandler(_mockTradeQueryService.Object, _mockTradeRepository.Object, _mockUnitOfWork.Object);
     }
 
     [Fact]
@@ -28,7 +31,7 @@ public class DeleteTradeCommandHandlerTests
 
         var command = new DeleteTradeCommand { Id = tradeId };
 
-        _mockTradeRepository
+        _mockTradeQueryService
             .Setup(x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(trade);
 
@@ -45,7 +48,7 @@ public class DeleteTradeCommandHandlerTests
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        _mockTradeRepository.Verify(
+        _mockTradeQueryService.Verify(
             x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()),
             Times.Once);
         _mockTradeRepository.Verify(
@@ -63,7 +66,7 @@ public class DeleteTradeCommandHandlerTests
         var tradeId = Guid.NewGuid();
         var command = new DeleteTradeCommand { Id = tradeId };
 
-        _mockTradeRepository
+        _mockTradeQueryService
             .Setup(x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Trade?)null);
 
@@ -91,7 +94,7 @@ public class DeleteTradeCommandHandlerTests
         var trade = Trade.Create("GBPUSD", 1.2650m, 0.5m, TradeDirection.Short, Guid.NewGuid(), DateTimeOffset.UtcNow);
         var command = new DeleteTradeCommand { Id = tradeId };
 
-        _mockTradeRepository
+        _mockTradeQueryService
             .Setup(x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(trade);
 

@@ -1,19 +1,14 @@
 ﻿using LinqKit;
 using System.Linq.Expressions;
-using TradingDashboard.Application.Abstractions.Services.Metric;
 using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Domain.Entities;
 
-namespace TradingDashboard.Application.Services.Metric.Specifications
+namespace TradingDashboard.Application.Abstractions.Services.Metric.Specifications
 {
-    public class MetricFilterSpecification : ISpecification<Trade>
+    public class MetricFilterSpecification(ConfigFilter? queryFilter) : ISpecification<Trade>
     {
-        private readonly QueryFilter _filter;
+        private readonly ConfigFilter _filter = queryFilter ?? new ConfigFilter([]);
 
-        public MetricFilterSpecification(QueryFilter queryFilter)
-        {
-            this._filter = queryFilter;
-        }
         public Expression<Func<Trade, bool>> ToExpression()
         {
             var predicate = PredicateBuilder.New<Trade>(true);

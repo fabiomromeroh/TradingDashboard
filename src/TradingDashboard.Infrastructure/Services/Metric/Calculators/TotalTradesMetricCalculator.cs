@@ -1,14 +1,15 @@
 ﻿using TradingDashboard.Application.Abstractions.Services.Metric;
 using TradingDashboard.Application.Abstractions.Services.Metric.Models;
+using TradingDashboard.Application.Abstractions.Services.Trades;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Services.Metric.Calculators
 {
     public class TotalTradesMetricCalculator : IMetricCalculator
     {
-        private readonly IMetricQueryService _queryService;
+        private readonly ITradeQueryService _queryService;
 
-        public TotalTradesMetricCalculator(IMetricQueryService queryService)
+        public TotalTradesMetricCalculator(ITradeQueryService queryService)
         {
             _queryService = queryService;
         }
@@ -18,10 +19,10 @@ namespace TradingDashboard.Infrastructure.Services.Metric.Calculators
 
 
 
-        public async Task<object> CalculateMetricAsync(ISpecification<Trade> spec, CancellationToken cancellationToken)
+        public async Task<object> CalculateMetricAsync(Guid userId, ISpecification<Trade> spec, CancellationToken cancellationToken)
         {
 
-            var trades = await _queryService.GetTradesAsync(spec, cancellationToken);
+            var trades = await _queryService.GetTradesAsync(userId, spec, cancellationToken);
 
             if (trades == null || !trades.Any())
             {

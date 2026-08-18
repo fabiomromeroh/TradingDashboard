@@ -1,25 +1,27 @@
 using AutoMapper;
 using MediatR;
-using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services.Metric;
+using TradingDashboard.Application.Abstractions.Services.Metric.Specifications;
+using TradingDashboard.Application.Abstractions.Services.Trades;
+using TradingDashboard.Application.Abstractions.Services.UserConfig;
 using TradingDashboard.Application.Common.Models;
+using TradingDashboard.Application.Features.Config.Dtos;
 using TradingDashboard.Application.Features.Trades.Dtos;
+using TradingDashboard.Domain.Entities;
 
-namespace TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
+namespace TradingDashboard.Application.Features.Trades.Queries.GetTradesByAccountId;
 
-public class GetTradesByAccountIdQueryHandler : IRequestHandler<GetTradesByAccountIdQuery, Result<IEnumerable<TradeDto>>>
+public class GetTradesByAccountIdQueryHandler(ITradeQueryService tradeQuery, IMapper mapper, IUserConfigQueryService userConfigQuery) : IRequestHandler<GetTradesByAccountIdQuery, Result<IEnumerable<TradeDto>>>
 {
-    private readonly ITradeRepository tradeRepository;
-    private readonly IMapper mapper;
-
-    public GetTradesByAccountIdQueryHandler(ITradeRepository tradeRepository, IMapper mapper)
-    {
-        this.tradeRepository = tradeRepository;
-        this.mapper = mapper;
-    }
-
     public async Task<Result<IEnumerable<TradeDto>>> Handle(GetTradesByAccountIdQuery query, CancellationToken cancellationToken)
     {
-        var trades = await tradeRepository.GetTradesByAccountId(query.accountIds, cancellationToken);
+
+        UserConfigDto config = await userConfigQuery.GetUserConfigAsync(query.UserId, cancellationToken);
+
+        ISpecification<Trade> spec = new MetricFilterSpecification(config.Filters);
+
+        var trades = await tradeQuery.GetTradesAsync(query.UserId, spec, cancellationToken);
+
         return Result<IEnumerable<TradeDto>>.Success(mapper.Map<IEnumerable<TradeDto>>(trades));
     }
 }

@@ -4,35 +4,29 @@ using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
 using TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
 using TradingDashboard.Application.Features.Trades.Commands.DeleteTrade;
-using TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
 using TradingDashboard.Application.Features.Trades.Queries.GetExecutionsByTradeId;
 using TradingDashboard.Application.Features.Trades.Queries.GetTradeById;
+using TradingDashboard.Application.Features.Trades.Queries.GetTradesByAccountId;
 
 namespace TradingDashboard.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class TradesController : ControllerBase
+public class TradesController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator mediator;
-
-    public TradesController(IMediator mediator)
-    {
-        this.mediator = mediator;
-    }
 
     /// <summary>
     /// Handles HTTP GET requests to retrieve all trades.
     /// </summary>
-    /// <param name="accountIds"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost("accounts")]
-    public async Task<ActionResult> GetByAccountId([FromBody] List<Guid> accountIds, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetByAccountId(CancellationToken cancellationToken)
     {
+        Guid userId = User.GetUserId();
 
-        var result = await mediator.Send(new GetTradesByAccountIdQuery(accountIds), cancellationToken);
+        var result = await mediator.Send(new GetTradesByAccountIdQuery(userId), cancellationToken);
 
         return result.ToActionResult();
     }

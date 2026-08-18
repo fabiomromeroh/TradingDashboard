@@ -1,24 +1,19 @@
 ﻿using TradingDashboard.Application.Abstractions.Services.Metric;
 using TradingDashboard.Application.Abstractions.Services.Metric.Models;
+using TradingDashboard.Application.Abstractions.Services.Trades;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Services.Metric.Calculators
 {
-    public class AverageWinLossMetricCalculator : IMetricCalculator
+    public class AverageWinLossMetricCalculator(ITradeQueryService queryService) : IMetricCalculator
     {
-        private readonly IMetricQueryService _queryService;
-
-        public AverageWinLossMetricCalculator(IMetricQueryService queryService)
-        {
-            _queryService = queryService;
-        }
         public string MetricType => "avg-win-loss";
 
         public string RenderType => "range";
 
-        public async Task<object> CalculateMetricAsync(ISpecification<Trade> spec, CancellationToken cancellationToken)
+        public async Task<object> CalculateMetricAsync(Guid userId, ISpecification<Trade> spec, CancellationToken cancellationToken)
         {
-            var trades = await _queryService.GetTradeAggregatesAsync(spec, cancellationToken);
+            var trades = await queryService.GetTradeAggregatesAsync(userId, spec, cancellationToken);
 
             if (trades is null || trades.TotalTrades == 0)
             {

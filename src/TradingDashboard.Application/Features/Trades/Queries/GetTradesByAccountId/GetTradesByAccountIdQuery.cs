@@ -2,7 +2,7 @@ using MediatR;
 using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Features.Trades.Dtos;
 
-namespace TradingDashboard.Application.Features.Trades.Queries.GetAllTrades;
+namespace TradingDashboard.Application.Features.Trades.Queries.GetTradesByAccountId;
 
-public record GetTradesByAccountIdQuery(List<Guid> accountIds) : IRequest<Result<IEnumerable<TradeDto>>>;
+public record GetTradesByAccountIdQuery(Guid UserId) : IRequest<Result<IEnumerable<TradeDto>>>;
 

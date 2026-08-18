@@ -1,14 +1,15 @@
 ﻿using TradingDashboard.Application.Abstractions.Services.Metric;
 using TradingDashboard.Application.Abstractions.Services.Metric.Models;
+using TradingDashboard.Application.Abstractions.Services.Trades;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Services.Metric.Calculators
 {
     public class ProfitFactorMetricCalculator : IMetricCalculator
     {
-        private readonly IMetricQueryService _queryService;
+        private readonly ITradeQueryService _queryService;
 
-        public ProfitFactorMetricCalculator(IMetricQueryService queryService)
+        public ProfitFactorMetricCalculator(ITradeQueryService queryService)
         {
             _queryService = queryService;
         }
@@ -16,9 +17,9 @@ namespace TradingDashboard.Infrastructure.Services.Metric.Calculators
 
         public string RenderType => "range";
 
-        public async Task<object> CalculateMetricAsync(ISpecification<Trade> spec, CancellationToken cancellationToken)
+        public async Task<object> CalculateMetricAsync(Guid userId, ISpecification<Trade> spec, CancellationToken cancellationToken)
         {
-            var trades = await _queryService.GetTradeAggregatesAsync(spec, cancellationToken);
+            var trades = await _queryService.GetTradeAggregatesAsync(userId, spec, cancellationToken);
 
             if (trades is null || trades.TotalTrades == 0)
             {

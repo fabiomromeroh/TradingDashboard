@@ -9,15 +9,19 @@ using TradingDashboard.Application.Abstractions.Services.BrokerSync;
 using TradingDashboard.Application.Abstractions.Services.BrokerSync.Ibkr;
 using TradingDashboard.Application.Abstractions.Services.Import;
 using TradingDashboard.Application.Abstractions.Services.Metric;
+using TradingDashboard.Application.Abstractions.Services.Trades;
+using TradingDashboard.Application.Abstractions.Services.UserConfig;
 using TradingDashboard.Infrastructure.Persistence;
 using TradingDashboard.Infrastructure.Persistence.Repositories;
 using TradingDashboard.Infrastructure.Services.BrokerSync;
 using TradingDashboard.Infrastructure.Services.BrokerSync.Ibkr;
+using TradingDashboard.Infrastructure.Services.Config;
 using TradingDashboard.Infrastructure.Services.Identity;
 using TradingDashboard.Infrastructure.Services.Import;
 using TradingDashboard.Infrastructure.Services.Import.Ibkr;
 using TradingDashboard.Infrastructure.Services.Metric;
 using TradingDashboard.Infrastructure.Services.Metric.Calculators;
+using TradingDashboard.Infrastructure.Services.Trades;
 
 namespace TradingDashboard.Infrastructure;
 
@@ -53,7 +57,8 @@ public static class DependencyInjection
         services.AddScoped<IBrokerAccountCredentialRepository, BrokerAccountCredentialRepository>();
 
         //---Query Services---
-        services.AddScoped<IMetricQueryService, MetricQueryService>();
+        services.AddScoped<ITradeQueryService, TradeQueryService>();
+        services.AddScoped<IUserConfigQueryService, UserConfigQueryService>();
 
         //---Metric Calculator Factory---
         services.AddScoped<IMetricCalculatorFactory, MetricCalculatorFactory>();

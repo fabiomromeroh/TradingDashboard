@@ -6,24 +6,24 @@ using TradingDashboard.Application.Features.Config.Dtos;
 
 namespace TradingDashboard.Application.Features.Config.Queries
 {
-    public class GetUserConfigurationQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUserConfigurationQuery, Result<UserConfigurationDto>>
+    public class GetUserConfigurationQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUserConfigurationQuery, Result<UserConfigDto>>
     {
-        public async Task<Result<UserConfigurationDto>> Handle(GetUserConfigurationQuery request, CancellationToken cancellationToken)
+        public async Task<Result<UserConfigDto>> Handle(GetUserConfigurationQuery request, CancellationToken cancellationToken)
         {
             var userConfig = await userRepository.GetUserConfigurationAsync(request.UserId, cancellationToken);
             if (userConfig is null)
             {
-                return Result<UserConfigurationDto>.Success(new UserConfigurationDto
+                return Result<UserConfigDto>.Success(new UserConfigDto
                 {
-                    Filters = new QueryFilter([])
+                    Filters = new ConfigFilter([])
                 });
             }
-            QueryFilter? filters = JsonSerializer.Deserialize<QueryFilter>(userConfig.FiltersJson);
-            var userConfigDto = new UserConfigurationDto
+            ConfigFilter? filters = JsonSerializer.Deserialize<ConfigFilter>(userConfig.FiltersJson);
+            var userConfigDto = new UserConfigDto
             {
                 Filters = filters
             };
-            return Result<UserConfigurationDto>.Success(userConfigDto);
+            return Result<UserConfigDto>.Success(userConfigDto);
         }
 
     }

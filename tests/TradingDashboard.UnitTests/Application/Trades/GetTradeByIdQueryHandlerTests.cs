@@ -1,6 +1,6 @@
 using AutoMapper;
 using System.Net;
-using TradingDashboard.Application.Abstractions.Repositories;
+using TradingDashboard.Application.Abstractions.Services.Trades;
 using TradingDashboard.Application.Features.Trades.Dtos;
 using TradingDashboard.Application.Features.Trades.Queries.GetTradeById;
 using TradingDashboard.Domain.Entities;
@@ -10,15 +10,15 @@ namespace TradingDashboard.UnitTests.Application.Trades;
 
 public class GetTradeByIdQueryHandlerTests
 {
-    private readonly Mock<ITradeRepository> _mockTradeRepository;
+    private readonly Mock<ITradeQueryService> _mockTradeQueryService;
     private readonly Mock<IMapper> _mockMapper;
     private readonly GetTradeByIdQueryHandler _handler;
 
     public GetTradeByIdQueryHandlerTests()
     {
-        _mockTradeRepository = new Mock<ITradeRepository>();
+        _mockTradeQueryService = new Mock<ITradeQueryService>();
         _mockMapper = new Mock<IMapper>();
-        _handler = new GetTradeByIdQueryHandler(_mockTradeRepository.Object, _mockMapper.Object);
+        _handler = new GetTradeByIdQueryHandler(_mockTradeQueryService.Object, _mockMapper.Object);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class GetTradeByIdQueryHandlerTests
 
         var query = new GetTradeByIdQuery(tradeId);
 
-        _mockTradeRepository
+        _mockTradeQueryService
             .Setup(x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(trade);
 
@@ -63,7 +63,7 @@ public class GetTradeByIdQueryHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().BeEquivalentTo(expectedDto);
 
-        _mockTradeRepository.Verify(
+        _mockTradeQueryService.Verify(
             x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()),
             Times.Once);
         _mockMapper.Verify(
@@ -78,7 +78,7 @@ public class GetTradeByIdQueryHandlerTests
         var tradeId = Guid.NewGuid();
         var query = new GetTradeByIdQuery(tradeId);
 
-        _mockTradeRepository
+        _mockTradeQueryService
             .Setup(x => x.GetTradeAsync(tradeId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Trade?)null);
 
@@ -89,7 +89,7 @@ public class GetTradeByIdQueryHandlerTests
         result.StatusCode.Should().Be(HttpStatusCode.NotFound);
         result.Errors.Should().ContainSingle(e => e.Code == "NotFound" && e.Message.Contains(nameof(Trade)));
 
-        _mockTradeRepository.Verify(x => x.GetTradeAsync(tradeId, CancellationToken.None), Times.Once);
+        _mockTradeQueryService.Verify(x => x.GetTradeAsync(tradeId, CancellationToken.None), Times.Once);
 
 
         _mockMapper.Verify(
@@ -124,7 +124,7 @@ public class GetTradeByIdQueryHandlerTests
         var query = new GetTradeByIdQuery(tradeId);
         var cancellationToken = CancellationToken.None;
 
-        _mockTradeRepository
+        _mockTradeQueryService
             .Setup(x => x.GetTradeAsync(tradeId, cancellationToken))
             .ReturnsAsync(trade);
 
@@ -137,7 +137,7 @@ public class GetTradeByIdQueryHandlerTests
 
         // Assert
         result.Should().NotBeNull();
-        _mockTradeRepository.Verify(
+        _mockTradeQueryService.Verify(
             x => x.GetTradeAsync(tradeId, cancellationToken),
             Times.Once);
     }
