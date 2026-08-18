@@ -4,21 +4,18 @@ using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Infrastructure.Services.Metric.Calculators
 {
-    public class WinRateMetricCalculator : IMetricCalculator
+    public class WinRateMetricCalculator(IMetricQueryService queryService) : IMetricCalculator
     {
-        private readonly IMetricQueryService _queryService;
-
-        public WinRateMetricCalculator(IMetricQueryService queryService)
-        {
-            _queryService = queryService;
-        }
         public string MetricType => "win-rate";
         public string RenderType => "gauge";
 
         public async Task<object> CalculateMetricAsync(ISpecification<Trade> spec, CancellationToken cancellationToken)
         {
-            var trades = await _queryService.GetTradeAggregatesAsync(spec, cancellationToken);
+            var trades = await queryService.GetTradeAggregatesAsync(spec, cancellationToken);
             var percent = trades is null || trades.TotalTrades == 0 ? 0 : (decimal)trades.WinningTrades / trades.TotalTrades * 100;
+            var wins = trades?.WinningTrades ?? 0;
+            var losses = trades?.LosingTrades ?? 0;
+
 
             return new GaugePayloadDto(
                 DisplayValue: $"{percent:F0}%",
@@ -26,8 +23,8 @@ namespace TradingDashboard.Infrastructure.Services.Metric.Calculators
                 Percent: percent,
                 Stats:
                 [
-                new("Wins", trades.WinningTrades.ToString(), MetricTone.Success),
-                new("Losses", trades.LosingTrades.ToString(), MetricTone.Danger)
+                new("Wins", wins.ToString(), MetricTone.Success),
+                new("Losses", losses.ToString(), MetricTone.Danger)
                 ]);
         }
     }

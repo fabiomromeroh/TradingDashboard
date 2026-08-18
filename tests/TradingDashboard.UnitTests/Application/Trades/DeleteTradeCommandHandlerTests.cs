@@ -1,6 +1,6 @@
+using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Features.Trades.Commands.DeleteTrade;
-using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
 

@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TradingDashboard.API.Extensions;
-using TradingDashboard.Application.Features.Config.Commands.UpdateFilterCommand;
+using TradingDashboard.Application.Features.Config.Commands.UpdateUserConfigCommand;
 using TradingDashboard.Application.Features.Config.Queries;
 using TradingDashboard.Application.Features.Users.Commands.DeleteUser;
 using TradingDashboard.Application.Features.Users.Commands.LoginUser;
@@ -17,29 +17,19 @@ namespace TradingDashboard.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class UsersController(IMediator mediator, IHostEnvironment hostEnvironment) : ControllerBase
 {
-    private readonly IMediator _mediator;
-    private readonly IHostEnvironment hostEnvironment;
-
-    public UsersController(IMediator mediator, IHostEnvironment hostEnvironment)
-    {
-        _mediator = mediator;
-        this.hostEnvironment = hostEnvironment;
-
-    }
-
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
         return result.ToActionResult(value => CreatedAtAction(nameof(GetById), new { id = value.Id }, value));
     }
 
     [HttpPost("login")]
     public async Task<ActionResult> Login([FromBody] LoginUserCommand command, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
         if (!result.IsSuccess) return result.ToActionResult();
 
         Response.Cookies.Append("refreshToken", result.Value!.RefreshToken, new CookieOptions
@@ -59,7 +49,7 @@ public class UsersController : ControllerBase
     {
         if (Request.Cookies.TryGetValue("refreshToken", out var rawRefreshToken))
         {
-            var result = await _mediator.Send(new LogoutCommand(rawRefreshToken), cancellationToken);
+            var result = await mediator.Send(new LogoutCommand(rawRefreshToken), cancellationToken);
             Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/api/users" });
 
             return result.ToActionResult();
@@ -74,7 +64,7 @@ public class UsersController : ControllerBase
         if (!Request.Cookies.TryGetValue("refreshToken", out var rawToken))
             return Unauthorized();
 
-        var result = await _mediator.Send(new RefreshTokenCommand(rawToken), ct);
+        var result = await mediator.Send(new RefreshTokenCommand(rawToken), ct);
         if (!result.IsSuccess) return result.ToActionResult();
 
         Response.Cookies.Append("refreshToken", result.Value!.RefreshToken, new CookieOptions
@@ -92,7 +82,7 @@ public class UsersController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new GetUserByIdQuery(id), cancellationToken);
+        var result = await mediator.Send(new GetUserByIdQuery(id), cancellationToken);
         return result.ToActionResult();
     }
 
@@ -100,7 +90,7 @@ public class UsersController : ControllerBase
     [Authorize]
     public async Task<ActionResult> Update(Guid id, [FromBody] UpdateUserCommand command, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(command with { Id = id }, cancellationToken);
+        var result = await mediator.Send(command with { Id = id }, cancellationToken);
         return result.ToActionResult();
     }
 
@@ -108,7 +98,7 @@ public class UsersController : ControllerBase
     [Authorize]
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        await _mediator.Send(new DeleteUserCommand(id), cancellationToken);
+        await mediator.Send(new DeleteUserCommand(id), cancellationToken);
         return NoContent();
     }
 
@@ -116,7 +106,7 @@ public class UsersController : ControllerBase
     public async Task<ActionResult> Get(CancellationToken cancellationToken)
     {
 
-        var result = await _mediator.Send(new GetUsersQuery(), cancellationToken);
+        var result = await mediator.Send(new GetUsersQuery(), cancellationToken);
 
         return result.ToActionResult();
 
@@ -128,7 +118,7 @@ public class UsersController : ControllerBase
     {
         Guid userId = HttpContext.User.GetUserId();
 
-        var result = await _mediator.Send(command with { UserId = userId }, cancellationToken);
+        var result = await mediator.Send(command with { UserId = userId }, cancellationToken);
 
         return result.ToActionResult();
     }
@@ -138,7 +128,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetUserConfiguration(CancellationToken cancellationToken)
     {
         Guid userId = HttpContext.User.GetUserId();
-        var result = await _mediator.Send(new GetUserConfigurationQuery(userId), cancellationToken);
+        var result = await mediator.Send(new GetUserConfigurationQuery(userId), cancellationToken);
         return result.ToActionResult();
     }
 }

@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
 using System.Security.Cryptography;
+using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services;
 using TradingDashboard.Application.Common.Helpers;
 using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Features.Users.Dtos;
-using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Users.Commands.RefreshTokenUser
@@ -18,11 +18,6 @@ namespace TradingDashboard.Application.Features.Users.Commands.RefreshTokenUser
     IMapper mapper,
     IUnitOfWork unitOfWork) : IRequestHandler<RefreshTokenCommand, Result<RefreshTokenDto>>
     {
-        private readonly IRefreshTokenRepository refreshTokenRepository = refreshTokenRepository;
-        private readonly IUserRepository userRepository = userRepository;
-        private readonly IJwtTokenService jwtTokenService = jwtTokenService;
-        private readonly IMapper mapper = mapper;
-        private readonly IUnitOfWork unitOfWork = unitOfWork;
 
         public async Task<Result<RefreshTokenDto>> Handle(RefreshTokenCommand command, CancellationToken ct)
         {

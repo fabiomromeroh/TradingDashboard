@@ -6,13 +6,11 @@ using TradingDashboard.Application.Features.Config.Dtos;
 
 namespace TradingDashboard.Application.Features.Config.Queries
 {
-    public class GetUserConfigurationQueryHandler : IRequestHandler<GetUserConfigurationQuery, Result<UserConfigurationDto>>
+    public class GetUserConfigurationQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUserConfigurationQuery, Result<UserConfigurationDto>>
     {
-        private readonly IUserRepository _userRepository;
-        public GetUserConfigurationQueryHandler(IUserRepository userRepository) => _userRepository = userRepository;
         public async Task<Result<UserConfigurationDto>> Handle(GetUserConfigurationQuery request, CancellationToken cancellationToken)
         {
-            var userConfig = await _userRepository.GetUserConfigurationAsync(request.UserId, cancellationToken);
+            var userConfig = await userRepository.GetUserConfigurationAsync(request.UserId, cancellationToken);
             if (userConfig is null)
             {
                 return Result<UserConfigurationDto>.NotFound("User configuration not found.");

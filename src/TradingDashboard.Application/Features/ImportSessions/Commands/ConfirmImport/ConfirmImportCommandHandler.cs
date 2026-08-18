@@ -1,30 +1,17 @@
 ﻿using MediatR;
 using System.Data;
+using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services.Import;
 using TradingDashboard.Application.Common.Exceptions;
 using TradingDashboard.Application.Common.Models;
-using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmImport
 {
-    public class ConfirmImportCommandHandler : IRequestHandler<ConfirmImportCommand, Result<Guid>>
+    public class ConfirmImportCommandHandler(IUnitOfWork unitOfWork, IImportSessionRepository importSessionRepository, IExecutionRepository executionRepository, IImportService importService) : IRequestHandler<ConfirmImportCommand, Result<Guid>>
     {
-        private readonly IUnitOfWork unitOfWork;
-        private readonly IImportSessionRepository importSessionRepository;
-        private readonly IExecutionRepository executionRepository;
-        private readonly IImportService importService;
-
-        public ConfirmImportCommandHandler(IUnitOfWork unitOfWork, IImportSessionRepository importSessionRepository, IExecutionRepository executionRepository, IImportService importService)
-        {
-            this.unitOfWork = unitOfWork;
-            this.importSessionRepository = importSessionRepository;
-
-            this.executionRepository = executionRepository;
-            this.importService = importService;
-        }
         public async Task<Result<Guid>> Handle(ConfirmImportCommand command, CancellationToken ct)
         {
 

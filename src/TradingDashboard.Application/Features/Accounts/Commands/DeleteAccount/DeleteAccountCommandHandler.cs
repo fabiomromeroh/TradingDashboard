@@ -1,28 +1,19 @@
+using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Common.Models;
-using TradingDashboard.Application.Interfaces;
 
 namespace TradingDashboard.Application.Features.Accounts.Commands.DeleteAccount;
 
-public class DeleteAccountCommandHandler : MediatR.IRequestHandler<DeleteAccountCommand, Result>
+public class DeleteAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork unitOfWork) : MediatR.IRequestHandler<DeleteAccountCommand, Result>
 {
-    private readonly IAccountRepository _accountRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public DeleteAccountCommandHandler(IAccountRepository accountRepository, IUnitOfWork unitOfWork)
-    {
-        _accountRepository = accountRepository;
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<Result> Handle(DeleteAccountCommand command, CancellationToken cancellationToken)
     {
-        var account = await _accountRepository.GetByIdAsync(command.Id, cancellationToken);
+        var account = await accountRepository.GetByIdAsync(command.Id, cancellationToken);
         if (account is null) return Result.NotFound(nameof(Domain.Entities.Account), command.Id);
 
         account.Deactivate();
-        await _accountRepository.UpdateAsync(account, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await accountRepository.UpdateAsync(account, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

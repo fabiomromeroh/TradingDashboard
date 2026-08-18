@@ -1,22 +1,13 @@
 using MediatR;
+using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Common.Models;
-using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Trades.Commands.CreateTrade;
 
-public class CreateTradeCommandHandler : IRequestHandler<CreateTradeCommand, Result<Guid>>
+public class CreateTradeCommandHandler(ITradeRepository tradeRepository, IUnitOfWork unitOfWork) : IRequestHandler<CreateTradeCommand, Result<Guid>>
 {
-    private readonly ITradeRepository tradeRepository;
-    private readonly IUnitOfWork unitOfWork;
-
-    public CreateTradeCommandHandler(ITradeRepository tradeRepository, IUnitOfWork unitOfWork)
-    {
-        this.tradeRepository = tradeRepository;
-        this.unitOfWork = unitOfWork;
-    }
-
     public async Task<Result<Guid>> Handle(CreateTradeCommand command, CancellationToken cancellationToken)
     {
 

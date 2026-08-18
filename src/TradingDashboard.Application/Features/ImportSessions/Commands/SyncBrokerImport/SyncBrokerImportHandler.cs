@@ -1,62 +1,42 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Net;
+using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services.BrokerSync;
 using TradingDashboard.Application.Abstractions.Services.Import;
 using TradingDashboard.Application.Common.Exceptions;
 using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Features.ImportSessions.Dtos;
-using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
 
 namespace TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrokerImport
 {
-    public class SyncBrokerImportHandler : IRequestHandler<SyncBrokerImportCommand, Result<SyncBrokerDto>>
+    public class SyncBrokerImportHandler(IBrokerSyncFactory factory,
+        IBrokerAccountCredentialService brokerAccountCredentialService,
+        IExecutionRepository executionRepository,
+        ILogger<SyncBrokerImportHandler> logger,
+        IAccountRepository accountRepository,
+        IImportSessionRepository importSessionRepository,
+        IImportService importService,
+        IUnitOfWork unitOfWork) : IRequestHandler<SyncBrokerImportCommand, Result<SyncBrokerDto>>
     {
-        private readonly IBrokerSyncFactory _brokerSyncFactory;
-        private readonly IBrokerAccountCredentialService _brokerAccountCredentialService;
-        private readonly ILogger<SyncBrokerImportHandler> _logger;
-        private readonly IAccountRepository _accountRepository;
-        private readonly IExecutionRepository _executionRepository;
-        private readonly IImportSessionRepository _importSessionRepository;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IImportService _importService;
-
-        public SyncBrokerImportHandler(IBrokerSyncFactory factory,
-            IBrokerAccountCredentialService brokerAccountCredentialService,
-            IExecutionRepository executionRepository,
-            ILogger<SyncBrokerImportHandler> logger,
-            IAccountRepository accountRepository,
-            IImportSessionRepository importSessionRepository,
-            IImportService importService,
-            IUnitOfWork unitOfWork)
-        {
-            _brokerSyncFactory = factory;
-            _brokerAccountCredentialService = brokerAccountCredentialService;
-            _logger = logger;
-            _accountRepository = accountRepository;
-            _importSessionRepository = importSessionRepository;
-            _executionRepository = executionRepository;
-            _importService = importService;
-            _unitOfWork = unitOfWork;
-        }
         public async Task<Result<SyncBrokerDto>> Handle(SyncBrokerImportCommand command, CancellationToken cancellationToken)
         {
 
-            var account = await _accountRepository.GetByIdAsync(command.AccountId, cancellationToken);
+            var account = await accountRepository.GetByIdAsync(command.AccountId, cancellationToken);
             if (account is null) return Result<SyncBrokerDto>.NotFound(nameof(Account), command.AccountId);
 
-            if (!_brokerSyncFactory.SupportedBrokers.Contains(account.Broker.Name))
+            if (!factory.SupportedBrokers.Contains(account.Broker.Name))
                 return Result<SyncBrokerDto>.Failure(
                         new Error("UnsupportedBroker",
                             $"'{account.Broker.Name}' is not supported. " +
-                            $"Supported brokers: {string.Join(", ", _brokerSyncFactory.SupportedBrokers)}"),
+                            $"Supported brokers: {string.Join(", ", factory.SupportedBrokers)}"),
                         HttpStatusCode.BadRequest);
 
             //get broker's credentials 
-            var credentials = await _brokerAccountCredentialService.GetAsync<BrokerCredentials>(account.Id, cancellationToken);
+            var credentials = await brokerAccountCredentialService.GetAsync<BrokerCredentials>(account.Id, cancellationToken);
 
             if (credentials is null)
                 return Result<SyncBrokerDto>.Failure(
@@ -70,13 +50,13 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrok
             DateOnly toDate = DateOnly.FromDateTime(DateTime.Today);
 
             //get the broker sync service from the factory
-            var syncService = _brokerSyncFactory.GetSyncService(account.Broker.Name);
+            var syncService = factory.GetSyncService(account.Broker.Name);
 
             var result = await syncService.SyncAsync(new BrokerSyncRequest(credentials, fromDate, toDate), cancellationToken);
 
             if (!result.IsSuccess)
             {
-                _logger.LogError("Broker sync failed for account {AccountId}: {Code} {Message}", command.AccountId, result.ErrorCode, result.ErrorMessage);
+                logger.LogError("Broker sync failed for account {AccountId}: {Code} {Message}", command.AccountId, result.ErrorCode, result.ErrorMessage);
                 return Result<SyncBrokerDto>.Failure(new Error("502", result.ErrorMessage ?? "Broker sync failed"), HttpStatusCode.BadGateway);
             }
 
@@ -85,7 +65,7 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrok
                 .Select(r => r.BrokerExecutionId)
                 .ToList();
 
-            var existingIds = await _executionRepository
+            var existingIds = await executionRepository
                 .GetExistingBrokerExecutionIdsAsync(brokerExecutionIds, command.AccountId, cancellationToken);
 
             if (existingIds.Count == brokerExecutionIds.Count)
@@ -105,10 +85,10 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrok
             var importSession = ImportSession.Create(command.AccountId, account.Broker.Name, ImportSourceType.BrokerSync);
             importSession.Complete(totalRows, 0, startPeriod, endPeriod);
 
-            return await _unitOfWork.ExecuteInTransactionAsync(async ct =>
+            return await unitOfWork.ExecuteInTransactionAsync(async ct =>
             {
 
-                await _importSessionRepository.AddAsync(importSession, ct);
+                await importSessionRepository.AddAsync(importSession, ct);
 
                 //Process and save executions 
                 foreach (var row in orderedExecutions)
@@ -129,11 +109,11 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrok
 
                         );
 
-                    await _executionRepository.AddAsync(execution, cancellationToken);
+                    await executionRepository.AddAsync(execution, cancellationToken);
 
                 }
 
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
 
                 //rebuild trades
                 var impactedSymbols = orderedExecutions
@@ -141,7 +121,7 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrok
                       .Distinct(StringComparer.OrdinalIgnoreCase)
                       .ToArray();
 
-                var newTrades = await _importService.RebuildTradesAsync(command.AccountId, impactedSymbols, cancellationToken);
+                var newTrades = await importService.RebuildTradesAsync(command.AccountId, impactedSymbols, cancellationToken);
 
                 return Result<SyncBrokerDto>.Success(new SyncBrokerDto() { NewTrades = newTrades });
 

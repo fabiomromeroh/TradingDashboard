@@ -1,29 +1,17 @@
 ﻿using MediatR;
+using TradingDashboard.Application.Abstractions;
 using TradingDashboard.Application.Abstractions.Repositories;
 using TradingDashboard.Application.Abstractions.Services.BrokerSync;
 using TradingDashboard.Application.Common.Models;
-using TradingDashboard.Application.Interfaces;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Accounts.Commands.SetBrokerCredentials
 {
-    public class SetBrokerCredentialsHandler : IRequestHandler<SetBrokerCredentialsCommand, Result>
+    public class SetBrokerCredentialsHandler(IAccountRepository accountRepository,
+        IBrokerAccountCredentialService brokerAccountCredentialService,
+        IBrokerAccountCredentialRepository brokerAccountCredentialRepository,
+        IUnitOfWork unitOfWork) : IRequestHandler<SetBrokerCredentialsCommand, Result>
     {
-        private readonly IAccountRepository accountRepository;
-        private readonly IBrokerAccountCredentialService brokerAccountCredentialService;
-        private readonly IBrokerAccountCredentialRepository brokerAccountCredentialRepository;
-        private readonly IUnitOfWork unitOfWork;
-
-        public SetBrokerCredentialsHandler(IAccountRepository accountRepository,
-            IBrokerAccountCredentialService brokerAccountCredentialService,
-            IBrokerAccountCredentialRepository brokerAccountCredentialRepository,
-            IUnitOfWork unitOfWork)
-        {
-            this.accountRepository = accountRepository;
-            this.brokerAccountCredentialService = brokerAccountCredentialService;
-            this.brokerAccountCredentialRepository = brokerAccountCredentialRepository;
-            this.unitOfWork = unitOfWork;
-        }
         public async Task<Result> Handle(SetBrokerCredentialsCommand command, CancellationToken cancellationToken)
         {
             var account = await accountRepository.GetByIdAsync(command.AccountId, cancellationToken);
