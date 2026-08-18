@@ -41,9 +41,9 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmI
             var importSession = ImportSession.Create(command.AccountId, command.BrokerName, ImportSourceType.FileUpload, command.FileName);
             importSession.Complete(command.TotalRows, command.DuplicateRows, startPeriod, endPeriod);
 
-            try
+
+            return await unitOfWork.ExecuteInTransactionAsync(async ct =>
             {
-                await unitOfWork.BeginTransactionAsync(ct);
 
                 await importSessionRepository.AddAsync(importSession, ct);
 
@@ -80,15 +80,11 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.ConfirmI
                 await importService.RebuildTradesAsync(command.AccountId, impactedSymbols, ct);
 
 
-                await unitOfWork.CommitAsync(ct);
 
                 return Result<Guid>.Success(importSession.Id);
-            }
-            catch (Exception)
-            {
-                await unitOfWork.RollbackAsync(ct);
-                throw;
-            }
+
+            }, ct);
+
 
         }
 

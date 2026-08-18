@@ -9,10 +9,7 @@ namespace TradingDashboard.Application.Features.Config.Queries
     public class GetUserConfigurationQueryHandler : IRequestHandler<GetUserConfigurationQuery, Result<UserConfigurationDto>>
     {
         private readonly IUserRepository _userRepository;
-        public GetUserConfigurationQueryHandler(IUserRepository userRepository)
-        {
-            _userRepository = userRepository;
-        }
+        public GetUserConfigurationQueryHandler(IUserRepository userRepository) => _userRepository = userRepository;
         public async Task<Result<UserConfigurationDto>> Handle(GetUserConfigurationQuery request, CancellationToken cancellationToken)
         {
             var userConfig = await _userRepository.GetUserConfigurationAsync(request.UserId, cancellationToken);

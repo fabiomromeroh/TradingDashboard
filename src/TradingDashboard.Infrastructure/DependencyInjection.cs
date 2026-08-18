@@ -35,7 +35,12 @@ public static class DependencyInjection
         // --- Database ---
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(
-                configuration.GetConnectionString("DefaultConnection")));
+                configuration.GetConnectionString("DefaultConnection"),
+                sqlOptions => sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null)));
+
 
         // --- Repositories ---
         services.AddScoped<ITradeRepository, TradeRepository>();

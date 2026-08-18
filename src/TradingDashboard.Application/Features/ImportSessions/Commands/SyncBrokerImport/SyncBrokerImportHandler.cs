@@ -105,11 +105,10 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrok
             var importSession = ImportSession.Create(command.AccountId, account.Broker.Name, ImportSourceType.BrokerSync);
             importSession.Complete(totalRows, 0, startPeriod, endPeriod);
 
-            try
+            return await _unitOfWork.ExecuteInTransactionAsync(async ct =>
             {
-                await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-                await _importSessionRepository.AddAsync(importSession, cancellationToken);
+                await _importSessionRepository.AddAsync(importSession, ct);
 
                 //Process and save executions 
                 foreach (var row in orderedExecutions)
@@ -144,16 +143,9 @@ namespace TradingDashboard.Application.Features.ImportSessions.Commands.SyncBrok
 
                 var newTrades = await _importService.RebuildTradesAsync(command.AccountId, impactedSymbols, cancellationToken);
 
-                await _unitOfWork.CommitAsync(cancellationToken);
-
                 return Result<SyncBrokerDto>.Success(new SyncBrokerDto() { NewTrades = newTrades });
 
-            }
-            catch (Exception)
-            {
-                await _unitOfWork.RollbackAsync(cancellationToken);
-                throw;
-            }
+            }, cancellationToken);
         }
     }
 }
