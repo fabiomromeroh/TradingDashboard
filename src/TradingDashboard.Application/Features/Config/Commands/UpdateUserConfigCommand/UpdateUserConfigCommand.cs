@@ -4,7 +4,14 @@ using TradingDashboard.Application.Common.Models;
 
 namespace TradingDashboard.Application.Features.Config.Commands.UpdateUserConfigCommand
 {
-    public record UpdateUserConfigCommand(Guid UserId, JsonElement Filters) : IRequest<Result<Unit>>
+    /// <summary>
+    /// Command to update a specific user configuration.
+    /// The ConfigType discriminator determines which configuration property is updated.
+    /// </summary>
+    public record UpdateUserConfigCommand(
+        Guid UserId,
+        string ConfigType,
+        JsonElement Config) : IRequest<Result<Unit>>
     {
     }
 }

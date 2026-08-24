@@ -10,7 +10,7 @@ export function useTradesQuery(): UseTradesResult {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<ApiError[] | null>(null);
   const selectedAccounts = useAppSelector<string[]>(
-    (x) => x.auth.configFilters.accountIds,
+    (x) => x.auth.filtersConfig.accountIds,
   );
 
   // useCallback ensures `fetchTrades` keeps a stable reference so it's safe

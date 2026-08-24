@@ -6,6 +6,7 @@ using TradingDashboard.Application.Abstractions.Services.Trades;
 using TradingDashboard.Application.Abstractions.Services.UserConfig;
 using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Application.Features.Config.Dtos;
+using TradingDashboard.Application.Features.Config.Extensions;
 using TradingDashboard.Application.Features.Trades.Dtos;
 using TradingDashboard.Domain.Entities;
 
@@ -18,7 +19,7 @@ public class GetTradesByAccountIdQueryHandler(ITradeQueryService tradeQuery, IMa
 
         UserConfigDto config = await userConfigQuery.GetUserConfigAsync(query.UserId, cancellationToken);
 
-        ISpecification<Trade> spec = new MetricFilterSpecification(config.Filters);
+        ISpecification<Trade> spec = new MetricFilterSpecification(config.GetFilters());
 
         var trades = await tradeQuery.GetTradesAsync(query.UserId, spec, cancellationToken);
 

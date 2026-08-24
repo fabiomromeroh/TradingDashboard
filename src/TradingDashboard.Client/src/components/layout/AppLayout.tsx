@@ -2,9 +2,9 @@ import { Outlet } from "react-router-dom";
 import TopBar from "./TopBar";
 import { useAccountsQuery } from "@/features/account/hooks/useAccountsQuery";
 import { useAppDispatch } from "@/store/hooks";
-import { setAccounts, setConfigFilters } from "@/store/store";
+import { setAccounts } from "@/store/store";
 import { useEffect } from "react";
-import { useConfigFiltersQuery } from "@/features/users/hooks/useConfigFiltersQuery";
+import { useConfigQuery } from "@/features/users/hooks/useConfigQuery";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 
@@ -12,17 +12,13 @@ export default function AppLayout() {
   const dispatch = useAppDispatch();
 
   const { accounts } = useAccountsQuery();
-  const { config } = useConfigFiltersQuery();
+  useConfigQuery();
 
   useEffect(() => {
     if (accounts.length > 0) {
       dispatch(setAccounts(accounts));
     }
-
-    if (config && config.filters) {
-      dispatch(setConfigFilters(config.filters));
-    }
-  }, [accounts, dispatch, config]);
+  }, [accounts, dispatch]);
 
   return (
     <SidebarProvider className="bg-background text-foreground">

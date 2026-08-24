@@ -3,13 +3,14 @@ import { GripVertical, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
-import type { DashboardWidget } from "../types/dashboard.types";
 import { getWidgetColSpan } from "../../../components/shared/widgets/base/WidgetRegistry";
 import { LiveWidget } from "./LiveWidget";
+import type { DashboardConfig } from "@/features/users/types/user.types";
+import type { WidgetType } from "../types/dashboard.types";
 
 interface SortableWidgetProps {
-  widget: DashboardWidget;
-  onRemove: (id: string, zone: DashboardWidget["zone"]) => void;
+  widget: DashboardConfig;
+  onRemove: (type: WidgetType, zone: DashboardConfig["zone"]) => void;
 }
 
 export function SortableWidget({ widget, onRemove }: SortableWidgetProps) {
@@ -20,7 +21,7 @@ export function SortableWidget({ widget, onRemove }: SortableWidgetProps) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: widget.id });
+  } = useSortable({ id: widget.type + widget.zone });
 
   const colSpan = getWidgetColSpan(widget.type);
 
@@ -57,7 +58,7 @@ export function SortableWidget({ widget, onRemove }: SortableWidgetProps) {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => onRemove(widget.id, widget.zone)}
+        onClick={() => onRemove(widget.type, widget.zone)}
         aria-label="Remove widget"
         className={cn(
           "absolute top-2 right-2 z-10 size-7",

@@ -4,6 +4,7 @@ using TradingDashboard.Application.Abstractions.Services.Metric.Models;
 using TradingDashboard.Application.Abstractions.Services.Metric.Specifications;
 using TradingDashboard.Application.Abstractions.Services.UserConfig;
 using TradingDashboard.Application.Common.Models;
+using TradingDashboard.Application.Features.Config.Extensions;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Features.Dashboard.Queries
@@ -14,7 +15,7 @@ namespace TradingDashboard.Application.Features.Dashboard.Queries
         {
             var config = await userConfigQueryService.GetUserConfigAsync(request.UserId, cancellationToken);
 
-            ISpecification<Trade> spec = new MetricFilterSpecification(config.Filters);
+            ISpecification<Trade> spec = new MetricFilterSpecification(config.GetFilters());
 
             var metricCalculator = factory.GetMetricCalculator(request.MetricType);
 

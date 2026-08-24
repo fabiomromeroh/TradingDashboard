@@ -1,4 +1,5 @@
 import type {
+  DashboardConfig,
   ConfigFiltersDto,
   UserDto,
 } from "@/features/users/types/user.types";
@@ -9,7 +10,8 @@ interface AuthState {
   authCheckComplete: boolean;
   user: UserDto | null;
   isAuthenticated: boolean;
-  configFilters: ConfigFiltersDto;
+  filtersConfig: ConfigFiltersDto;
+  dashboardConfig: DashboardConfig[];
 }
 
 interface ConfigFilterState {
@@ -21,7 +23,8 @@ const initialState: AuthState = {
   authCheckComplete: false,
   user: null,
   isAuthenticated: false,
-  configFilters: { accountIds: [] },
+  filtersConfig: { accountIds: [] },
+  dashboardConfig: [],
 };
 
 type PatchFiltersPayload = Partial<ConfigFilterState>;
@@ -49,7 +52,36 @@ export const userSlice = createSlice({
       };
     },
     setConfigFilters(state, action: { payload: PatchFiltersPayload }) {
-      state.configFilters = { ...state.configFilters, ...action.payload };
+      state.filtersConfig = { ...state.filtersConfig, ...action.payload };
+    },
+    setConfigDashboard(state, action: { payload: DashboardConfig[] }) {
+      state.dashboardConfig = [...action.payload];
+    },
+    loadUserConfig(
+      state,
+      action: {
+        payload: {
+          configs: Array<{ configType: string; filters?: any; widgets?: any }>;
+        };
+      },
+    ) {
+      const configs = action.payload.configs;
+
+      const filtersConfig = configs.find((c) => c.configType === "filters");
+
+      if (filtersConfig && filtersConfig.filters) {
+        state.filtersConfig = {
+          accountIds: filtersConfig.filters.accountIds || [],
+          dateFrom: filtersConfig.filters.dateFrom,
+          dateTo: filtersConfig.filters.dateTo,
+        };
+      }
+
+      const dashboardConfig = configs.find((c) => c.configType === "dashboard");
+
+      if (dashboardConfig && dashboardConfig.widgets) {
+        state.dashboardConfig = dashboardConfig.widgets;
+      }
     },
   },
 });

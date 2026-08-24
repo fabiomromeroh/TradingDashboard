@@ -19,7 +19,7 @@ export type WidgetType = OverviewWidgetType | MainWidgetType;
 export type WidgetZone = "overview" | "main";
 
 export interface DashboardWidget {
-  id: string;
+  // id: string;
   type: WidgetType;
   zone: WidgetZone;
 }
@@ -118,10 +118,4 @@ export interface UseDashboardWidgetResult {
   isLoading: boolean;
   error: ApiError[] | null;
   refetch: () => void;
-}
-
-export interface UseDashboardWidgetOptions {
-  from?: string;
-  to?: string;
-  period?: "day" | "week" | "month";
 }

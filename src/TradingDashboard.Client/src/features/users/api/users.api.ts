@@ -1,6 +1,6 @@
 import apiClient from "@/lib/apiClient";
 import type {
-  ConfigDto,
+  ConfigDashboardCommand,
   ConfigFiltersCommand,
   CreateUserCommand,
   LoginResponse,
@@ -29,9 +29,21 @@ export async function logout(): Promise<void> {
 export async function updateConfigFilters(
   filters: ConfigFiltersCommand,
 ): Promise<void> {
-  return apiClient.post("/users/config", { filters });
+  return apiClient.post("/users/config", {
+    ConfigType: "filters",
+    Config: filters,
+  });
 }
 
-export async function getConfigFilters(): Promise<ConfigDto> {
+export async function updateConfigDashboard(
+  dashboardLayout: ConfigDashboardCommand[],
+): Promise<void> {
+  return apiClient.post("/users/config", {
+    ConfigType: "dashboard",
+    Config: dashboardLayout,
+  });
+}
+
+export async function getUserConfig(): Promise<any> {
   return apiClient.get("/users/config");
 }

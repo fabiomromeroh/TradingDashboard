@@ -22,6 +22,7 @@ interface WidgetCatalogProps {
   open: boolean;
   onClose: () => void;
   onAdd: (type: WidgetType, zone: WidgetZone) => void;
+  layout: any[]; // Adjust the type according to your layout structure
 }
 
 function CatalogCard({
@@ -64,8 +65,22 @@ export function WidgetCatalogModal({
   open,
   onClose,
   onAdd,
+  layout,
 }: WidgetCatalogProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "main">("overview");
+
+  const filteredOverviewCatalog = OVERVIEW_CATALOG.filter(
+    (item) =>
+      !layout.some(
+        (widget) => widget.type === item.type && widget.zone === item.zone,
+      ),
+  );
+  const filteredMainCatalog = MAIN_CATALOG.filter(
+    (item) =>
+      !layout.some(
+        (widget) => widget.type === item.type && widget.zone === item.zone,
+      ),
+  );
 
   function handleAdd(item: WidgetCatalogItem) {
     onAdd(item.type, item.zone);
@@ -95,7 +110,7 @@ export function WidgetCatalogModal({
               dashboard.
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {OVERVIEW_CATALOG.map((item) => (
+              {filteredOverviewCatalog.map((item) => (
                 <CatalogCard
                   key={item.type}
                   item={item}
@@ -111,7 +126,7 @@ export function WidgetCatalogModal({
               dashboard area.
             </p>
             <div className="grid grid-cols-2 gap-3">
-              {MAIN_CATALOG.map((item) => (
+              {filteredMainCatalog.map((item) => (
                 <CatalogCard
                   key={item.type}
                   item={item}

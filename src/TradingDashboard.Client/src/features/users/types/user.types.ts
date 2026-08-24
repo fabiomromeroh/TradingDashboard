@@ -1,5 +1,9 @@
 import type { ApiError } from "@/types/api.types";
 
+import type {
+  WidgetType,
+  WidgetZone,
+} from "@/features/dashboard/types/dashboard.types";
 export interface UserDto {
   id: string;
   firstName: string;
@@ -32,20 +36,29 @@ export interface LogoutUserCommand {
 }
 
 export interface ConfigFiltersCommand {
-  AccountIds: string[];
+  accountIds: string[];
+  dateFrom?: string;
+  dateTo?: string;
 }
 
-export interface ConfigDto {
-  filters: ConfigFiltersDto;
+export interface ConfigDashboardCommand {
+  zone: string;
+  type: string;
 }
 
+export interface DashboardConfig {
+  zone: WidgetZone;
+  type: WidgetType;
+}
 export interface ConfigFiltersDto {
   accountIds: string[];
+  dateFrom?: string;
+  dateTo?: string;
 }
 
-export interface ConfigFiltersQueryResult {
-  config: ConfigDto | null;
+export interface ConfigQueryResult {
+  config: any | null;
   isLoading: boolean;
   error: ApiError[] | null;
-  refetch: () => Promise<ConfigDto | null>;
+  refetch: () => Promise<any | null>;
 }

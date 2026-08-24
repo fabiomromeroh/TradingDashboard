@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { renderWidgetFromDto } from "@/components/shared/widgets/base/WidgetRegistry";
 import { useDashboardWidget } from "../hooks/useDashboardWidget";
-import type { DashboardWidget } from "../types/dashboard.types";
+import type { DashboardConfig } from "@/features/users/types/user.types";
 
 interface LiveWidgetProps {
-  widget: DashboardWidget;
+  widget: DashboardConfig;
 }
 
 export function LiveWidget({ widget }: LiveWidgetProps) {

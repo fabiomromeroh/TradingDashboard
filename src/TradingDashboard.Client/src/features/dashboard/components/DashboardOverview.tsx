@@ -21,10 +21,10 @@ import { Separator } from "@/components/ui/separator";
 import { useDashboardLayout } from "../hooks/useDashboardLayout";
 import { SortableWidget } from "./SortableWidget";
 import { WidgetCatalogModal } from "./WidgetCatalogModal";
-import type { DashboardWidget } from "../types/dashboard.types";
 import { useAppSelector } from "@/store/hooks";
 import { renderWidgetFromDto } from "@/components/shared/widgets/base/WidgetRegistry";
 import { AppButton } from "@/components/shared/AppButton";
+import type { DashboardConfig } from "@/features/users/types/user.types";
 
 function EmptyZone({ label, onAdd }: { label: string; onAdd: () => void }) {
   return (
@@ -44,7 +44,7 @@ function EmptyZone({ label, onAdd }: { label: string; onAdd: () => void }) {
 }
 
 /** Overlay preview shown while dragging */
-function DragPreview({ widget }: { widget: DashboardWidget }) {
+function DragPreview({ widget }: { widget: DashboardConfig }) {
   const metricData = useAppSelector((x) =>
     x.metric.metrics.find((m) => m.widgetType === widget.type),
   );
@@ -59,7 +59,7 @@ function DragPreview({ widget }: { widget: DashboardWidget }) {
 export function DashboardOverview() {
   const { layout, saveLayout, addWidget, removeWidget } = useDashboardLayout();
   const [catalogOpen, setCatalogOpen] = useState(false);
-  const [activeWidget, setActiveWidget] = useState<DashboardWidget | null>(
+  const [activeWidget, setActiveWidget] = useState<DashboardConfig | null>(
     null,
   );
 
@@ -73,8 +73,8 @@ export function DashboardOverview() {
   function handleDragStart(event: DragStartEvent) {
     const id = event.active.id as string;
     const found =
-      layout.overview.find((w) => w.id === id) ??
-      layout.main.find((w) => w.id === id) ??
+      layout.find((w) => w.type + w.zone === id) ??
+      layout.find((w) => w.zone === "main" && w.type + w.zone === id) ??
       null;
     setActiveWidget(found);
   }
@@ -87,21 +87,18 @@ export function DashboardOverview() {
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    const inOverview = layout.overview.some((w) => w.id === activeId);
+    const inOverview = layout.some((w) => w.type + w.zone === activeId);
     if (inOverview) {
-      const oldIdx = layout.overview.findIndex((w) => w.id === activeId);
-      const newIdx = layout.overview.findIndex((w) => w.id === overId);
+      const oldIdx = layout.findIndex((w) => w.type + w.zone === activeId);
+      const newIdx = layout.findIndex((w) => w.type + w.zone === overId);
       if (oldIdx !== -1 && newIdx !== -1) {
-        saveLayout({
-          ...layout,
-          overview: arrayMove(layout.overview, oldIdx, newIdx),
-        });
+        saveLayout(arrayMove(layout, oldIdx, newIdx));
       }
     } else {
-      const oldIdx = layout.main.findIndex((w) => w.id === activeId);
-      const newIdx = layout.main.findIndex((w) => w.id === overId);
+      const oldIdx = layout.findIndex((w) => w.type + w.zone === activeId);
+      const newIdx = layout.findIndex((w) => w.type + w.zone === overId);
       if (oldIdx !== -1 && newIdx !== -1) {
-        saveLayout({ ...layout, main: arrayMove(layout.main, oldIdx, newIdx) });
+        saveLayout(arrayMove(layout, oldIdx, newIdx));
       }
     }
   }
@@ -131,21 +128,25 @@ export function DashboardOverview() {
             <Separator className="flex-1" />
           </div>
 
-          {layout.overview.length === 0 ? (
+          {layout.filter((w) => w.zone === "overview").length === 0 ? (
             <EmptyZone label="overview" onAdd={() => setCatalogOpen(true)} />
           ) : (
             <SortableContext
-              items={layout.overview.map((w) => w.id)}
+              items={layout
+                .filter((w) => w.zone === "overview")
+                .map((w) => w.type + w.zone)}
               strategy={rectSortingStrategy}
             >
               <div className="grid gap-4 max-[645px]:grid-cols-1 min-[646px]:max-[917px]:grid-cols-2 min-[918px]:max-[1180px]:grid-cols-3 min-[1180px]:max-[1630px]:grid-cols-4 min-[1630px]:grid-cols-5 min-[1630px]:max-[1800px]:max-[1630px]:grid-cols-4 min-[1800px]:grid-cols-6">
-                {layout.overview.map((widget) => (
-                  <SortableWidget
-                    key={widget.id}
-                    widget={widget}
-                    onRemove={removeWidget}
-                  />
-                ))}
+                {layout
+                  .filter((w) => w.zone === "overview")
+                  .map((widget) => (
+                    <SortableWidget
+                      key={widget.type + widget.zone}
+                      widget={widget}
+                      onRemove={removeWidget}
+                    />
+                  ))}
               </div>
             </SortableContext>
           )}
@@ -160,21 +161,25 @@ export function DashboardOverview() {
             <Separator className="flex-1" />
           </div>
 
-          {layout.main.length === 0 ? (
+          {layout.filter((w) => w.zone === "main").length === 0 ? (
             <EmptyZone label="main" onAdd={() => setCatalogOpen(true)} />
           ) : (
             <SortableContext
-              items={layout.main.map((w) => w.id)}
+              items={layout
+                .filter((w) => w.zone === "main")
+                .map((w) => w.type + w.zone)}
               strategy={rectSortingStrategy}
             >
               <div className="grid gap-4 grid-cols-1 md:grid-cols-4">
-                {layout.main.map((widget) => (
-                  <SortableWidget
-                    key={widget.id}
-                    widget={widget}
-                    onRemove={removeWidget}
-                  />
-                ))}
+                {layout
+                  .filter((w) => w.zone === "main")
+                  .map((widget) => (
+                    <SortableWidget
+                      key={widget.type + widget.zone}
+                      widget={widget}
+                      onRemove={removeWidget}
+                    />
+                  ))}
               </div>
             </SortableContext>
           )}
@@ -191,6 +196,7 @@ export function DashboardOverview() {
         open={catalogOpen}
         onClose={() => setCatalogOpen(false)}
         onAdd={addWidget}
+        layout={layout}
       />
     </DndContext>
   );

@@ -39,6 +39,8 @@ export const {
   setAuthCheckComplete,
   setUser,
   setConfigFilters,
+  setConfigDashboard,
+  loadUserConfig,
 } = userSlice.actions;
 export const { setMetrics } = metricSlice.actions;
 

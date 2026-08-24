@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using TradingDashboard.API.Middleware;
 using TradingDashboard.Application;
+using TradingDashboard.Application.Common.Configurations;
 using TradingDashboard.Infrastructure;
 using TradingDashboard.Infrastructure.Persistence.Seed;
 
@@ -57,12 +56,8 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        // Configure JSON serializer to use string representation for enums
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-    });
+    .AddJsonOptions(options => AppJsonOptions.Configure(options.JsonSerializerOptions));
+
 
 // Add services to the container.
 builder.Services.AddOpenApi();

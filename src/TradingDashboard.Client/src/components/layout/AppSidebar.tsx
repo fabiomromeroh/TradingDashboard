@@ -69,10 +69,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-            // size="lg"
-            // className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
+            <SidebarMenuButton>
               <span className="text-sidebar-foreground font-bold text-base tracking-tight">
                 Trading Dashboard
               </span>
@@ -125,12 +122,6 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="flex flex-row items-center justify-between gap-2 border-t border-sidebar-border">
-        {/* <div className="flex items-center gap-2">
-          <AvatarDropdown onClick={logoutUser} />
-          <span className="text-sm text-sidebar-foreground truncate group-data-[collapsible=icon]:hidden">
-            {user?.fullName}
-          </span>
-        </div> */}
         <NavUser
           user={{ fullName: user?.fullName ?? "", email: user?.email ?? "" }}
           logoutUser={logoutUser}

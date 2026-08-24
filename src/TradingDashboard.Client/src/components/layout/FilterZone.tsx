@@ -10,17 +10,16 @@ export function FilterZone() {
   const accountOptions = toSelectOptions(accounts);
   const dispatch = useAppDispatch();
   const { mutate: updateConfigFilters } = useConfigFiltersMutation();
-
-  const configFilter = useAppSelector((x) => x.auth.configFilters);
+  const filtersConfig = useAppSelector((x) => x.auth.filtersConfig);
 
   return (
     <div className="w-[320px]">
       <AppMultiSelect
         options={accountOptions}
-        value={configFilter.accountIds}
+        value={filtersConfig.accountIds}
         onValueChange={(values) => {
           updateConfigFilters(
-            { AccountIds: values },
+            { ...filtersConfig, accountIds: values },
             {
               onSuccess: () => {
                 dispatch(setConfigFilters({ accountIds: values }));

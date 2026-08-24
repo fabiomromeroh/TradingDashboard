@@ -1,19 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ApiError } from "@/types/api.types";
-import { getConfigFilters } from "../api/users.api";
-import type { ConfigDto, ConfigFiltersQueryResult } from "../types/user.types";
+import type { ConfigQueryResult } from "../types/user.types";
+import { useAppDispatch } from "@/store/hooks";
+import { getUserConfig } from "../api/users.api";
+import { loadUserConfig } from "@/store/store";
 
-export function useConfigFiltersQuery(): ConfigFiltersQueryResult {
-  const [config, setConfig] = useState<ConfigDto | null>(null);
+export function useConfigQuery(): ConfigQueryResult {
+  const dispatch = useAppDispatch();
+  const [config, setConfig] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<ApiError[] | null>(null);
 
   const fetchConfig = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    return await getConfigFilters()
+    return await getUserConfig()
       .then((data) => {
-        setConfig(data);
+        setConfig(data.configs);
+        dispatch(loadUserConfig(data));
+
         setError(null);
         return data;
       })

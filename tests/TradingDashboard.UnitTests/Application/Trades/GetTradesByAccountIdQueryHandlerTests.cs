@@ -4,12 +4,11 @@ using TradingDashboard.Application.Abstractions.Services.Metric.Specifications;
 using TradingDashboard.Application.Abstractions.Services.Trades;
 using TradingDashboard.Application.Abstractions.Services.UserConfig;
 using TradingDashboard.Application.Features.Config.Dtos;
+using TradingDashboard.Application.Features.Config.Extensions;
 using TradingDashboard.Application.Features.Trades.Dtos;
 using TradingDashboard.Application.Features.Trades.Queries.GetTradesByAccountId;
 using TradingDashboard.Domain.Entities;
 using TradingDashboard.Domain.Enums;
-
-namespace TradingDashboard.UnitTests.Application.Trades;
 
 public class GetTradesByAccountIdQueryHandlerTests
 {
@@ -42,7 +41,13 @@ public class GetTradesByAccountIdQueryHandlerTests
         var dtos = trades.Select(t => new TradeDto(t.Id, t.Symbol, t.EntryPrice, t.ClosePrice, t.Quantity, t.PositionSize,
             t.Direction.ToString(), t.Status.ToString(), t.OpenedAt, t.ClosedAt, t.TotalCommissions, t.AverageEntryPrice, t.AverageClosePrice, t.NetReturn, t.PercentageReturn)).ToList();
 
-        var userConfig = new UserConfigDto { Filters = null };
+        var userConfig = new UserConfigDto
+        {
+            Configs = new List<IUserConfig>
+            {
+                new FiltersConfig { Filters = null }
+            }
+        };
 
         _userConfigQueryService
             .Setup(x => x.GetUserConfigAsync(_userId, It.IsAny<CancellationToken>()))
@@ -81,7 +86,13 @@ public class GetTradesByAccountIdQueryHandlerTests
     {
         // Arrange
         var emptyTrades = new List<Trade>();
-        var userConfig = new UserConfigDto { Filters = null };
+        var userConfig = new UserConfigDto
+        {
+            Configs = new List<IUserConfig>
+            {
+                new FiltersConfig { Filters = null }
+            }
+        };
 
         _userConfigQueryService
             .Setup(x => x.GetUserConfigAsync(_userId, It.IsAny<CancellationToken>()))
@@ -118,7 +129,13 @@ public class GetTradesByAccountIdQueryHandlerTests
         var expectedDto = new TradeDto(trade.Id, trade.Symbol, trade.EntryPrice, trade.ClosePrice, trade.Quantity, trade.PositionSize,
             trade.Direction.ToString(), trade.Status.ToString(), trade.OpenedAt, trade.ClosedAt, trade.TotalCommissions, trade.AverageEntryPrice, trade.AverageClosePrice, trade.NetReturn, trade.PercentageReturn);
 
-        var userConfig = new UserConfigDto { Filters = null };
+        var userConfig = new UserConfigDto
+        {
+            Configs = new List<IUserConfig>
+            {
+                new FiltersConfig { Filters = null }
+            }
+        };
 
         _userConfigQueryService
             .Setup(x => x.GetUserConfigAsync(_userId, It.IsAny<CancellationToken>()))
@@ -149,3 +166,4 @@ public class GetTradesByAccountIdQueryHandlerTests
         dto.Status.Should().Be("Open");
     }
 }
+

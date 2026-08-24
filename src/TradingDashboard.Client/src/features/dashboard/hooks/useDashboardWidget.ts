@@ -17,7 +17,7 @@ export function useDashboardWidget(
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<ApiError[] | null>(null);
   const dispatch = useAppDispatch();
-  const configFilters = useAppSelector((x) => x.auth.configFilters);
+  const filtersConfig = useAppSelector((x) => x.auth.filtersConfig);
 
   const fetchMetric = useCallback(async () => {
     setIsLoading(true);
@@ -34,7 +34,7 @@ export function useDashboardWidget(
         return false;
       })
       .finally(() => setIsLoading(false));
-  }, [widgetType, configFilters]);
+  }, [widgetType, filtersConfig]);
 
   useEffect(() => {
     fetchMetric();
