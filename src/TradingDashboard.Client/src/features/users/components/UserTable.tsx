@@ -70,6 +70,8 @@ export function UserTable() {
     <DataTable
       columns={columns}
       data={users}
+      withPagination
+      withFilter={true}
       filterPlaceholder="Filter users..."
       toolbar={<CreateUserModal reload={refetch} />}
     />

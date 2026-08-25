@@ -39,10 +39,16 @@ interface DataTableProps<TData> {
   toolbar?: React.ReactNode;
   withColumnVisibilityToggle?: boolean;
   withPagination?: boolean;
+  pageSize?: number;
+  withTradeFooter?: boolean;
   withViewDetails?: boolean;
   detailColumns?: ColumnDef<any, unknown>[];
   detailsFetcher?: (row: TData) => Promise<any[]>;
   detailTitle?: string;
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  totalCount?: number;
 }
 
 export function DataTable<TData>({
@@ -52,11 +58,17 @@ export function DataTable<TData>({
   toolbar,
   withColumnVisibilityToggle = false,
   withPagination = false,
+  pageSize = 50,
+  withTradeFooter = false,
   withViewDetails = false,
   withFilter = false,
   detailColumns = [],
   detailsFetcher,
   detailTitle = "Details",
+  onLoadMore,
+  hasMore = false,
+  isLoadingMore = false,
+  totalCount = 0,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -154,7 +166,7 @@ export function DataTable<TData>({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: withPagination ? getPaginationRowModel() : undefined,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -163,7 +175,7 @@ export function DataTable<TData>({
     initialState: {
       pagination: {
         pageIndex: 0,
-        pageSize: 50,
+        pageSize: pageSize,
       },
     },
     state: {
@@ -175,8 +187,31 @@ export function DataTable<TData>({
     },
   });
 
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer || withPagination || !onLoadMore) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+      const threshold = 200;
+
+      if (
+        scrollHeight - (scrollTop + clientHeight) < threshold &&
+        hasMore &&
+        !isLoadingMore
+      ) {
+        onLoadMore();
+      }
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll);
+    return () => scrollContainer.removeEventListener("scroll", handleScroll);
+  }, [hasMore, isLoadingMore, onLoadMore, withPagination]);
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
+    <div className="flex min-h-0  flex-1 flex-col gap-4 overflow-hidden">
       <div className="flex shrink-0 items-center justify-between gap-2">
         {withFilter && (
           <Input
@@ -215,10 +250,11 @@ export function DataTable<TData>({
         {toolbar}
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border">
-        <div className="min-h-0 flex-1 overflow-auto">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-md border">
+        {/* Fixed Header */}
+        <div className="shrink-0 overflow-x-auto">
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-background">
+            <TableHeader className="bg-background">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
@@ -251,6 +287,15 @@ export function DataTable<TData>({
                 </TableRow>
               ))}
             </TableHeader>
+          </Table>
+        </div>
+
+        {/* Scrollable Body */}
+        <div
+          ref={scrollContainerRef}
+          className="min-h-0 flex-1 overflow-auto scrollbar-thin scrollbar-track-background scrollbar-thumb-muted"
+        >
+          <Table>
             <TableBody>
               {table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map((row) => {
@@ -326,6 +371,7 @@ export function DataTable<TData>({
           </Table>
         </div>
 
+        {/* Fixed Footer */}
         {withPagination && (
           <div className="flex shrink-0 items-center justify-between border-t bg-background px-3 py-2">
             <p className="text-sm text-muted-foreground">
@@ -354,6 +400,18 @@ export function DataTable<TData>({
                 Next
               </Button>
             </div>
+          </div>
+        )}
+        {!withPagination && isLoadingMore && (
+          <div className="flex shrink-0 items-center justify-center border-t bg-background px-3 py-2">
+            <p className="text-sm text-muted-foreground">Loading more...</p>
+          </div>
+        )}
+        {withTradeFooter && (
+          <div className="flex shrink-0 items-center justify-between border-t bg-background px-3 py-2">
+            <p className="text-sm text-muted-foreground">
+              Trades: {table.getFilteredRowModel().rows.length}/{totalCount}
+            </p>
           </div>
         )}
       </div>

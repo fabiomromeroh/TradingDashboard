@@ -34,4 +34,5 @@ export interface UseTradesResult {
   isLoading: boolean;
   error: ApiError[] | null;
   refetch: () => void; // lets the UI trigger a manual refresh
+  totalCount: number; // total number of trades available (for pagination)
 }

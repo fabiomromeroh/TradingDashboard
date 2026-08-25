@@ -21,11 +21,11 @@ export default function AppLayout() {
   }, [accounts, dispatch]);
 
   return (
-    <SidebarProvider className="bg-background text-foreground">
+    <SidebarProvider className="bg-background text-foreground h-screen overflow-hidden">
       <AppSidebar />
-      <SidebarInset className="min-w-0">
+      <SidebarInset className="min-w-0 flex flex-col">
         <TopBar />
-        <main className="flex-1 min-h-0 overflow-y-auto p-6">
+        <main className="flex-1 min-h-0 overflow-hidden p-6">
           <Outlet />
         </main>
       </SidebarInset>

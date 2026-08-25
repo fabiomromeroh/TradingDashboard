@@ -1,4 +1,5 @@
 ﻿using TradingDashboard.Application.Abstractions.Services.Metric;
+using TradingDashboard.Application.Common.Models;
 using TradingDashboard.Domain.Entities;
 
 namespace TradingDashboard.Application.Abstractions.Services.Trades
@@ -11,6 +12,8 @@ namespace TradingDashboard.Application.Abstractions.Services.Trades
         Task<IEnumerable<Trade>> GetTradesByAccountId(List<Guid> accountIds, CancellationToken cancellationToken);
 
         public Task<Trade?> GetTradeAsync(Guid id, CancellationToken cancellationToken);
+
+        Task<PaginatedResult<Trade>> GetTradesPaginatedAsync(Guid userId, ISpecification<Trade> spec, int pageSize, string? cursor, CancellationToken ct);
 
     }
 }

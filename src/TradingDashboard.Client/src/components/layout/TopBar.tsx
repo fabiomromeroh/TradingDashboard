@@ -10,11 +10,13 @@ const pageTitles: Record<string, string> = {
   "/accounts": "Accounts",
   "/add-trades": "Add Trade",
   "/reports": "Reports",
+  "/trades/detail": "Trade Detail",
 };
 
 export default function TopBar() {
   const { pathname } = useLocation();
-  const title = pageTitles[pathname] ?? "Trading Dashboard";
+
+  const title = pageTitles[pathname] ?? "";
 
   return (
     <header className="h-13 border-b border-border bg-card flex items-center justify-between px-6 shrink-0 text-foreground">
