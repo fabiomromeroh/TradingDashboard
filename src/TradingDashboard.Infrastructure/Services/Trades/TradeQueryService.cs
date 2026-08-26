@@ -97,14 +97,14 @@ namespace TradingDashboard.Infrastructure.Services.Trades
             return new PaginatedResult<Trade>(items, nextCursor, hasMore, totalCount);
         }
 
-        private string EncodeCursor(DateTimeOffset openedAt, Guid tradeId)
+        private static string EncodeCursor(DateTimeOffset openedAt, Guid tradeId)
         {
             var cursorData = $"{openedAt:O}|{tradeId}";
             var bytes = System.Text.Encoding.UTF8.GetBytes(cursorData);
             return Convert.ToBase64String(bytes);
         }
 
-        private (DateTimeOffset openedAt, Guid tradeId) DecodeCursor(string cursor)
+        private static (DateTimeOffset openedAt, Guid tradeId) DecodeCursor(string cursor)
         {
             try
             {
