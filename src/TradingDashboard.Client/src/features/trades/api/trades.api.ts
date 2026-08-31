@@ -1,5 +1,10 @@
 import apiClient from "../../../lib/apiClient"; // ← was: services/api
-import type { ExecutionDto, TradeDto } from "../types/trade.types";
+import type {
+  CreateTradeEventCommand,
+  ExecutionDto,
+  TradeDto,
+  TradeEventDto,
+} from "../types/trade.types";
 
 export async function getTrades(): Promise<TradeDto[]> {
   return apiClient.get(`/trades`);
@@ -36,6 +41,21 @@ export async function closeTrade(
   exitPrice: number,
 ): Promise<TradeDto> {
   return apiClient.patch(`/trades/${id}/close`, { exitPrice });
+}
+
+// Not called yet — useTradeEvents currently seeds dummy data; swap it to call
+// these once the backend endpoints exist.
+export async function getTradeEvents(
+  tradeId: string,
+): Promise<TradeEventDto[]> {
+  return apiClient.get(`/trades/${tradeId}/events`);
+}
+
+export async function createTradeEvent(
+  tradeId: string,
+  command: CreateTradeEventCommand,
+): Promise<TradeEventDto> {
+  return apiClient.post(`/trades/${tradeId}/events`, command);
 }
 
 export interface TradeStatusBadgeProps {

@@ -14,27 +14,22 @@ export function TradeChart({ candles, height = 500 }: TradeChartProps) {
 
   if (candles.length === 0) {
     return (
-      <div className="trade-chart-empty">
+      <div
+        className="flex items-center justify-center text-sm text-muted-foreground"
+        style={{ height }}
+      >
         No price data available for this trade.
       </div>
     );
   }
 
   return (
-    <div className="trade-chart-wrapper" style={{ position: "relative" }}>
+    <div className="relative">
       <div
         ref={legendRef}
-        className="trade-chart-legend"
-        style={{
-          position: "absolute",
-          top: 8,
-          left: 8,
-          zIndex: 1,
-          opacity: 0,
-          transition: "opacity 0.15s",
-        }}
+        className="pointer-events-none absolute top-2 left-2 z-10 rounded bg-popover/90 px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-xs transition-opacity duration-150"
       />
-      <div ref={containerRef} className="trade-chart-container" />
+      <div ref={containerRef} />
     </div>
   );
 }
